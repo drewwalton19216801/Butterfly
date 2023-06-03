@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ButterflyCS", "ButterflyCS\ButterflyCS.csproj", "{AAE21F01-404D-471F-9430-D3CB25C7652C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharp6502", "Sharp6502\Sharp6502.csproj", "{00D9BFB1-E9F5-4750-AFEB-4490C1C299BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AAE21F01-404D-471F-9430-D3CB25C7652C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAE21F01-404D-471F-9430-D3CB25C7652C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAE21F01-404D-471F-9430-D3CB25C7652C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAE21F01-404D-471F-9430-D3CB25C7652C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00D9BFB1-E9F5-4750-AFEB-4490C1C299BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00D9BFB1-E9F5-4750-AFEB-4490C1C299BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00D9BFB1-E9F5-4750-AFEB-4490C1C299BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00D9BFB1-E9F5-4750-AFEB-4490C1C299BE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB54A563-5981-4D1D-A4E5-26677B5A879F}
+	EndGlobalSection
+EndGlobal
