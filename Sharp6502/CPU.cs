@@ -5,6 +5,17 @@
     /// </summary>
     public class CPU
     {
+        /// <summary>
+        /// The CPU variant (such as 6502, 65C02, etc).
+        /// </summary>
+        /// <remarks>
+        /// Currently only a generic 6502 is supported.
+        /// </remarks>
+        public enum CPUVariant
+        {
+            Generic
+        }
+
         public Registers registers = new Registers(0, 0, 0, 0xFD, 0, 0);
         public Memory memory = new();
 
