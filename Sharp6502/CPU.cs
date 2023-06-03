@@ -30,9 +30,14 @@
 
         public Registers registers = new(0, 0, 0, 0xFD, 0, 0);
         public Memory memory = new();
-        public int cyclesRemaining = 0;
+        public byte cycles = 0x00;
+        public ushort addressAbsolute = 0x0000;
+        public ushort addressRelative = 0x00;
+        public byte opcode = 0x00;
         public ExecutionState cpuState = ExecutionState.Stopped;
         public Variant cpuVariant = Variant.Generic;
+        public byte fetchedByte = 0x00;
+        
 
         /// <summary>
         /// Gets or sets the clock speed.
@@ -81,6 +86,24 @@
         private void Write(ushort address, byte data)
         {
             memory.Write(address, data);
+        }
+
+        public void Clock()
+        {
+
+        }
+
+        public void IRQ()
+        {
+        }
+
+        public void NMI()
+        {
+        }
+
+        public byte Fetch()
+        {
+            return 0;
         }
 
         /// <summary>

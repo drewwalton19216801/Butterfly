@@ -28,119 +28,272 @@
         /// <summary>
         /// The implied addressing mode.
         /// </summary>
-        /// <returns>0</returns>
-        public static short Implied()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte Implied(CPU cpu)
         {
-            return 0; // No operand
+            // Set the fetched byte to the value of the accumulator
+            cpu.fetchedByte = cpu.registers.A;
+
+            // This mode never uses an extra cycle
+            return 0;
         }
 
         /// <summary>
         /// The accumulator addressing mode.
         /// </summary>
-        /// <returns>0</returns>
-        public static short Accumulator()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte Accumulator(CPU cpu)
         {
-            return 0; // No operand
+            // This mode never uses an extra cycle,
+            // and doesn't need to fetch any data.
+            return 0;
         }
 
         /// <summary>
         /// The immediate addressing mode.
         /// </summary>
-        /// <returns>The immediate address.</returns>
-        public static ushort Immediate(CPU cpu)
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte Immediate(CPU cpu)
         {
-            // Address is the PC + 1
-            return cpu.registers.PC++;
+            // Set the absolute address to the program counter
+            cpu.addressAbsolute = cpu.registers.PC++;
+
+            // This mode never uses an extra cycle
+            return 0;
         }
 
         /// <summary>
         /// The zero page addressing mode.
         /// </summary>
-        /// <returns>The calculated zero page address.</returns>
-        public static ushort ZeroPage()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte ZeroPage(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Set the absolute address to the data at the program counter
+            // and increment the program counter
+            cpu.addressAbsolute = cpu.memory.Read(cpu.registers.PC++);
+            
+            // Increment the program counter
+            cpu.registers.PC++;
+
+            // The zero page addressing mode only uses the first byte of the
+            // address, so we need to mask the address to 0x00FF to get the
+            // correct address.
+            cpu.addressAbsolute &= 0x00FF;
+
+            // This mode never uses an extra cycle
+            return 0;
         }
 
         /// <summary>
         /// The zero page X addressing mode.
         /// </summary>
-        /// <returns>The calculated zero page X address.</returns>
-        public static ushort ZeroPageX()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte ZeroPageX(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Set the absolute address to the data at the program counter + X
+            cpu.addressAbsolute = (ushort)(cpu.memory.Read(cpu.registers.PC++) + cpu.registers.X);
+
+            // Increment the program counter
+            cpu.registers.PC++;
+
+            // The zero page addressing mode only uses the first byte of the
+            // address, so we need to mask the address to 0x00FF to get the
+            // correct address.
+            cpu.addressAbsolute &= 0x00FF;
+            return 0;
         }
 
         /// <summary>
         /// The zero page Y addressing mode.
         /// </summary>
-        /// <returns>The calculated zero page Y address.</returns>
-        public static ushort ZeroPageY()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte ZeroPageY(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Set the absolute address to the data at the program counter + Y
+            cpu.addressAbsolute = (ushort)(cpu.memory.Read(cpu.registers.PC++) + cpu.registers.Y);
+
+            // Increment the program counter
+            cpu.registers.PC++;
+
+            // The zero page addressing mode only uses the first byte of the
+            // address, so we need to mask the address to 0x00FF to get the
+            // correct address.
+            cpu.addressAbsolute &= 0x00FF;
+            return 0;
         }
 
         /// <summary>
         /// The relative addressing mode.
         /// </summary>
-        /// <returns>The calculated relative address.</returns>
-        public static ushort Relative()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte Relative(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Set the relative address to the data at the program counter
+            cpu.addressRelative = cpu.memory.Read(cpu.registers.PC++);
+
+            // Increment the program counter
+            cpu.registers.PC++;
+
+            // If the relative address is negative, we need to sign extend it
+            // to get the correct address.
+            if ((cpu.addressRelative & 0x80) != 0)
+            {
+                cpu.addressRelative |= 0xFF00;
+            }
+
+            // This mode never uses an extra cycle
+            return 0;
         }
 
         /// <summary>
         /// The absolute addressing mode.
         /// </summary>
-        /// <returns>The calculated absolute address.</returns>
-        public static ushort Absolute()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte Absolute(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Get the low byte of the address, and increment the program counter
+            ushort lo = cpu.memory.Read(cpu.registers.PC++);
+
+            // Get the high byte of the address
+            ushort hi = cpu.memory.Read(cpu.registers.PC++);
+
+            // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
+            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+
+            // This mode never uses an extra cycle
+            return 0;
         }
 
         /// <summary>
         /// The absolute X addressing mode.
         /// </summary>
-        /// <returns>The calculated absolute X address.</returns>
-        public static ushort AbsoluteX()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte AbsoluteX(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Get the low byte of the address, and increment the program counter
+            ushort lo = cpu.memory.Read(cpu.registers.PC++);
+
+            // Get the high byte of the address
+            ushort hi = cpu.memory.Read(cpu.registers.PC++);
+
+            // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
+            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+            // Add the X register to the absolute address
+            cpu.addressAbsolute += cpu.registers.X;
+
+            // If the absolute address crosses a page boundary, we need to add an extra cycle
+            if ((cpu.addressAbsolute & 0xFF00) != (hi << 8))
+            {
+                return 1;
+            }
+
+            return 0;
         }
 
         /// <summary>
         /// The absolute Y addressing mode.
         /// </summary>
-        /// <returns>The calculated absolute Y address.</returns>
-        public static ushort AbsoluteY()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte AbsoluteY(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Get the low byte of the address, and increment the program counter
+            ushort lo = cpu.memory.Read(cpu.registers.PC++);
+
+            // Get the high byte of the address
+            ushort hi = cpu.memory.Read(cpu.registers.PC++);
+
+            // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
+            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+            // Add the Y register to the absolute address
+            cpu.addressAbsolute += cpu.registers.Y;
+
+            // If the absolute address crosses a page boundary, we need to add an extra cycle
+            if ((cpu.addressAbsolute & 0xFF00) != (hi << 8))
+            {
+                return 1;
+            }
+
+            return 0;
         }
 
         /// <summary>
         /// The indirect addressing mode.
         /// </summary>
-        /// <returns>The calculated indirect address.</returns>
-        public static ushort Indirect()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte Indirect(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Get the low byte of the address, and increment the program counter
+            ushort ptrLo = cpu.memory.Read(cpu.registers.PC++);
+            // Get the high byte of the address, and increment the program counter
+            ushort ptrHi = cpu.memory.Read(cpu.registers.PC++);
+
+            // Set the pointer address to the high byte shifted left 8 bits OR'd with the low byte
+            ushort ptr = (ushort)((ptrHi << 8) | ptrLo);
+
+            // If the low byte of the pointer is 0xFF, we need to simulate a bug in the 6502
+            // where the high byte of the address is fetched from the low byte of the pointer
+            // and the high byte of the address is fetched from the low byte of the pointer + 1.
+            // Otherwise, we just get the high byte of the address from the pointer + 1.
+            if (ptrLo == 0x00FF)
+            {
+                cpu.addressAbsolute = (ushort)((cpu.memory.Read((ushort)(ptr & 0xFF00)) << 8) | cpu.memory.Read((ushort)(ptr + 0)));
+            } else
+            {
+                cpu.addressAbsolute = (ushort)((cpu.memory.Read((ushort)(ptr + 1)) << 8) | cpu.memory.Read((ushort)(ptr + 0)));
+            }
+
+            // This mode never uses an extra cycle
+            return 0;
+
         }
 
         /// <summary>
         /// The indirect X addressing mode.
         /// </summary>
-        /// <returns>The calculated indirect X address.</returns>
-        public static ushort IndirectX()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte IndirectX(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Store the address of the pointer and increment the program counter
+            ushort ptr = cpu.memory.Read(cpu.registers.PC++);
+
+            // Get the low byte of the address
+            ushort lo = cpu.memory.Read((ushort)((ptr + cpu.registers.X) & 0x00FF));
+            // Get the high byte of the address
+            ushort hi = cpu.memory.Read((ushort)((ptr + cpu.registers.X + 1) & 0x00FF));
+
+            // Set the indirect address to the high byte shifted left 8 bits OR'd with the low byte
+            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+
+            // This mode never uses an extra cycle
+            return 0;
         }
 
         /// <summary>
         /// The indirect y addressing mode.
         /// </summary>
-        /// <returns>The calculated indirect Y address.</returns>
-        public static ushort IndirectY()
+        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
+        public static byte IndirectY(CPU cpu)
         {
-            throw new NotImplementedException();
+            // Store the address of the pointer and increment the program counter
+            ushort ptr = cpu.memory.Read(cpu.registers.PC++);
+
+            // Get the low byte of the address
+            ushort lo = cpu.memory.Read((ushort)(ptr & 0x00FF));
+            // Get the high byte of the address
+            ushort hi = cpu.memory.Read((ushort)((ptr + 1) & 0x00FF));
+
+            // Set the indirect address to the high byte shifted left 8 bits OR'd with the low byte
+            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+            // Add the Y register to the indirect address
+            cpu.addressAbsolute += cpu.registers.Y;
+
+            // If the indirect address crosses a page boundary, we need to add an extra cycle
+            if ((cpu.addressAbsolute & 0xFF00) != (hi << 8))
+            {
+                return 1;
+            }
+
+            return 0;
         }
     }
 }
