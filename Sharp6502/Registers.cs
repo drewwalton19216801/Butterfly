@@ -42,7 +42,7 @@
         /// These are the bitmasks for the status flags in the P register. They
         /// are used to set and clear the flags.
         /// </remarks>
-        public enum Flags
+        public enum Flags : byte
         {
             None = 0,
             Carry = 1 << 0,
