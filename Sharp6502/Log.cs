@@ -9,7 +9,7 @@ namespace Sharp6502
     /// <summary>
     /// Logging subsystem.
     /// </summary>
-    internal static class Log
+    public static class Log
     {
         /// <summary>
         /// An informational message.

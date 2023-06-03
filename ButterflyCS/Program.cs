@@ -3,6 +3,9 @@ using Sharp6502;
 
 namespace ButterflyCS
 {
+    /// <summary>
+    /// The program.
+    /// </summary>
     public static class Program
     {
         /// <summary>
@@ -12,9 +15,9 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static Task Main(string[] args)
         {
-            // Initialize the 6502 CPU
-            CPU cpu = new CPU();
-            cpu.Reset();
+            // Initialize the machine
+            Machine machine = new();
+            machine.Reset();
 
             Raylib.InitWindow(800, 600, "ButterflyCS");
             Raylib.SetTargetFPS(60);
