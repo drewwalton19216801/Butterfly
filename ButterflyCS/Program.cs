@@ -1,5 +1,4 @@
 ﻿using Raylib_CsLo;
-using Sharp6502;
 
 namespace ButterflyCS
 {
