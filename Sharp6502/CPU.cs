@@ -11,13 +11,38 @@
         /// <remarks>
         /// Currently only a generic 6502 is supported.
         /// </remarks>
-        public enum CPUVariant
+        public enum Variant
         {
             Generic
         }
 
+        /// <summary>
+        /// The CPU execution state.
+        /// </summary>
+        public enum ExecutionState
+        {
+            Stopped,
+            Fetching,
+            Executing,
+            Interrupt,
+            IllegalOpcode
+        }
+
         public Registers registers = new(0, 0, 0, 0xFD, 0, 0);
         public Memory memory = new();
+        public int cyclesRemaining = 0;
+        public ExecutionState cpuState = ExecutionState.Stopped;
+        public Variant cpuVariant = Variant.Generic;
+
+        /// <summary>
+        /// Gets or sets the clock speed.
+        /// </summary>
+        public double clockSpeed { get; set; } = 0; // Hz
+
+        /// <summary>
+        /// Gets or sets the current instruction.
+        /// </summary>
+        public Instruction? CurrentInstruction { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CPU"/> class.
