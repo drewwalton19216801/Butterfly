@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Sharp6502
 {
+    /// <summary>
+    /// The instruction set.
+    /// </summary>
     public static class InstructionSet
     {
         public static readonly Instruction[] Instructions =
@@ -274,6 +277,11 @@ namespace Sharp6502
             new Instruction(name: "TYA", opcode: 0x98, length: 1, cycles: 2, canTakeExtraCycles: false, addressingMode: Addressing.Implied),
         };
 
+        /// <summary>
+        /// Decodes an opcode into an Instruction.
+        /// </summary>
+        /// <param name="opcode">The opcode.</param>
+        /// <returns>The Instruction.</returns>
         public static Instruction Decode(byte opcode)
         {
             foreach(Instruction instruction in Instructions)
