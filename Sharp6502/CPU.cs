@@ -120,5 +120,91 @@
             registers.P = (byte)(Registers.Flags.None | Registers.Flags.Unused);
             Log.Info("CPU", "CPU reset complete.");
         }
+
+        /// <summary>
+        /// Disassembles the instruction at the specified address.
+        /// </summary>
+        /// <param name="address">The address.</param>
+        /// <returns>Ths disassembled instruction.</returns>
+        public string Disassemble(ushort address)
+        {
+            // Read the instruction at the specified address.
+            byte opcode = Read(address);
+
+            // Get the instruction.
+            Instruction instruction = InstructionSet.Decode(opcode);
+
+            // Return the disassembled instruction.
+            return Disassemble(instruction);
+        }
+
+        /// <summary>
+        /// Disassembles an instruction.
+        /// </summary>
+        /// <param name="instruction">The instruction.</param>
+        /// <returns>The disassembled instruction.</returns>
+        public string Disassemble(Instruction instruction)
+        {
+            // Get the instruction's address mode.
+            Addressing addressingMode = instruction.AddressingMode;
+
+            ushort operand;
+            string operandString = string.Empty;
+
+            // Get the string representation of the operand.
+            switch (addressingMode)
+            {
+                case Addressing.Immediate:
+                    operand = Read((ushort)(registers.PC + 1));
+                    operandString = $"#${operand:X2}";
+                    break;
+                case Addressing.ZeroPage:
+                    operand = Read((ushort)(registers.PC + 1));
+                    operandString = $"${operand:X2}";
+                    break;
+                case Addressing.ZeroPageX:
+                    operand = Read((ushort)(registers.PC + 1));
+                    operandString = $"${operand:X2},X";
+                    break;
+                case Addressing.ZeroPageY:
+                    operand = Read((ushort)(registers.PC + 1));
+                    operandString = $"${operand:X2},Y";
+                    break;
+                case Addressing.Absolute:
+                    operand = ReadWord((ushort)(registers.PC + 1));
+                    operandString = $"${operand:X4}";
+                    break;
+                case Addressing.AbsoluteX:
+                    operand = ReadWord((ushort)(registers.PC + 1));
+                    operandString = $"${operand:X4},X";
+                    break;
+                case Addressing.AbsoluteY:
+                    operand = ReadWord((ushort)(registers.PC + 1));
+                    operandString = $"${operand:X4},Y";
+                    break;
+                case Addressing.Indirect:
+                    operand = ReadWord((ushort)(registers.PC + 1));
+                    operandString = $"(${operand:X4})";
+                    break;
+                case Addressing.IndirectX:
+                    operand = Read((ushort)(registers.PC + 1));
+                    operandString = $"(${operand:X2},X)";
+                    break;
+                case Addressing.IndirectY:
+                    operand = Read((ushort)(registers.PC + 1));
+                    operandString = $"(${operand:X2}),Y";
+                    break;
+                case Addressing.Relative:
+                    operand = Read((ushort)(registers.PC + 1));
+                    operandString = $"${operand:X2}";
+                    break;
+                case Addressing.Accumulator:
+                    operandString = "A";
+                    break;
+            }
+
+            // Return the disassembled instruction.
+            return $"{instruction.Name} {operandString}";
+        }
     }
 }
