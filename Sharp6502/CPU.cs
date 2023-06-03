@@ -16,7 +16,7 @@
             Generic
         }
 
-        public Registers registers = new Registers(0, 0, 0, 0xFD, 0, 0);
+        public Registers registers = new(0, 0, 0, 0xFD, 0, 0);
         public Memory memory = new();
 
         /// <summary>
