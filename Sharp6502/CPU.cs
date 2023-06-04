@@ -88,22 +88,46 @@
             memory.Write(address, data);
         }
 
+        /// <summary>
+        /// Runs the CPU for one clock cycle.
+        /// </summary>
         public void Clock()
         {
 
         }
 
+        /// <summary>
+        /// Emits an interrupt request.
+        /// </summary>
         public void IRQ()
         {
         }
 
+        /// <summary>
+        /// Emits a non-maskable interrupt request.
+        /// </summary>
         public void NMI()
         {
         }
 
+        /// <summary>
+        /// Fetches the next byte from memory.
+        /// </summary>
+        /// <returns>The data.</returns>
+        /// <remarks>
+        /// This method fetches the next byte from memory. If the current instruction is an implied instruction, no byte is fetched.
+        /// </remarks>
         public byte Fetch()
         {
-            return 0;
+            if (CurrentInstruction == null)
+            {
+                throw new InvalidOperationException("Cannot fetch instruction when no instruction is set.");
+            } else if (!(CurrentInstruction.AddressingMode == Addressing.Implied))
+            {
+                fetchedByte = Read(addressAbsolute);
+            }
+
+            return fetchedByte;
         }
 
         /// <summary>
