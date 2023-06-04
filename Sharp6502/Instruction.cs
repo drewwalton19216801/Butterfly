@@ -23,7 +23,7 @@
         /// <summary>
         /// The number of cycles the instruction takes to execute.
         /// </summary>
-        public uint Cycles { get; set; }
+        public byte Cycles { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instruction can take extra cycles.
@@ -47,7 +47,7 @@
         /// <param name="cycles">The cycles.</param>
         /// <param name="canTakeExtraCycles">If true, can take extra cycles.</param>
         /// <param name="addressingMode">The addressing mode.</param>
-        public Instruction(string name, byte opcode, uint length, uint cycles, bool canTakeExtraCycles, Addressing addressingMode)
+        public Instruction(string name, byte opcode, uint length, byte cycles, bool canTakeExtraCycles, Addressing addressingMode)
         {
             Name = name;
             Opcode = opcode;
