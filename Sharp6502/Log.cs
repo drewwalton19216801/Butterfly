@@ -16,6 +16,8 @@
             Debug
         }
 
+        public static bool DebugEnabled = true;
+
         /// <summary>
         /// An informational message.
         /// </summary>
@@ -53,7 +55,10 @@
         /// <param name="message">The message.</param>
         public static void Debug(string subsystem, string message)
         {
-            LogMessage(LogType.Debug, subsystem, message);
+            if (DebugEnabled)
+            {
+                LogMessage(LogType.Debug, subsystem, message);
+            }
         }
 
         /// <summary>

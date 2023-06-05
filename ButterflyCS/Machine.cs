@@ -25,7 +25,7 @@ namespace ButterflyCS
         /// </summary>
         public Machine()
         {
-            Log.Info(subsystem, "Machine created.");
+            Log.Debug(subsystem, "Machine created.");
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ButterflyCS
         /// </summary>
         public void Cycle()
         {
-            Log.Info(subsystem, "Running a single machine cycle.");
+            Log.Debug(subsystem, "Running a single machine cycle.");
             cpu.Clock();
         }
 
@@ -42,9 +42,9 @@ namespace ButterflyCS
         /// </summary>
         public void Reset()
         {
-            Log.Info(subsystem, "Resetting machine to power-up state.");
+            Log.Debug(subsystem, "Resetting machine to power-up state.");
             cpu.Reset();
-            Log.Info(subsystem, "Machine reset complete.");
+            Log.Debug(subsystem, "Machine reset complete.");
         }
 
         /// <summary>
@@ -86,13 +86,13 @@ namespace ButterflyCS
         /// </remarks>
         public void LoadProgram(string filename, ushort address)
         {
-            Log.Info(subsystem, $"Loading program {filename} into memory at address {address:X4}.");
+            Log.Debug(subsystem, $"Loading program {filename} into memory at address {address:X4}.");
             byte[] program = File.ReadAllBytes(filename);
             for (int i = 0; i < program.Length; i++)
             {
                 cpu.memory.data[address + i] = program[i];
             }
-            Log.Info(subsystem, $"Program {filename} loaded into memory at address {address:X4}.");
+            Log.Debug(subsystem, $"Program {filename} loaded into memory at address {address:X4}.");
         }
     }
 }
