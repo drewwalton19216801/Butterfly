@@ -1,6 +1,26 @@
 ﻿namespace Sharp6502
 {
     /// <summary>
+    /// The status flag bitmasks.
+    /// </summary>
+    /// <remarks>
+    /// These are the bitmasks for the status flags in the P register. They
+    /// are used to set and clear the flags.
+    /// </remarks>
+    public enum CPUFlags : byte
+    {
+        None = 0,
+        Carry = 1 << 0,
+        Zero = 1 << 1,
+        InterruptDisable = 1 << 2,
+        Decimal = 1 << 3,
+        Break = 1 << 4,
+        Unused = 1 << 5,
+        Overflow = 1 << 6,
+        Negative = 1 << 7
+    }
+
+    /// <summary>
     /// The 6502 microprocessor registers.
     /// </summary>
     public class Registers
@@ -36,26 +56,6 @@
         public byte P { get; set; }
 
         /// <summary>
-        /// The status flag bitmasks.
-        /// </summary>
-        /// <remarks>
-        /// These are the bitmasks for the status flags in the P register. They
-        /// are used to set and clear the flags.
-        /// </remarks>
-        public enum Flags : byte
-        {
-            None = 0,
-            Carry = 1 << 0,
-            Zero = 1 << 1,
-            InterruptDisable = 1 << 2,
-            Decimal = 1 << 3,
-            Break = 1 << 4,
-            Unused = 1 << 5,
-            Overflow = 1 << 6,
-            Negative = 1 << 7
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Registers"/> class.
         /// </summary>
         public Registers(byte a, byte x, byte y, byte sp, ushort pc, byte p)
@@ -73,7 +73,7 @@
         /// </summary>
         /// <param name="flag">The flag to set.</param>
         /// <param name="value">The value to set the flag to.</param>
-        public void SetFlag(Flags flag, bool value)
+        public void SetFlag(CPUFlags flag, bool value)
         {
             if (value)
             {
@@ -90,7 +90,7 @@
         /// </summary>
         /// <param name="flag">The flag to get.</param>
         /// <returns>The flag value.</returns>
-        public bool GetFlag(Flags flag)
+        public bool GetFlag(CPUFlags flag)
         {
             return (P & (byte)flag) != 0;
         }

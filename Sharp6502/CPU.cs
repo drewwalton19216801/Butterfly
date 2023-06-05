@@ -121,7 +121,7 @@ namespace Sharp6502
                 Log.Debug("CPU", $"Opcode: {opcode:X2}");
 
                 // Always set the unused flag to 1.
-                registers.SetFlag(Registers.Flags.Unused, true);
+                registers.SetFlag(CPUFlags.Unused, true);
 
                 // Decode the instruction
                 CurrentInstruction = InstructionSet.Decode(opcode);
@@ -148,7 +148,7 @@ namespace Sharp6502
                 cycles += (byte)(addressingUsedExtraCycle & instructionUsedExtraCycle);
 
                 // Set the unused flag to 1
-                registers.SetFlag(Registers.Flags.Unused, true);
+                registers.SetFlag(CPUFlags.Unused, true);
             }
 
             // Decrement the number of cycles remaining for this instruction
@@ -161,7 +161,7 @@ namespace Sharp6502
         public void IRQ()
         {
             // Make sure interrupts are enabled
-            if (registers.GetFlag(Registers.Flags.InterruptDisable) == false)
+            if (registers.GetFlag(CPUFlags.InterruptDisable) == false)
             {
                 // Push the program counter to the stack
                 Write((ushort)(0x0100 + registers.SP), (byte)((registers.PC >> 8) & 0x00FF));
@@ -170,9 +170,9 @@ namespace Sharp6502
                 registers.SP--;
 
                 // Push the status register to the stack
-                registers.SetFlag(Registers.Flags.Break, false);
-                registers.SetFlag(Registers.Flags.Unused, true);
-                registers.SetFlag(Registers.Flags.InterruptDisable, true);
+                registers.SetFlag(CPUFlags.Break, false);
+                registers.SetFlag(CPUFlags.Unused, true);
+                registers.SetFlag(CPUFlags.InterruptDisable, true);
                 Write((ushort)(0x0100 + registers.SP), registers.P);
                 registers.SP--;
 
@@ -199,9 +199,9 @@ namespace Sharp6502
             registers.SP--;
 
             // Set the break flag to 0, unused and interrupt to 1
-            registers.SetFlag(Registers.Flags.Break, false);
-            registers.SetFlag(Registers.Flags.Unused, true);
-            registers.SetFlag(Registers.Flags.InterruptDisable, true);
+            registers.SetFlag(CPUFlags.Break, false);
+            registers.SetFlag(CPUFlags.Unused, true);
+            registers.SetFlag(CPUFlags.InterruptDisable, true);
 
             // Push the status register to the stack
             Write((ushort)(0x0100 + registers.SP), registers.P);
@@ -257,21 +257,21 @@ namespace Sharp6502
             registers.Y = 0;
             registers.SP = 0xFD;
             registers.PC = ReadWord(0xFFFC); // Read the PC from the reset vector.
-            registers.P = (byte)(Registers.Flags.None | Registers.Flags.Unused);
+            registers.P = (byte)(CPUFlags.None | CPUFlags.Unused);
             cycles = 8;
             Log.Debug("CPU_RESET", "CPU reset complete.");
 
             // assemble a string representing the current register values (except the status register)
             string registersString = string.Format("A:{0:X2} X:{1:X2} Y:{2:X2} SP:{3:X2} PC:{4:X4}", registers.A, registers.X, registers.Y, registers.SP, registers.PC);
             // now assemble a string representing the current status register values as individual bits
-            string statusString = string.Format("NV-BDIZC", registers.GetFlag(Registers.Flags.Negative) ? 'N' : 'n',
-                registers.GetFlag(Registers.Flags.Overflow) ? 'V' : 'v',
-                registers.GetFlag(Registers.Flags.Unused) ? 'U' : 'u',
-                registers.GetFlag(Registers.Flags.Break) ? 'B' : 'b',
-                registers.GetFlag(Registers.Flags.Decimal) ? 'D' : 'd',
-                registers.GetFlag(Registers.Flags.InterruptDisable) ? 'I' : 'i',
-                registers.GetFlag(Registers.Flags.Zero) ? 'Z' : 'z',
-                registers.GetFlag(Registers.Flags.Carry) ? 'C' : 'c');
+            string statusString = string.Format("NV-BDIZC", registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
+                registers.GetFlag(CPUFlags.Overflow) ? 'V' : 'v',
+                registers.GetFlag(CPUFlags.Unused) ? 'U' : 'u',
+                registers.GetFlag(CPUFlags.Break) ? 'B' : 'b',
+                registers.GetFlag(CPUFlags.Decimal) ? 'D' : 'd',
+                registers.GetFlag(CPUFlags.InterruptDisable) ? 'I' : 'i',
+                registers.GetFlag(CPUFlags.Zero) ? 'Z' : 'z',
+                registers.GetFlag(CPUFlags.Carry) ? 'C' : 'c');
 
             // Assemble the final string, with the register values and status register bits on separate lines
             string finalString = string.Format("{0} {1}", registersString, statusString);

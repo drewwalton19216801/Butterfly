@@ -158,7 +158,7 @@ namespace Sharp6502
             cpu.registers.PC++;
 
             // Set the interrupt flag
-            cpu.registers.SetFlag(Registers.Flags.InterruptDisable, true);
+            cpu.registers.SetFlag(CPUFlags.InterruptDisable, true);
 
             // Push the PC to the stack (high byte first)
             cpu.PushStack((byte)(cpu.registers.PC >> 8 & 0x00FF));
@@ -166,13 +166,13 @@ namespace Sharp6502
             cpu.PushStack((byte)(cpu.registers.PC & 0x00FF));
 
             // Set the break flag
-            cpu.registers.SetFlag(Registers.Flags.Break, true);
+            cpu.registers.SetFlag(CPUFlags.Break, true);
 
             // Push the status register to the stack
             cpu.PushStack(cpu.registers.P);
 
             // Clear the break flag
-            cpu.registers.SetFlag(Registers.Flags.Break, false);
+            cpu.registers.SetFlag(CPUFlags.Break, false);
 
             // Set the PC to the data at the interrupt vector
             cpu.registers.PC = (ushort)(cpu.memory.Read(0xFFFE) | cpu.memory.Read(0xFFFF) << 8);
@@ -379,10 +379,10 @@ namespace Sharp6502
             cpu.registers.A = cpu.fetchedByte;
 
             // Set the zero flag if the accumulator is zero
-            cpu.registers.SetFlag(Registers.Flags.Zero, cpu.registers.A == 0);
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.A == 0);
 
             // Set the negative flag if the accumulator is negative
-            cpu.registers.SetFlag(Registers.Flags.Negative, (cpu.registers.A & 0x80) > 0);
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.A & 0x80) > 0);
 
             // Return 1 since this instruction uses an extra cycle
             return 1;
@@ -402,10 +402,10 @@ namespace Sharp6502
             cpu.registers.X = cpu.fetchedByte;
 
             // Set the zero flag if the X register is zero
-            cpu.registers.SetFlag(Registers.Flags.Zero, cpu.registers.X == 0);
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.X == 0);
 
             // Set the negative flag if the X register is negative
-            cpu.registers.SetFlag(Registers.Flags.Negative, (cpu.registers.X & 0x80) > 0);
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.X & 0x80) > 0);
 
             // Return 1 since this instruction uses an extra cycle
             return 1;
@@ -425,10 +425,10 @@ namespace Sharp6502
             cpu.registers.Y = cpu.fetchedByte;
 
             // Set the zero flag if the Y register is zero
-            cpu.registers.SetFlag(Registers.Flags.Zero, cpu.registers.Y == 0);
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.Y == 0);
 
             // Set the negative flag if the Y register is negative
-            cpu.registers.SetFlag(Registers.Flags.Negative, (cpu.registers.Y & 0x80) > 0);
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.Y & 0x80) > 0);
 
             // Return 1 since this instruction uses an extra cycle
             return 1;
@@ -605,6 +605,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte STX(CPU cpu)
         {
+            // Write the X register to memory
+            cpu.memory.Write(cpu.addressAbsolute, cpu.registers.X);
+
+            // No extra cycle
             return 0;
         }
 
@@ -615,6 +619,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte STY(CPU cpu)
         {
+            // Write the Y register to memory
+            cpu.memory.Write(cpu.addressAbsolute, cpu.registers.Y);
+
+            // No extra cycle
             return 0;
         }
 
@@ -625,6 +633,11 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte TAX(CPU cpu)
         {
+            // Copy the accumulator to the X register
+            cpu.registers.X = cpu.registers.A;
+            
+            // Set the zero flag if the result is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.X == 0x00);
             return 0;
         }
 
