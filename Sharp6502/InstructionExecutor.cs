@@ -638,6 +638,11 @@ namespace Sharp6502
             
             // Set the zero flag if the result is zero
             cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.X == 0x00);
+
+            // Set the negative flag if bit 7 is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.X & 0x80) > 0);
+
+            // No extra cycle
             return 0;
         }
 
@@ -648,6 +653,16 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte TAY(CPU cpu)
         {
+            // Copy the accumulator to the Y register
+            cpu.registers.Y = cpu.registers.A;
+
+            // Set the zero flag if the result is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.Y == 0x00);
+
+            // Set the negative flag if bit 7 is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.Y & 0x80) > 0);
+
+            // No extra cycle
             return 0;
         }
 
@@ -658,6 +673,16 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte TSX(CPU cpu)
         {
+            // Copy the stack pointer to the X register
+            cpu.registers.X = cpu.registers.SP;
+
+            // Set the zero flag if the result is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.X == 0x00);
+
+            // Set the negative flag if bit 7 is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.X & 0x80) > 0);
+
+            // No extra cycle
             return 0;
         }
 
@@ -668,6 +693,16 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte TXA(CPU cpu)
         {
+            // Copy the X register to the accumulator
+            cpu.registers.A = cpu.registers.X;
+
+            // Set the zero flag if the result is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.A == 0x00);
+
+            // Set the negative flag if bit 7 is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.A & 0x80) > 0);
+
+            // No extra cycle
             return 0;
         }
 
@@ -678,6 +713,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte TXS(CPU cpu)
         {
+            // Copy the X register to the stack pointer
+            cpu.registers.SP = cpu.registers.X;
+
+            // No extra cycle
             return 0;
         }
 
@@ -688,6 +727,16 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte TYA(CPU cpu)
         {
+            // Copy the Y register to the accumulator
+            cpu.registers.A = cpu.registers.Y;
+
+            // Set the zero flag if the result is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.A == 0x00);
+
+            // Set the negative flag if bit 7 is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.A & 0x80) > 0);
+
+            // No extra cycle
             return 0;
         }
 
