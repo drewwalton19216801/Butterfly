@@ -1,10 +1,52 @@
-﻿namespace Sharp6502
+﻿using System.Reflection;
+
+namespace Sharp6502
 {
     /// <summary>
     /// The instruction execution engine
     /// </summary>
     public static class InstructionExecutor
     {
+        /// <summary>
+        /// Executes the instruction.
+        /// </summary>
+        /// <param name="cpu">The CPU object</param>
+        /// <returns>1 if an additional cycle was used, otherwise 0</returns>
+        public static byte ExecuteInstruction(CPU cpu)
+        {
+            // This is extremely hacky, but it works
+            // --------------------------------------
+            // We're going to use reflection to get the method that corresponds to the instruction name
+            // and then invoke it. This is a lot faster than a switch statement, and it's a lot easier
+            // to maintain.
+            // --------------------------------------
+
+            // Get the instruction name
+            string instructionName = cpu.CurrentInstruction?.Name ?? "???";
+
+            // Get the method
+            MethodInfo? method = typeof(InstructionExecutor).GetMethod(instructionName, BindingFlags.Public | BindingFlags.Static);
+
+            if (method == null)
+            {
+                // The method doesn't exist, so we'll throw an exception
+                throw new InvalidOperationException($"The instruction \"{instructionName}\" does not exist.");
+            }
+
+            // Invoke the method
+            object result = (byte)method.Invoke(null, new object[] { cpu });
+
+            // Handle the result
+            if (result is byte byteResult)
+            {
+                return byteResult;
+            }
+            else
+            {
+                throw new InvalidOperationException($"The instruction \"{instructionName}\" returned an invalid result.");
+            }
+        }
+
         /// <summary>
         /// The ADC (Add with Carry) instruction.
         /// </summary>
@@ -112,6 +154,30 @@
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte BRK(CPU cpu)
         {
+            // Increment the PC
+            cpu.registers.PC++;
+
+            // Set the interrupt flag
+            cpu.registers.SetFlag(Registers.Flags.InterruptDisable, true);
+
+            // Push the PC to the stack (high byte first)
+            cpu.PushStack((byte)(cpu.registers.PC >> 8 & 0x00FF));
+            // Push the PC to the stack (low byte last)
+            cpu.PushStack((byte)(cpu.registers.PC & 0x00FF));
+
+            // Set the break flag
+            cpu.registers.SetFlag(Registers.Flags.Break, true);
+
+            // Push the status register to the stack
+            cpu.PushStack(cpu.registers.P);
+
+            // Clear the break flag
+            cpu.registers.SetFlag(Registers.Flags.Break, false);
+
+            // Set the PC to the data at the interrupt vector
+            cpu.registers.PC = (ushort)(cpu.memory.Read(0xFFFE) | cpu.memory.Read(0xFFFF) << 8);
+
+            // Return 0 cycles
             return 0;
         }
 
@@ -282,6 +348,10 @@
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte JMP(CPU cpu)
         {
+            // Set the PC to the absolute address of the operand
+            cpu.registers.PC = cpu.addressAbsolute;
+            
+            // Return 0 because the instruction did not use an extra cycle
             return 0;
         }
 
@@ -302,7 +372,20 @@
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte LDA(CPU cpu)
         {
-            return 0;
+            // Fetch the next byte from memory
+            cpu.Fetch();
+
+            // Load the fetched byte into the accumulator
+            cpu.registers.A = cpu.fetchedByte;
+
+            // Set the zero flag if the accumulator is zero
+            cpu.registers.SetFlag(Registers.Flags.Zero, cpu.registers.A == 0);
+
+            // Set the negative flag if the accumulator is negative
+            cpu.registers.SetFlag(Registers.Flags.Negative, (cpu.registers.A & 0x80) > 0);
+
+            // Return 1 since this instruction uses an extra cycle
+            return 1;
         }
 
         /// <summary>
@@ -312,7 +395,20 @@
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte LDX(CPU cpu)
         {
-            return 0;
+            // Fetch the next byte from memory
+            cpu.Fetch();
+
+            // Load the fetched byte into the X register
+            cpu.registers.X = cpu.fetchedByte;
+
+            // Set the zero flag if the X register is zero
+            cpu.registers.SetFlag(Registers.Flags.Zero, cpu.registers.X == 0);
+
+            // Set the negative flag if the X register is negative
+            cpu.registers.SetFlag(Registers.Flags.Negative, (cpu.registers.X & 0x80) > 0);
+
+            // Return 1 since this instruction uses an extra cycle
+            return 1;
         }
 
         /// <summary>
@@ -322,7 +418,20 @@
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte LDY(CPU cpu)
         {
-            return 0;
+            // Fetch the next byte from memory
+            cpu.Fetch();
+
+            // Load the fetched byte into the Y register
+            cpu.registers.Y = cpu.fetchedByte;
+
+            // Set the zero flag if the Y register is zero
+            cpu.registers.SetFlag(Registers.Flags.Zero, cpu.registers.Y == 0);
+
+            // Set the negative flag if the Y register is negative
+            cpu.registers.SetFlag(Registers.Flags.Negative, (cpu.registers.Y & 0x80) > 0);
+
+            // Return 1 since this instruction uses an extra cycle
+            return 1;
         }
 
         /// <summary>
@@ -482,6 +591,10 @@
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte STA(CPU cpu)
         {
+            // Write the accumulator to memory
+            cpu.memory.Write(cpu.addressAbsolute, cpu.registers.A);
+
+            // No extra cycle
             return 0;
         }
 

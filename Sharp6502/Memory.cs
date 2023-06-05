@@ -101,7 +101,7 @@
             }
 
             // Log the read
-            string msg = $"Read called at address {address:X4}";
+            string msg = $"Read called at address {address:X4}, got data {data[address]:X2}";
             Log.Info(subsystem, msg);
 
             // No hooks, so we read from main memory
@@ -118,7 +118,7 @@
             data[address] = value;
 
             // Log the write
-            string msg = $"Write called at address {address:X4}";
+            string msg = $"Write called at address {address:X4}, with data {value:X2}";
             Log.Info(subsystem, msg);
 
             // Check for write hooks

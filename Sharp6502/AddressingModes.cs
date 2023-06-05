@@ -26,6 +26,47 @@
     public static class AddressingModes
     {
         /// <summary>
+        /// Gets the address of an instruction.
+        /// </summary>
+        /// <param name="cpu">The CPU object</param>
+        /// <param name="addressingMode">The addressing mode.</param>
+        /// <returns>A byte.</returns>
+        public static byte GetAddress(CPU cpu, Addressing addressingMode)
+        {
+            switch (addressingMode)
+            {
+                case Addressing.Implied:
+                    return Implied(cpu);
+                case Addressing.Accumulator:
+                    return Accumulator(cpu);
+                case Addressing.Immediate:
+                    return Immediate(cpu);
+                case Addressing.ZeroPage:
+                    return ZeroPage(cpu);
+                case Addressing.ZeroPageX:
+                    return ZeroPageX(cpu);
+                case Addressing.ZeroPageY:
+                    return ZeroPageY(cpu);
+                case Addressing.Relative:
+                    return Relative(cpu);
+                case Addressing.Absolute:
+                    return Absolute(cpu);
+                case Addressing.AbsoluteX:
+                    return AbsoluteX(cpu);
+                case Addressing.AbsoluteY:
+                    return AbsoluteY(cpu);
+                case Addressing.Indirect:
+                    return Indirect(cpu);
+                case Addressing.IndirectX:
+                    return IndirectX(cpu);
+                case Addressing.IndirectY:
+                    return IndirectY(cpu);
+                default:
+                    throw new Exception("Invalid addressing mode.");
+            }
+        }
+
+        /// <summary>
         /// The implied addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>

@@ -287,7 +287,7 @@
             }
 
             // If we get here, we have an invalid opcode
-            return new Instruction(name: "???", opcode: 0xFF, length: 1, cycles: 1, canTakeExtraCycles: false, addressingMode: Addressing.Implied);
+            return new Instruction(name: "XXX", opcode: 0xFF, length: 1, cycles: 1, canTakeExtraCycles: false, addressingMode: Addressing.Implied);
         }
     }
 }

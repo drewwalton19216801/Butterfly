@@ -14,8 +14,11 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static Task Main(string[] args)
         {
+            int instructionsToExecute = 4;
+
             // Initialize the machine
             Machine machine = new();
+            machine.LoadDemoProgram();
             machine.Reset();
 
             Raylib.InitWindow(800, 600, "ButterflyCS");
@@ -23,6 +26,13 @@ namespace ButterflyCS
             // Main emulator loop
             while (!Raylib.WindowShouldClose())
             {
+                if (instructionsToExecute > 0)
+                {
+                    // Execute the next instruction
+                    machine.Cycle();
+                    instructionsToExecute--;
+                }
+
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Raylib.GREEN);
                 Raylib.DrawFPS(10, 10);
