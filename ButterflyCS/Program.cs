@@ -1,4 +1,5 @@
 ﻿using Raylib_CsLo;
+using Sharp6502;
 
 namespace ButterflyCS
 {
@@ -14,7 +15,7 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static Task Main(string[] args)
         {
-            int instructionsToExecute = 4;
+            int cyclesToExecute = 14;
 
             // Initialize the machine
             Machine machine = new();
@@ -26,11 +27,11 @@ namespace ButterflyCS
             // Main emulator loop
             while (!Raylib.WindowShouldClose())
             {
-                if (instructionsToExecute > 0)
+                if (cyclesToExecute > 0)
                 {
                     // Execute the next instruction
                     machine.Cycle();
-                    instructionsToExecute--;
+                    cyclesToExecute--;
                 }
 
                 Raylib.BeginDrawing();
@@ -39,6 +40,13 @@ namespace ButterflyCS
                 Raylib.DrawText("Raylib_CsLo", 10, 30, 20, Raylib.WHITE);
                 Raylib.EndDrawing();
             }
+
+            // Log the state of the A register
+            Log.Info(Machine.subsystem, $"A register: {machine.cpu.registers.A}");
+
+            // Log the state of memory address 0x0200
+            Log.Info(Machine.subsystem, $"Memory address 0x0200: {machine.cpu.memory.Read(0x200)}");
+
             Raylib.CloseWindow();
             return Task.CompletedTask;
         }

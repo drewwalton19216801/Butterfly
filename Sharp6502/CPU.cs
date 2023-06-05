@@ -96,6 +96,9 @@ namespace Sharp6502
         /// </summary>
         public void Clock()
         {
+            // Log the current cycles
+            Log.Info("CPU", $"Cycles: {cycles}");
+
             /*
              * Instructions can require a variable number of clock cycles to execute. The number of cycles required is stored in the instruction's
              * definition. The number of cycles remaining is stored in the CPU's cycles field. When the cycles field reaches zero, the instruction
@@ -147,12 +150,12 @@ namespace Sharp6502
                 // Set the unused flag to 1
                 registers.SetFlag(Registers.Flags.Unused, true);
 
-                // Decrement the number of cycles remaining for this instruction
-                cycles--;
-
                 // Log the execution state
                 Log.Info("CPU", "Instruction complete.");
             }
+
+            // Decrement the number of cycles remaining for this instruction
+            cycles--;
         }
 
         /// <summary>
