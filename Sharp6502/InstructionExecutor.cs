@@ -624,6 +624,8 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte SBC(CPU cpu)
         {
+            // TODO: implement decimal mode
+
             // Fetch the next byte from memory
             cpu.Fetch();
 
