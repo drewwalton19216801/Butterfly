@@ -54,7 +54,31 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte ADC(CPU cpu)
         {
-            return 0;
+            // TODO: Implement decimal mode
+
+            // Fetch the data to add
+            cpu.Fetch();
+
+            // We need perform the addition in 16-bit mode so we can detect the carry bit
+            ushort result = (ushort)(cpu.registers.A + cpu.fetchedByte + (cpu.registers.GetFlag(CPUFlags.Carry) ? 1 : 0));
+
+            // Set the carry flag if the result is greater than 255
+            cpu.registers.SetFlag(CPUFlags.Carry, result > 255);
+
+            // Set the zero flag if the result is 0
+            cpu.registers.SetFlag(CPUFlags.Zero, (result & 0x00FF) == 0);
+
+            // Set the overflow flag if the result is greater than 127 or less than -128
+            cpu.registers.SetFlag(CPUFlags.Overflow, ((cpu.registers.A ^ result) & (cpu.fetchedByte ^ result) & 0x80) != 0);
+
+            // Set the negative flag if the result is less than 0
+            cpu.registers.SetFlag(CPUFlags.Negative, (result & 0x80) != 0);
+
+            // Store the result in the accumulator
+            cpu.registers.A = (byte)(result & 0x00FF);
+
+            // This instruction can take an extra cycle
+            return 1;
         }
 
         /// <summary>
@@ -318,6 +342,22 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte INC(CPU cpu)
         {
+            // Fetch the data
+            cpu.Fetch();
+
+            // Increment the data
+            ushort data = (ushort)(cpu.fetchedByte + 1);
+
+            // Write the data back to memory
+            cpu.memory.Write(cpu.addressAbsolute, (byte)(data & 0x00FF));
+
+            // Set the zero flag if the data is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, (data & 0x00FF) == 0x0000);
+
+            // Set the negative flag if bit 7 is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (data & 0x0080) > 0);
+
+            // We didn't use an extra cycle
             return 0;
         }
 
@@ -328,6 +368,16 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte INX(CPU cpu)
         {
+            // Increment the X register
+            cpu.registers.X++;
+
+            // Set the zero flag if the X register is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.X == 0x00);
+
+            // Set the negative flag if bit 7 is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.X & 0x80) > 0);
+
+            // We didn't use an extra cycle
             return 0;
         }
 
@@ -338,6 +388,16 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte INY(CPU cpu)
         {
+            // Increment the Y register
+            cpu.registers.Y++;
+
+            // Set the zero flag if the Y register is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.Y == 0x00);
+
+            // Set the negative flag if bit 7 is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.Y & 0x80) > 0);
+
+            // We didn't use an extra cycle
             return 0;
         }
 
@@ -362,6 +422,19 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte JSR(CPU cpu)
         {
+            // Decrement the PC by 1
+            cpu.registers.PC--;
+
+            // Push the high byte of the PC to the stack
+            cpu.PushStack((byte)((cpu.registers.PC >> 8) & 0x00FF));
+
+            // Push the low byte of the PC to the stack
+            cpu.PushStack((byte)(cpu.registers.PC & 0x00FF));
+
+            // Set the PC to the absolute address of the operand
+            cpu.registers.PC = cpu.addressAbsolute;
+
+            // Return 0 because the instruction did not use an extra cycle
             return 0;
         }
 
@@ -551,7 +624,32 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte SBC(CPU cpu)
         {
-            return 0;
+            // Fetch the next byte from memory
+            cpu.Fetch();
+
+            // Invert the fetched byte
+            ushort value = (ushort)(cpu.fetchedByte ^ 0x00FF);
+
+            // Now we can add with carry as normal
+            ushort temp = (ushort)(cpu.registers.A + value + (cpu.registers.GetFlag(CPUFlags.Carry) ? 1 : 0));
+
+            // Set the carry flag if the result is greater than 255
+            cpu.registers.SetFlag(CPUFlags.Carry, (temp & 0xFF00) > 0);
+
+            // Set the zero flag if the result is 0
+            cpu.registers.SetFlag(CPUFlags.Zero, (temp & 0x00FF) == 0);
+
+            // Set the overflow flag if the result is greater than 127 or less than -128
+            cpu.registers.SetFlag(CPUFlags.Overflow, ((temp ^ cpu.registers.A) & (temp ^ value) & 0x0080) > 0);
+
+            // Set the negative flag if the result is negative
+            cpu.registers.SetFlag(CPUFlags.Negative, (temp & 0x0080) > 0);
+
+            // Load the result into the accumulator
+            cpu.registers.A = (byte)(temp & 0x00FF);
+
+            // This instruction can take an extra cycle
+            return 1;
         }
 
         /// <summary>
