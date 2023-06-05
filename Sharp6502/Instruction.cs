@@ -26,14 +26,6 @@
         public byte Cycles { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instruction can take extra cycles.
-        /// </summary>
-        /// <remarks>
-        /// This is used for instructions that can take extra cycles when a page boundary is crossed.
-        /// </remarks>
-        public bool CanTakeExtraCycles { get; set; }
-
-        /// <summary>
         /// The addressing mode of the instruction.
         /// </summary>
         public Addressing AddressingMode { get; set; }
@@ -45,15 +37,13 @@
         /// <param name="opcode">The opcode.</param>
         /// <param name="length">The length.</param>
         /// <param name="cycles">The cycles.</param>
-        /// <param name="canTakeExtraCycles">If true, can take extra cycles.</param>
         /// <param name="addressingMode">The addressing mode.</param>
-        public Instruction(string name, byte opcode, uint length, byte cycles, bool canTakeExtraCycles, Addressing addressingMode)
+        public Instruction(string name, byte opcode, uint length, byte cycles, Addressing addressingMode)
         {
             Name = name;
             Opcode = opcode;
             Length = length;
             Cycles = cycles;
-            CanTakeExtraCycles = canTakeExtraCycles;
             AddressingMode = addressingMode;
         }
     }
