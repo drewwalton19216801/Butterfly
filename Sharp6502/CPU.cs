@@ -123,9 +123,6 @@ namespace Sharp6502
                 // Always set the unused flag to 1.
                 registers.SetFlag(Registers.Flags.Unused, true);
 
-                // Increment the program counter
-                registers.PC++;
-
                 // Decode the instruction
                 CurrentInstruction = InstructionSet.Decode(opcode);
 
@@ -135,23 +132,23 @@ namespace Sharp6502
                 // Set the CPU state to executing
                 cpuState = ExecutionState.Executing;
 
-                // Log the execution state
-                Log.Debug("CPU", "Executing instruction...");
+                // Log the disassembly of the current instruction
+                Log.Debug("CPU", $"Disassembly: {Disassemble(CurrentInstruction)}");
+
+                // Increment the program counter
+                registers.PC++;
 
                 // Run the addressing mode method and get the number of additional cycles required
-                byte additionalCycle1 = AddressingModes.GetAddress(this, CurrentInstruction.AddressingMode);
+                byte addressingUsedExtraCycle = AddressingModes.GetAddress(this, CurrentInstruction.AddressingMode);
 
                 // Run the instruction method and get the number of additional cycles required
-                byte additionalCycle2 = InstructionExecutor.ExecuteInstruction(this);
+                byte instructionUsedExtraCycle = InstructionExecutor.ExecuteInstruction(this);
 
                 // Add the additional cycles to the total number of cycles required
-                cycles += (byte)(additionalCycle1 & additionalCycle2);
+                cycles += (byte)(addressingUsedExtraCycle & instructionUsedExtraCycle);
 
                 // Set the unused flag to 1
                 registers.SetFlag(Registers.Flags.Unused, true);
-
-                // Log the execution state
-                Log.Debug("CPU", "Instruction complete.");
             }
 
             // Decrement the number of cycles remaining for this instruction
