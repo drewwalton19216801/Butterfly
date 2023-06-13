@@ -9,6 +9,11 @@ namespace Sharp6502
     public class CPU
     {
         /// <summary>
+        /// The subsystem.
+        /// </summary>
+        private static readonly string subsystem = "CPU";
+
+        /// <summary>
         /// The CPU variant (such as 6502, 65C02, etc).
         /// </summary>
         /// <remarks>
@@ -52,7 +57,7 @@ namespace Sharp6502
         /// </summary>
         public CPU()
         {
-            Log.Debug("CPU", "CPU created.");
+            Log.Debug(subsystem, "CPU created.");
         }
 
         /// <summary>
@@ -91,7 +96,7 @@ namespace Sharp6502
         public void Clock()
         {
             // Log the current cycles
-            Log.Debug("CPU", $"Cycles: {cycles}");
+            Log.Debug(subsystem, $"Cycles: {cycles}");
 
             /*
              * Instructions can require a variable number of clock cycles to execute. The number of cycles required is stored in the instruction's
@@ -104,7 +109,7 @@ namespace Sharp6502
                 cpuState = ExecutionState.Fetching;
 
                 // Log the execution state
-                Log.Debug("CPU", "Fetching instruction...");
+                Log.Debug(subsystem, "Fetching instruction...");
 
                 /*
                  * Read the next instruction opcode from memory. We can then use
@@ -112,7 +117,7 @@ namespace Sharp6502
                  */
                 opcode = Read(registers.PC);
 
-                Log.Debug("CPU", $"Opcode: {opcode:X2}");
+                Log.Debug(subsystem, $"Opcode: {opcode:X2}");
 
                 // Always set the unused flag to 1.
                 registers.SetFlag(CPUFlags.Unused, true);
@@ -130,7 +135,7 @@ namespace Sharp6502
                 currentDisassembly = Disassemble(CurrentInstruction);
 
                 // Log the disassembly of the current instruction
-                Log.Debug("CPU", $"Disassembly: {currentDisassembly}");
+                Log.Debug(subsystem, $"Disassembly: {currentDisassembly}");
 
                 // Increment the program counter
                 registers.PC++;
@@ -249,7 +254,7 @@ namespace Sharp6502
         /// </summary>
         public void Reset()
         {
-            Log.Debug("CPU_RESET", "Resetting CPU to power-up state.");
+            Log.Debug(subsystem, "Resetting CPU to power-up state.");
             registers.A = 0;
             registers.X = 0;
             registers.Y = 0;
@@ -257,7 +262,7 @@ namespace Sharp6502
             registers.PC = ReadWord(0xFFFC); // Read the PC from the reset vector.
             registers.P = (byte)(CPUFlags.None | CPUFlags.Unused);
             cycles = 8;
-            Log.Debug("CPU_RESET", "CPU reset complete.");
+            Log.Debug(subsystem, "CPU reset complete.");
 
             // assemble a string representing the current register values (except the status register)
             string registersString = string.Format("A:{0:X2} X:{1:X2} Y:{2:X2} SP:{3:X2} PC:{4:X4}", registers.A, registers.X, registers.Y, registers.SP, registers.PC);
@@ -275,7 +280,7 @@ namespace Sharp6502
             // Assemble the final string, with the register values and status register bits on separate lines
             string finalString = string.Format("{0} {1}", registersString, statusString);
 
-            Log.Debug("CPU_RESET_FINISH", finalString);
+            Log.Debug(subsystem, finalString);
         }
 
         /// <summary>

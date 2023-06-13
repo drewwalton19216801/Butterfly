@@ -162,6 +162,10 @@
         /// </remarks>
         public void RegisterReadHook(ushort startAddress, ushort endAddress, Func<ushort, byte> readFunc)
         {
+            // Log that we're registering a read hook
+            string message = $"Registering read hook for addresses {startAddress:X4} - {endAddress:X4}";
+            Log.Debug(subsystem, message);
+
             readHooks.Add(new MemoryReadHook(startAddress, endAddress, readFunc));
         }
 
@@ -178,6 +182,10 @@
         /// </remarks>
         public void RegisterWriteHook(ushort startAddress, ushort endAddress, Action<ushort, byte> writeFunc)
         {
+            // Log that we're registering a write hook
+            string message = $"Registering write hook for addresses {startAddress:X4} - {endAddress:X4}";
+            Log.Debug(subsystem, message);
+
             writeHooks.Add(new MemoryWriteHook(startAddress, endAddress, writeFunc));
         }
     }
