@@ -323,8 +323,11 @@ namespace ButterflyCS
             // Draw the disassembly
             Raylib.DrawText("Disassembly", 200, 30, 20, Raylib.BLACK);
 
-            // Draw the current disassembly at the current address (memoryViewStartAddress + 4)
-            Raylib.DrawText($"{machine.cpu.Disassemble((ushort)(memoryViewStartAddress + 4))}", 200, 50 + (4 * 20), 20, Raylib.BLACK);
+            // Draw the disassembly at the listed address
+            for (int i = 0; i < 20; i++)
+            {
+                Raylib.DrawText($"{machine.cpu.Disassemble((ushort)(memoryViewStartAddress + i))}", 200, 50 + (i * 20), 20, Raylib.BLACK);
+            }
         }
     }
 }
