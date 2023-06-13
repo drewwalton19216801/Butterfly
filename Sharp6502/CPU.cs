@@ -181,7 +181,7 @@ namespace Sharp6502
 
                 // Add the number of cycles required to execute the interrupt
                 cycles += 7;
-            }   
+            }
         }
 
         /// <summary>
@@ -236,7 +236,8 @@ namespace Sharp6502
             if (CurrentInstruction == null)
             {
                 throw new InvalidOperationException("Cannot fetch instruction when no instruction is set.");
-            } else if (!(CurrentInstruction.AddressingMode == Addressing.Implied))
+            }
+            else if (!(CurrentInstruction.AddressingMode == Addressing.Implied))
             {
                 fetchedByte = Read(addressAbsolute);
             }
@@ -261,14 +262,15 @@ namespace Sharp6502
             // assemble a string representing the current register values (except the status register)
             string registersString = string.Format("A:{0:X2} X:{1:X2} Y:{2:X2} SP:{3:X2} PC:{4:X4}", registers.A, registers.X, registers.Y, registers.SP, registers.PC);
             // now assemble a string representing the current status register values as individual bits
-            string statusString = string.Format("NV-BDIZC", registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
-                registers.GetFlag(CPUFlags.Overflow) ? 'V' : 'v',
-                registers.GetFlag(CPUFlags.Unused) ? 'U' : 'u',
-                registers.GetFlag(CPUFlags.Break) ? 'B' : 'b',
-                registers.GetFlag(CPUFlags.Decimal) ? 'D' : 'd',
-                registers.GetFlag(CPUFlags.InterruptDisable) ? 'I' : 'i',
-                registers.GetFlag(CPUFlags.Zero) ? 'Z' : 'z',
-                registers.GetFlag(CPUFlags.Carry) ? 'C' : 'c');
+			string statusString = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
+                registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
+	            registers.GetFlag(CPUFlags.Overflow) ? 'V' : 'v',
+	            registers.GetFlag(CPUFlags.Unused) ? 'U' : 'u',
+	            registers.GetFlag(CPUFlags.Break) ? 'B' : 'b',
+	            registers.GetFlag(CPUFlags.Decimal) ? 'D' : 'd',
+	            registers.GetFlag(CPUFlags.InterruptDisable) ? 'I' : 'i',
+	            registers.GetFlag(CPUFlags.Zero) ? 'Z' : 'z',
+	            registers.GetFlag(CPUFlags.Carry) ? 'C' : 'c');
 
             // Assemble the final string, with the register values and status register bits on separate lines
             string finalString = string.Format("{0} {1}", registersString, statusString);

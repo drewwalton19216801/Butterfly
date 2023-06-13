@@ -17,31 +17,31 @@ namespace ButterflyCS
         /// <summary>
         /// The subsystem.
         /// </summary>
-        private static string subsystem = "Machine";
+        private static readonly string subsystem = "Machine";
 
         /// <summary>
         /// The CPU.
         /// </summary>
-        private CPU cpu;
+        public CPU cpu;
 
         /// <summary>
         /// The CPU timer.
         /// </summary>
-        private Timer cpuTimer;
+        public Timer cpuTimer;
 
         /// <summary>
         /// Gets or sets the machine cycle speed.
         /// </summary>
-        private double cycleSpeed { get; set; } = 1; // 1 Hz = 1 cycle per second
+        public double CycleSpeed { get; set; } = 1; // 1 Hz = 1 cycle per second
 
         /// <summary>
         /// Duration of a single machine cycle, in seconds.
         /// </summary>
-        private double clockCycleDuration;
+        public double clockCycleDuration;
 
-        private bool isRunning;
-        private bool isPaused;
-        private bool isSingleStepping;
+        public bool isRunning;
+        public bool isPaused;
+        public bool isSingleStepping;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Machine"/> class.
@@ -50,7 +50,7 @@ namespace ButterflyCS
         {
             Log.Debug(subsystem, "Machine created.");
             cpu = new CPU();
-            clockCycleDuration = 1 / cycleSpeed;
+            clockCycleDuration = 1 / CycleSpeed;
             isRunning = false;
             isPaused = false;
             isSingleStepping = false;
@@ -61,141 +61,52 @@ namespace ButterflyCS
         }
 
         /// <summary>
-        /// Starts the machine.
+        /// Increases the speed of the machine.
         /// </summary>
-        public void Start()
+        /// <param name="amount">The amount.</param>
+        public void IncreaseSpeed(double amount)
         {
-            Raylib.InitWindow(800, 600, "ButterflyCS");
-            Raylib.SetTargetFPS(60);
+            // Increase the cycle speed by the specified amount
+            CycleSpeed += amount;
 
-            isRunning = false;
-            isPaused = true;
-            isSingleStepping = false;
+            UpdateTimer();
 
-            // Start the CPU timer
-            cpuTimer.Start();
-
-            while (!Raylib.WindowShouldClose())
-            {
-                Raylib.BeginDrawing();
-                // TODO: add display logic here
-                DrawMachineState();
-                Raylib.EndDrawing();
-
-                // Check for pause (Ctrl+P)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_P))
-                {
-                    isPaused = !isPaused;
-                    isSingleStepping = false;
-                }
-                // Check for single-step (Ctrl+S)
-                else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_S))
-                {
-                    isSingleStepping = true;
-                    isPaused = true;
-                }
-
-                // Check for speed increase (Ctrl+PgUp)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyDown(KeyboardKey.KEY_PAGE_UP))
-                {
-                    // Increase the cycle speed by 1 Hz
-                    cycleSpeed += 1;
-
-                    // Update the timer interval
-                    clockCycleDuration = 1 / cycleSpeed;
-                    cpuTimer.Interval = clockCycleDuration * 1000;
-
-                    // Log the new speed
-                    Log.Debug(subsystem, $"Cycle speed increased to {cycleSpeed} Hz.");
-                }
-
-                // Check for speed decrease (Ctrl+PgDown)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyDown(KeyboardKey.KEY_PAGE_DOWN))
-                {
-                    // Decrease the cycle speed by 1 Hz, unless it's already 1 Hz
-                    if (cycleSpeed > 1)
-                    {
-                        cycleSpeed -= 1;
-                    }
-
-                    // Update the timer interval
-                    clockCycleDuration = 1 / cycleSpeed;
-                    cpuTimer.Interval = clockCycleDuration * 1000;
-
-                    // Log the new speed
-                    Log.Debug(subsystem, $"Cycle speed decreased to {cycleSpeed} Hz.");
-                }
-
-                // Check for reset (Ctrl+R)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_R))
-                {
-                    Log.Debug(subsystem, "Resetting machine.");
-                    Reset();
-                }
-
-                // Check for quit (Ctrl+Q)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_Q))
-                {
-                    Log.Debug(subsystem, "Quitting.");
-                    break;
-                }
-
-                // Single-step if paused and single-stepping is enabled, and the space bar is pressed
-                if (isPaused && isSingleStepping && Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
-                {
-                    Log.Debug(subsystem, "Single-stepping.");
-                    cpu.Clock();
-                }
-            }
-
-            Raylib.CloseWindow();
+            // Log the new speed
+            Log.Info(subsystem, $"Cycle speed increased to {CycleSpeed} Hz.");
         }
 
         /// <summary>
-        /// Draw the machine's state.
+        /// Decreases the speed of the machine.
         /// </summary>
-        private void DrawMachineState()
+        /// <param name="amount">The amount.</param>
+        public void DecreaseSpeed(double amount)
         {
-            Raylib.ClearBackground(Raylib.GREEN);
-            Raylib.DrawFPS(10, 10);
-            // Draw the machine's state
-            Raylib.DrawText("Machine State", 10, 30, 20, Raylib.BLACK);
-            Raylib.DrawText($"A: {cpu.registers.A:X2}", 10, 50, 20, Raylib.BLACK);
-            Raylib.DrawText($"X: {cpu.registers.X:X2}", 10, 70, 20, Raylib.BLACK);
-            Raylib.DrawText($"Y: {cpu.registers.Y:X2}", 10, 90, 20, Raylib.BLACK);
-            Raylib.DrawText($"PC: {cpu.registers.PC:X4}", 10, 110, 20, Raylib.BLACK);
-            Raylib.DrawText($"SP: {cpu.registers.SP:X2}", 10, 130, 20, Raylib.BLACK);
-            Raylib.DrawText($"Status: {cpu.registers.P:X2}", 10, 150, 20, Raylib.BLACK);
+            // Decrease the cycle speed by the specified amount, unless it's already 1 Hz
+            if (CycleSpeed > 1)
+            {
+                CycleSpeed -= amount;
+            }
 
-            // Draw the CPU's speed, converting from Hz to MHz (with 6 decimal places)
-            Raylib.DrawText("CPU Speed", 10, 170, 20, Raylib.BLACK);
-            Raylib.DrawText($"{cycleSpeed / 1000000:F6} MHz", 10, 190, 20, Raylib.BLACK);
+            UpdateTimer();
 
-            // Draw the machine's running state
-            Raylib.DrawText("Machine Running", 10, 210, 20, Raylib.BLACK);
-            Raylib.DrawText(isRunning ? "Yes" : "No", 10, 230, 20, Raylib.BLACK);
+            // Log the new speed
+            Log.Info(subsystem, $"Cycle speed decreased to {CycleSpeed} Hz.");
+        }
 
-            // Draw the current instruction
-            Raylib.DrawText("Current Instruction", 10, 250, 20, Raylib.BLACK);
-            Raylib.DrawText(cpu.currentDisassembly, 10, 270, 20, Raylib.BLACK);
-
-            // Draw the cycles remaining
-            Raylib.DrawText("Cycles Remaining", 10, 290, 20, Raylib.BLACK);
-            Raylib.DrawText(cpu.cycles.ToString(), 10, 310, 20, Raylib.BLACK);
-
-            // Draw the paused state
-            Raylib.DrawText("Paused", 10, 330, 20, Raylib.BLACK);
-            Raylib.DrawText(isPaused ? "Yes" : "No", 10, 350, 20, Raylib.BLACK);
-
-            // Draw the single-stepping state
-            Raylib.DrawText("Single-Stepping", 10, 370, 20, Raylib.BLACK);
-            Raylib.DrawText(isSingleStepping ? "Yes" : "No", 10, 390, 20, Raylib.BLACK);
+        /// <summary>
+        /// Updates the timer.
+        /// </summary>
+        private void UpdateTimer()
+        {
+            // Update the timer interval
+            clockCycleDuration = 1 / CycleSpeed;
+            cpuTimer.Interval = clockCycleDuration * 1000;
         }
 
         /// <summary>
         /// Runs a single machine cycle.
         /// </summary>
-        private void Cycle(object? sender, ElapsedEventArgs a)
+        public void Cycle(object? sender, ElapsedEventArgs a)
         {
             // Execute one clock cycle if not paused or single-stepping
             if (!isPaused && !isSingleStepping)

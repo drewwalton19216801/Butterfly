@@ -60,7 +60,7 @@
         /// <summary>
         /// The subsystem name.
         /// </summary>
-        public static string subsystem = "Memory";
+        private static readonly string subsystem = "Memory";
 
         /// <summary>
         /// The data.

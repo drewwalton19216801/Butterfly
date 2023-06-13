@@ -1,4 +1,6 @@
-﻿namespace ButterflyCS
+﻿using Sharp6502;
+
+namespace ButterflyCS
 {
     /// <summary>
     /// The program.
@@ -10,13 +12,19 @@
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>A Task.</returns>
-        public static Task Main(string[] args)
+        public static Task Main()
         {
+            // Initialize the logging subsystem
+            Log.DebugEnabled = false;
+
             // Initialize the machine
             Machine machine = new();
             machine.LoadDemoProgram();
             machine.Reset();
-            machine.Start();
+
+            // Initialize the GUI
+            MainWin mainWin = new(machine);
+            mainWin.StartApplication();
             return Task.CompletedTask;
         }
     }
