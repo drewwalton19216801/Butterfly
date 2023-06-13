@@ -3,6 +3,7 @@ using System.Timers;
 using Timer = System.Timers.Timer;
 using Raylib_CsLo;
 using Sharp6502;
+using Microsoft.Win32;
 
 namespace ButterflyCS
 {
@@ -22,6 +23,21 @@ namespace ButterflyCS
         private readonly Machine machine;
 
         /// <summary>
+        /// The emulator screen.
+        /// </summary>
+        public enum EmulatorScreen
+        {
+            MachineState,
+            Memory,
+            Disassembly,
+            Stack,
+            Flags,
+            Registers,
+            Breakpoints,
+            Help
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MainWin"/> class.
         /// </summary>
         /// <param name="_machine">The _machine.</param>
@@ -39,6 +55,8 @@ namespace ButterflyCS
             // Initialize the window
             Raylib.InitWindow(800, 600, "Butterfly 6502 Emulator");
 
+            EmulatorScreen currentScreen = EmulatorScreen.MachineState;
+
             // Set the framerate
             Raylib.SetTargetFPS(60);
 
@@ -55,65 +73,85 @@ namespace ButterflyCS
             {
                 // Begin GUI drawing
                 Raylib.BeginDrawing();
-                
-                // Draw the machine's state
-                DrawMachineStateScreen();
+
+                switch (currentScreen)
+                {
+                    case EmulatorScreen.MachineState:
+                        DrawMachineStateScreen();
+                        break;
+                }
 
                 // End GUI drawing
                 Raylib.EndDrawing();
 
-                // Check for pause (Ctrl+P)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_P))
-                {
-                    machine.isPaused = !machine.isPaused;
-                    machine.isSingleStepping = false;
-                }
-                // Check for single-step (Ctrl+S)
-                else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_S))
-                {
-                    machine.isSingleStepping = true;
-                    machine.isPaused = true;
-                }
+                bool shouldQuit = ProcessInput();
 
-                // If machine is in single-step mode, execute one cycle if the user presses the spacebar
-                if (machine.isSingleStepping && Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
+                if (shouldQuit)
                 {
-                    Log.Debug(subsystem, "Single-stepping");
-                    machine.cpu.Clock();
-                }
-
-                // Check for speed increase (Ctrl+PgUp)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_UP))
-                {
-                    // Increase the speed by 2 Hz
-                    machine.IncreaseSpeed(2);
-                }
-
-                // Check for speed decrease (Ctrl+PgDn)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_DOWN))
-                {
-                    // Decrease the speed by 2 Hz
-                    machine.DecreaseSpeed(2);
-                }
-
-                // Check for reset (Ctrl+R)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_R))
-                {
-                    // Reset the machine
-                    machine.Reset();
-                }
-
-                // Check for quit (Ctrl+Q)
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_Q))
-                {
-                    // Quit the application
-                    Log.Info(subsystem, "Quitting application");
                     break;
                 }
             }
 
             // Close the window
             Raylib.CloseWindow();
+        }
+
+        /// <summary>
+        /// Processes input events.
+        /// </summary>
+        /// <returns>A bool.</returns>
+        private bool ProcessInput()
+        {
+            // Check for pause (Ctrl+P)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_P))
+            {
+                machine.isPaused = !machine.isPaused;
+                machine.isSingleStepping = false;
+            }
+            // Check for single-step (Ctrl+S)
+            else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_S))
+            {
+                machine.isSingleStepping = true;
+                machine.isPaused = true;
+            }
+
+            // If machine is in single-step mode, execute one cycle if the user presses the spacebar
+            if (machine.isSingleStepping && Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
+            {
+                Log.Debug(subsystem, "Single-stepping");
+                machine.cpu.Clock();
+            }
+
+            // Check for speed increase (Ctrl+PgUp)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_UP))
+            {
+                // Increase the speed by 2 Hz
+                machine.IncreaseSpeed(2);
+            }
+
+            // Check for speed decrease (Ctrl+PgDn)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_DOWN))
+            {
+                // Decrease the speed by 2 Hz
+                machine.DecreaseSpeed(2);
+            }
+
+            // Check for reset (Ctrl+R)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_R))
+            {
+                // Reset the machine
+                machine.Reset();
+            }
+
+            // Check for quit (Ctrl+Q)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_Q))
+            {
+                // Quit the application
+                Log.Info(subsystem, "Quitting application");
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -131,7 +169,18 @@ namespace ButterflyCS
             Raylib.DrawText($"Y: {machine.cpu.registers.Y:X2}", 10, 90, 20, Raylib.BLACK);
             Raylib.DrawText($"PC: {machine.cpu.registers.PC:X4}", 10, 110, 20, Raylib.BLACK);
             Raylib.DrawText($"SP: {machine.cpu.registers.SP:X2}", 10, 130, 20, Raylib.BLACK);
-            Raylib.DrawText($"Status: {machine.cpu.registers.P:X2}", 10, 150, 20, Raylib.BLACK);
+
+            string statusString = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
+                machine.cpu.registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
+                machine.cpu.registers.GetFlag(CPUFlags.Overflow) ? 'V' : 'v',
+                machine.cpu.registers.GetFlag(CPUFlags.Unused) ? 'U' : 'u',
+                machine.cpu.registers.GetFlag(CPUFlags.Break) ? 'B' : 'b',
+                machine.cpu.registers.GetFlag(CPUFlags.Decimal) ? 'D' : 'd',
+                machine.cpu.registers.GetFlag(CPUFlags.InterruptDisable) ? 'I' : 'i',
+                machine.cpu.registers.GetFlag(CPUFlags.Zero) ? 'Z' : 'z',
+                machine.cpu.registers.GetFlag(CPUFlags.Carry) ? 'C' : 'c');
+
+            Raylib.DrawText($"Status: {statusString}", 10, 150, 20, Raylib.BLACK);
 
             // Draw the CPU's speed, converting from Hz to MHz (with 6 decimal places)
             Raylib.DrawText($"Speed: {machine.CycleSpeed / 1000000.0:F6} MHz", 10, 170, 20, Raylib.BLACK);
