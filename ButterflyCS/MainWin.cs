@@ -23,6 +23,11 @@ namespace ButterflyCS
         private readonly Machine machine;
 
         /// <summary>
+        /// The memory view start address.
+        /// </summary>
+        private ushort memoryViewStartAddress = 0x8000;
+
+        /// <summary>
         /// The emulator screen.
         /// </summary>
         public enum EmulatorScreen
@@ -36,6 +41,8 @@ namespace ButterflyCS
             Breakpoints,
             Help
         }
+
+        private EmulatorScreen currentScreen = EmulatorScreen.MachineState;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainWin"/> class.
@@ -54,8 +61,6 @@ namespace ButterflyCS
         {
             // Initialize the window
             Raylib.InitWindow(800, 600, "Butterfly 6502 Emulator");
-
-            EmulatorScreen currentScreen = EmulatorScreen.MachineState;
 
             // Set the framerate
             Raylib.SetTargetFPS(60);
@@ -78,6 +83,9 @@ namespace ButterflyCS
                 {
                     case EmulatorScreen.MachineState:
                         DrawMachineStateScreen();
+                        break;
+                    case EmulatorScreen.Memory:
+                        DrawMemoryViewScreen();
                         break;
                 }
 
@@ -102,6 +110,38 @@ namespace ButterflyCS
         /// <returns>A bool.</returns>
         private bool ProcessInput()
         {
+            /*
+             * F1: Machine state, including CPU speed
+             * F2: Memory view
+             * F3: Stack
+             * F4: Flags
+             * F5: Registers
+             * F6: Breakpoints
+             * F7: Help
+             */
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_F1))
+            {
+                currentScreen = EmulatorScreen.MachineState;
+            } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_F2))
+            {
+                currentScreen = EmulatorScreen.Memory;
+            } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_F3))
+            {
+                currentScreen = EmulatorScreen.Stack;
+            } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_F4))
+            {
+                currentScreen = EmulatorScreen.Flags;
+            } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_F5))
+            {
+                currentScreen = EmulatorScreen.Registers;
+            } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_F6))
+            {
+                currentScreen = EmulatorScreen.Breakpoints;
+            } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_F7))
+            {
+                currentScreen = EmulatorScreen.Help;
+            }
+
             // Check for pause (Ctrl+P)
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_P))
             {
@@ -122,18 +162,61 @@ namespace ButterflyCS
                 machine.cpu.Clock();
             }
 
-            // Check for speed increase (Ctrl+PgUp)
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_UP))
+            // Each screen can have its own input processing
+            switch (currentScreen)
             {
-                // Increase the speed by 2 Hz
-                machine.IncreaseSpeed(2);
-            }
+                case EmulatorScreen.MachineState:
+                    {
+                        // Check for Ctrl+PgUp
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_UP))
+                        {
+                            // Increase the speed by 2 Hz
+                            machine.IncreaseSpeed(2);
+                        }
 
-            // Check for speed decrease (Ctrl+PgDn)
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_DOWN))
-            {
-                // Decrease the speed by 2 Hz
-                machine.DecreaseSpeed(2);
+                        // Check for Ctrl+PgDown
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_DOWN))
+                        {
+                            // Decrease the speed by 2 Hz
+                            machine.DecreaseSpeed(2);
+                        }
+                        break;
+                    }
+                case EmulatorScreen.Memory:
+                    {
+                        // Check for Ctrl+PgUp
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_UP))
+                        {
+                            // Increase the memory view start address by 15 addresses,
+                            // but don't go past the end of memory (0xFFFF)
+                            memoryViewStartAddress = (ushort)Math.Min(memoryViewStartAddress + 15, 0xFFFF);
+                        }
+
+                        // Check for Ctrl+PgDn
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_DOWN))
+                        {
+                            // Decrease the memory view start address by 15 addresses,
+                            // but don't go past the start of memory (0x0000)
+                            memoryViewStartAddress = (ushort)Math.Max(memoryViewStartAddress - 15, 0x0000);
+                        }
+
+                        // Check for Ctrl+Up
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_UP))
+                        {
+                            // Increase the memory view start address by 1 address,
+                            // but don't go past the end of memory (0xFFFF)
+                            memoryViewStartAddress = (ushort)Math.Min(memoryViewStartAddress + 1, 0xFFFF);
+                        }
+
+                        // Check for Ctrl+Down
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_DOWN))
+                        {
+                            // Decrease the memory view start address by 1 address,
+                            // but don't go past the start of memory (0x0000)
+                            memoryViewStartAddress = (ushort)Math.Max(memoryViewStartAddress - 1, 0x0000);
+                        }
+                        break;
+                    }
             }
 
             // Check for reset (Ctrl+R)
@@ -160,7 +243,6 @@ namespace ButterflyCS
         private void DrawMachineStateScreen()
         {
             Raylib.ClearBackground(Raylib.GREEN);
-            Raylib.DrawFPS(10, 10);
 
             // Draw the registers
             Raylib.DrawText("Registers", 10, 30, 20, Raylib.BLACK);
@@ -202,6 +284,47 @@ namespace ButterflyCS
 
             // Draw the memory at address 0x0200
             Raylib.DrawText($"Memory at 0x0200: {machine.cpu.memory.Read(0x0200):X2}", 10, 290, 20, Raylib.BLACK);
+        }
+
+        /// <summary>
+        /// Draws the memory view screen.
+        /// </summary>
+        private void DrawMemoryViewScreen()
+        {
+            Raylib.ClearBackground(Raylib.GREEN);
+
+            /*
+             * This screen is split into two parts:
+             * 
+             * The left half is a hex dump of memory, starting at memoryViewStartAddress. It
+             * shows 20 addresses at a time. The current address is highlighted in red and will be memoryViewStartAddress + 4.
+             * 
+             * The right half is a disassembly of the code at the current address. It shows the instruction at the current address.
+             */
+
+            // Draw the memory dump
+            Raylib.DrawText("Memory", 10, 30, 20, Raylib.BLACK);
+
+            // Draw the memory addresses
+            for (int i = 0; i < 20; i++)
+            {
+                Raylib.DrawText($"{memoryViewStartAddress + i:X4}", 10, 50 + (i * 20), 20, Raylib.BLACK);
+            }
+
+            // Draw the memory values
+            for (int i = 0; i < 20; i++)
+            {
+                Raylib.DrawText($"{machine.cpu.memory.Read((ushort)(memoryViewStartAddress + i)):X2}", 70, 50 + (i * 20), 20, Raylib.BLACK);
+            }
+
+            // Draw the current address
+            Raylib.DrawText(">", 50, 50 + (4 * 20), 20, Raylib.RED);
+
+            // Draw the disassembly
+            Raylib.DrawText("Disassembly", 200, 30, 20, Raylib.BLACK);
+
+            // Draw the current disassembly at the current address (memoryViewStartAddress + 4)
+            Raylib.DrawText($"{machine.cpu.Disassemble((ushort)(memoryViewStartAddress + 4))}", 200, 50 + (4 * 20), 20, Raylib.BLACK);
         }
     }
 }
