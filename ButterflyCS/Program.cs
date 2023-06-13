@@ -1,7 +1,4 @@
-﻿using Raylib_CsLo;
-using Sharp6502;
-
-namespace ButterflyCS
+﻿namespace ButterflyCS
 {
     /// <summary>
     /// The program.
@@ -19,26 +16,7 @@ namespace ButterflyCS
             Machine machine = new();
             machine.LoadDemoProgram();
             machine.Reset();
-
-            Raylib.InitWindow(800, 600, "ButterflyCS");
-            Raylib.SetTargetFPS(60);
-            // Main emulator loop
-            while (!Raylib.WindowShouldClose())
-            {
-                // Space bar executes a single machine cycle
-                if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
-                {
-                    machine.Cycle();
-                }
-
-                Raylib.BeginDrawing();
-                Raylib.ClearBackground(Raylib.GREEN);
-                Raylib.DrawFPS(10, 10);
-                Raylib.DrawText("Raylib_CsLo", 10, 30, 20, Raylib.WHITE);
-                Raylib.EndDrawing();
-            }
-
-            Raylib.CloseWindow();
+            machine.Start();
             return Task.CompletedTask;
         }
     }

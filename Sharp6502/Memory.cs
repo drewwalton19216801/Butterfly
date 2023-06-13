@@ -92,7 +92,7 @@
                 {
                     // Log the hook
                     string message = $"Read hook called at address {address:X4}";
-                    Log.Info(subsystem, message);
+                    Log.Debug(subsystem, message);
 
                     // This address is hooked, so call the hook function instead
                     // of reading from main memory
@@ -102,7 +102,7 @@
 
             // Log the read
             string msg = $"Read called at address {address:X4}, got data {data[address]:X2}";
-            Log.Info(subsystem, msg);
+            Log.Debug(subsystem, msg);
 
             // No hooks, so we read from main memory
             return data[address];
@@ -119,7 +119,7 @@
 
             // Log the write
             string msg = $"Write called at address {address:X4}, with data {value:X2}";
-            Log.Info(subsystem, msg);
+            Log.Debug(subsystem, msg);
 
             // Check for write hooks
             foreach (var hook in writeHooks)

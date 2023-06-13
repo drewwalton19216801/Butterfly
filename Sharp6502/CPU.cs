@@ -40,12 +40,7 @@ namespace Sharp6502
         public ExecutionState cpuState = ExecutionState.Stopped;
         public Variant cpuVariant = Variant.Generic;
         public byte fetchedByte = 0x00;
-        
-
-        /// <summary>
-        /// Gets or sets the clock speed.
-        /// </summary>
-        public double clockSpeed { get; set; } = 0; // Hz
+        public string currentDisassembly = string.Empty;
 
         /// <summary>
         /// Gets or sets the current instruction.
@@ -85,7 +80,6 @@ namespace Sharp6502
         /// </summary>
         /// <param name="address">The address to write to.</param>
         /// <param name="data">The data to write.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private void Write(ushort address, byte data)
         {
             memory.Write(address, data);
@@ -132,8 +126,11 @@ namespace Sharp6502
                 // Set the CPU state to executing
                 cpuState = ExecutionState.Executing;
 
+                // Update the current disassembly
+                currentDisassembly = Disassemble(CurrentInstruction);
+
                 // Log the disassembly of the current instruction
-                Log.Debug("CPU", $"Disassembly: {Disassemble(CurrentInstruction)}");
+                Log.Debug("CPU", $"Disassembly: {currentDisassembly}");
 
                 // Increment the program counter
                 registers.PC++;
