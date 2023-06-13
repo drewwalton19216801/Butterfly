@@ -83,16 +83,19 @@
         /// <summary>
         /// Reads a byte from the specified address.
         /// </summary>
-        public byte Read(ushort address)
+        public byte Read(ushort address, bool hideDebug = false)
         {
             // Check for read hooks
             foreach (var hook in readHooks)
             {
                 if (address >= hook.startAddress && address <= hook.endAddress)
                 {
-                    // Log the hook
-                    string message = $"Read hook called at address {address:X4}";
-                    Log.Debug(subsystem, message);
+                    if (hideDebug == false)
+                    {
+                        // Log the hook
+                        string message = $"Read hook called at address {address:X4}";
+                        Log.Info(subsystem, message);
+                    }
 
                     // This address is hooked, so call the hook function instead
                     // of reading from main memory
@@ -100,9 +103,12 @@
                 }
             }
 
-            // Log the read
-            string msg = $"Read called at address {address:X4}, got data {data[address]:X2}";
-            Log.Debug(subsystem, msg);
+            if (hideDebug == false)
+            {
+                // Log the read
+                string msg = $"Read called at address {address:X4}, got data {data[address]:X2}";
+                Log.Debug(subsystem, msg);
+            }
 
             // No hooks, so we read from main memory
             return data[address];
@@ -111,24 +117,30 @@
         /// <summary>
         /// Writes a byte to the specified address.
         /// </summary>
-        public void Write(ushort address, byte value)
+        public void Write(ushort address, byte value, bool hideDebug = false)
         {
             // Write the value to memory before calling any hooks,
             // so debugging tools can see the value in memory.
             data[address] = value;
 
-            // Log the write
-            string msg = $"Write called at address {address:X4}, with data {value:X2}";
-            Log.Debug(subsystem, msg);
+            if (hideDebug == false)
+            {
+                // Log the write
+                string msg = $"Write called at address {address:X4}, with data {value:X2}";
+                Log.Debug(subsystem, msg);
+            }
 
             // Check for write hooks
             foreach (var hook in writeHooks)
             {
                 if (address >= hook.startAddress && address <= hook.endAddress)
                 {
-                    // Log the hook
-                    string message = $"Write hook called at address {address:X4}";
-                    Log.Info(subsystem, message);
+                    if (hideDebug == false)
+                    {
+                        // Log the hook
+                        string message = $"Write hook called at address {address:X4}";
+                        Log.Info(subsystem, message);
+                    }
 
                     // Call the hook
                     hook.writeFunc(address, value);

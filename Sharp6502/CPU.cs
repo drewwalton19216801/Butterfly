@@ -296,6 +296,168 @@ namespace Sharp6502
         }
 
         /// <summary>
+        /// Disassembles a range of addresses.
+        /// </summary>
+        /// <param name="startAddress">The address to begin disassembling from.</param>
+        /// <param name="count">The number of addresses to disassemble</param>
+        /// <returns>An array of string.</returns>
+        public string[] Disassemble(ushort startAddress, int count)
+        {
+            /*
+             * We need to disassemble the instructions in the range of addresses specified by startAddress and count.
+             * 
+             * We'll do this by creating a list of strings, and adding each disassembled instruction to the list. We
+             * need to keep track of the current address, and increment it by the number of bytes in the instruction,
+             * as well as not trying to disassemble operands.
+             * 
+             * Non-instruction bytes will return a string containing the word "DATA"
+             */
+            ushort address = startAddress;
+            Instruction previousInstruction = null;
+            List<string> instructions = new List<string>();
+
+            // Loop through the addresses.
+            for (int i = 0; i < count; i++)
+            {
+                // Check if we're disassembling an operand.
+                if (previousInstruction != null && previousInstruction.AddressingMode == Addressing.Immediate)
+                {
+                    // We're disassembling an operand, so we just add "DATA" to the list.
+                    instructions.Add($"DATA");
+                }
+
+                // Read the instruction at the current address.
+                byte opcode = Read(address);
+
+                // Get the instruction.
+                Instruction instruction = InstructionSet.Decode(opcode);
+
+                // Disassemble the instruction.
+                string disassembledInstruction = Disassemble(instruction);
+                instructions.Add(disassembledInstruction);
+
+                // Go through the addressing mode and add the operand to the instruction.
+                switch (instruction.AddressingMode)
+                {
+                    case Addressing.Immediate:
+                        {
+                            // Get the operand.
+                            byte operand = Read((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" #{operand:X2}";
+                            break;
+                        }
+                    case Addressing.ZeroPage:
+                        {
+                            // Get the operand.
+                            byte operand = Read((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" ${operand:X2}";
+                            break;
+                        }
+                    case Addressing.ZeroPageX:
+                        {
+                            // Get the operand.
+                            byte operand = Read((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" ${operand:X2},X";
+                            break;
+                        }
+                    case Addressing.ZeroPageY:
+                        {
+                            // Get the operand.
+                            byte operand = Read((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" ${operand:X2},Y";
+                            break;
+                        }
+                    case Addressing.Absolute:
+                        {
+                            // Get the operand.
+                            ushort operand = ReadWord((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" ${operand:X4}";
+                            break;
+                        }
+                    case Addressing.AbsoluteX:
+                        {
+                            // Get the operand.
+                            ushort operand = ReadWord((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" ${operand:X4},X";
+                            break;
+                        }
+                    case Addressing.AbsoluteY:
+                        {
+                            // Get the operand.
+                            ushort operand = ReadWord((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" ${operand:X4},Y";
+                            break;
+                        }
+                    case Addressing.Indirect:
+                        {
+                            // Get the operand.
+                            ushort operand = ReadWord((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" (${operand:X4})";
+                            break;
+                        }
+                    case Addressing.IndirectX:
+                        {
+                            // Get the operand.
+                            byte operand = Read((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" (${operand:X2},X)";
+                            break;
+                        }
+                    case Addressing.IndirectY:
+                        {
+                            // Get the operand.
+                            byte operand = Read((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" (${operand:X2}),Y";
+                            break;
+                        }
+                    case Addressing.Relative:
+                        {
+                            // Get the operand.
+                            byte operand = Read((ushort)(address + 1));
+
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" ${operand:X2}";
+                            break;
+                        }
+                    case Addressing.Accumulator:
+                        {
+                            // Add the operand to the instruction.
+                            instructions[instructions.Count - 1] += $" A";
+                            break;
+                        }
+                }
+
+                // Increment the address by the number of bytes in the instruction.
+                address += (ushort)instruction.Length;
+
+                // Store the instruction and address.
+                previousInstruction = instruction;
+            }
+
+            // Return the list of disassembled instructions.
+            return instructions.ToArray();
+        }
+
+        /// <summary>
         /// Disassembles an instruction.
         /// </summary>
         /// <param name="instruction">The instruction.</param>

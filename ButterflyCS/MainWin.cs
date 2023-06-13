@@ -283,7 +283,7 @@ namespace ButterflyCS
             Raylib.DrawText($"Single-Stepping: {machine.isSingleStepping}", 10, 270, 20, Raylib.BLACK);
 
             // Draw the memory at address 0x0200
-            Raylib.DrawText($"Memory at 0x0200: {machine.cpu.memory.Read(0x0200):X2}", 10, 290, 20, Raylib.BLACK);
+            Raylib.DrawText($"Memory at 0x0200: {machine.cpu.memory.Read(0x0200, true):X2}", 10, 290, 20, Raylib.BLACK);
         }
 
         /// <summary>
@@ -303,30 +303,28 @@ namespace ButterflyCS
              */
 
             // Draw the memory dump
-            Raylib.DrawText("Memory", 10, 30, 20, Raylib.BLACK);
+            Raylib.DrawText("Address", 10, 30, 20, Raylib.BLACK);
 
-            // Draw the memory addresses
+            // Draw the memory addresses, but highlight the current address
             for (int i = 0; i < 20; i++)
             {
-                Raylib.DrawText($"{memoryViewStartAddress + i:X4}", 10, 50 + (i * 20), 20, Raylib.BLACK);
+                if (memoryViewStartAddress + i == memoryViewStartAddress + 4)
+                {
+                    Raylib.DrawText($"{memoryViewStartAddress + i:X4}", 10, 50 + (i * 20), 20, Raylib.RED);
+                }
+                else
+                {
+                    Raylib.DrawText($"{memoryViewStartAddress + i:X4}", 10, 50 + (i * 20), 20, Raylib.BLACK);
+                }
             }
+
+            // Draw the memory values
+            Raylib.DrawText("Value", 100, 30, 20, Raylib.BLACK);
 
             // Draw the memory values
             for (int i = 0; i < 20; i++)
             {
-                Raylib.DrawText($"{machine.cpu.memory.Read((ushort)(memoryViewStartAddress + i)):X2}", 70, 50 + (i * 20), 20, Raylib.BLACK);
-            }
-
-            // Draw the current address
-            Raylib.DrawText(">", 50, 50 + (4 * 20), 20, Raylib.RED);
-
-            // Draw the disassembly
-            Raylib.DrawText("Disassembly", 200, 30, 20, Raylib.BLACK);
-
-            // Draw the disassembly at the listed address
-            for (int i = 0; i < 20; i++)
-            {
-                Raylib.DrawText($"{machine.cpu.Disassemble((ushort)(memoryViewStartAddress + i))}", 200, 50 + (i * 20), 20, Raylib.BLACK);
+                Raylib.DrawText($"{machine.cpu.memory.Read((ushort)(memoryViewStartAddress + i), true):X2}", 100, 50 + (i * 20), 20, Raylib.BLACK);
             }
         }
     }

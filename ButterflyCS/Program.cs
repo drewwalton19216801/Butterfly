@@ -15,7 +15,7 @@ namespace ButterflyCS
         public static Task Main()
         {
             // Initialize the logging subsystem
-            Log.DebugEnabled = false;
+            Log.DebugEnabled = true;
 
             // Initialize the machine
             Machine machine = new();
