@@ -594,6 +594,33 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte ROR(CPU cpu)
         {
+            // Fetch the next byte from memory
+            cpu.Fetch();
+
+            // Rotate the fetched byte right
+            cpu.fetchedByte = (byte)((cpu.fetchedByte >> 1) | (cpu.registers.GetFlag(CPUFlags.Carry) ? 0x80 : 0x00));
+
+            // Set the carry flag if the 0 bit was set
+            cpu.registers.SetFlag(CPUFlags.Carry, (cpu.fetchedByte & 0x01) > 0);
+            
+            // Set the zero flag if the fetched byte is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.fetchedByte == 0);
+
+            // Set the negative flag if the fetched byte is negative
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.fetchedByte & 0x80) > 0);
+
+            // If the instruction is in implied mode, store the fetched byte in the accumulator
+            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Implied)
+            {
+                cpu.registers.A = cpu.fetchedByte;
+            }
+            else
+            {
+                // Store the fetched byte in memory
+                cpu.Write(cpu.addressAbsolute, cpu.fetchedByte);
+            }
+
+            // Return 0 since this instruction does not use an extra cycle
             return 0;
         }
 
@@ -604,6 +631,22 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte RTI(CPU cpu)
         {
+            // Increment the stack pointer
+            cpu.registers.SP++;
+
+            // Status register is pulled from the stack
+            cpu.registers.P = cpu.PopStack();
+
+            // Clear the break flag
+            cpu.registers.SetFlag(CPUFlags.Break, false);
+
+            // Clear the unused flag
+            cpu.registers.SetFlag(CPUFlags.Unused, true);
+
+            // Program counter is pulled from the stack
+            cpu.registers.PC = cpu.PopStackWord();
+
+            // Return 0 since this instruction does not use an extra cycle
             return 0;
         }
 

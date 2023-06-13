@@ -65,7 +65,7 @@ namespace Sharp6502
         /// </summary>
         /// <param name="address">The address to read from.</param>
         /// <returns>The data.</returns>
-        private byte Read(ushort address)
+        public byte Read(ushort address)
         {
             return memory.Read(address);
         }
@@ -75,7 +75,7 @@ namespace Sharp6502
         /// </summary>
         /// <param name="address">The address to read from.</param>
         /// <returns>The data.</returns>
-        private ushort ReadWord(ushort address)
+        public ushort ReadWord(ushort address)
         {
             return (ushort)(Read(address) | (Read((ushort)(address + 1)) << 8));
         }
@@ -85,7 +85,7 @@ namespace Sharp6502
         /// </summary>
         /// <param name="address">The address to write to.</param>
         /// <param name="data">The data to write.</param>
-        private void Write(ushort address, byte data)
+        public void Write(ushort address, byte data)
         {
             memory.Write(address, data);
         }
@@ -227,6 +227,27 @@ namespace Sharp6502
         {
             Write((ushort)(0x0100 + registers.SP), data);
             registers.SP--;
+        }
+
+        /// <summary>
+        /// Pops a byte from the stack.
+        /// </summary>
+        /// <returns>A byte.</returns>
+        public byte PopStack()
+        {
+            registers.SP++;
+            return Read((ushort)(0x0100 + registers.SP));
+        }
+
+        /// <summary>
+        /// Pops a word from the stack.
+        /// </summary>
+        /// <returns>An ushort.</returns>
+        public ushort PopStackWord()
+        {
+            ushort word = PopStack();
+            word |= (ushort)(PopStack() << 8);
+            return word;
         }
 
         /// <summary>
