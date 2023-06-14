@@ -23,6 +23,7 @@ namespace Sharp6502
         {
             NMOS_6502,
             CMOS_6502,
+            NES_6502,
         }
 
         /// <summary>
