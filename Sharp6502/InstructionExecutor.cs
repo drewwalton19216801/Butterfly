@@ -48,6 +48,8 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte ADC(CPU cpu)
         {
+            byte extraCycle = 0;
+
             // Fetch the data to add
             cpu.Fetch();
 
@@ -83,6 +85,9 @@ namespace Sharp6502
 
                     // Set the carry flag if the result is greater than 0x99
                     cpu.registers.SetFlag(CPUFlags.Carry, cpu.temp > 0x99);
+
+                    // Since we used decimal mode, we need to consume an extra cycle
+                    extraCycle = 1;
                 }
             } else
             {
@@ -100,7 +105,7 @@ namespace Sharp6502
             cpu.registers.A = (byte)(cpu.temp & 0x00FF);
 
             // This instruction can take an extra cycle
-            return 1;
+            return extraCycle;
         }
 
         /// <summary>
@@ -803,6 +808,9 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte SBC(CPU cpu)
         {
+            // Set the extra cycle to 0. This will be set to 1 if decimal mode is used.
+            byte extraCycle = 0;
+
             // Fetch the next byte from memory
             cpu.Fetch();
 
@@ -838,6 +846,9 @@ namespace Sharp6502
 
                     // Set the carry flag if the result is less than or equal to 0x99
                     cpu.registers.SetFlag(CPUFlags.Carry, cpu.temp <= 0x99);
+
+                    // We use an extra cycle here
+                    extraCycle = 1;
                 }
             }
             else
@@ -856,7 +867,7 @@ namespace Sharp6502
             cpu.registers.A = (byte)(cpu.temp & 0x00FF);
 
             // This instruction can take an extra cycle
-            return 1;
+            return extraCycle;
         }
 
         /// <summary>

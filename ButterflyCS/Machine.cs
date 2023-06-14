@@ -127,39 +127,6 @@ namespace ButterflyCS
         }
 
         /// <summary>
-        /// Loads the demo program.
-        /// </summary>
-        public void LoadDemoProgram()
-        {
-            /* Load the following program into memory at address 0x8000:
-             * LDA #$01
-             * STA $0200
-             * NOP
-             * BRK
-            */
-            byte[] program = new byte[] { 0xA9, 0x01, 0x8D, 0x00, 0x02, 0xEA, 0x00 };
-
-            for (int i = 0; i < program.Length; i++)
-            {
-                cpu.memory.data[0x8000 + i] = program[i];
-            }
-
-            // Make sure the reset vector points to the start of the program.
-            cpu.memory.data[0xFFFC] = 0x00;
-            cpu.memory.data[0xFFFD] = 0x80;
-
-            // Make sure the IRQ vector points to the initial instruction. This is
-            // normally useless, but we don't have proper branching implemented yet,
-            // so we're using the BRK instruction to restart the program.
-            cpu.memory.data[0xFFFE] = 0x00;
-            cpu.memory.data[0xFFFF] = 0x80;
-
-            // Same as above, but for the NMI vector.
-            cpu.memory.data[0xFFFA] = 0x00;
-            cpu.memory.data[0xFFFB] = 0x80;
-        }
-
-        /// <summary>
         /// Loads a program into memory.
         /// </summary>
         /// <remarks>
