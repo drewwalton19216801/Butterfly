@@ -634,9 +634,9 @@ namespace Sharp6502
         {
             return cpu.cpuVariant switch
             {
-                CPU.Variant.CMOS_6502 => ROR_CMOS(cpu),
-                CPU.Variant.NMOS_6502 => ROR_NMOS(cpu),
-                _ => throw new Exception("Invalid CPU variant"),
+                CPU.Variant.NMOS_6502 => ROR_NMOS(cpu), // The original 6502 (NMOS) has a bug in the ROR instruction
+                CPU.Variant.CMOS_6502 => ROR_CMOS(cpu), // The CMOS 6502 does not have the bug in the ROR instruction
+                _ => ROR_CMOS(cpu), // By default, use the CMOS 6502 implementation
             };
         }
 
