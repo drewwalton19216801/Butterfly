@@ -653,61 +653,47 @@ namespace Sharp6502
         private static byte ROR_NMOS(CPU cpu)
         {
             // Are we in accumulator mode?
-            if (cpu.CurrentInstruction?.Opcode == 0x6A)
+            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Accumulator)
             {
                 // Load the accumulator into the temp variable
                 cpu.temp = cpu.registers.A;
-
-                // Set the 9th bit of the temp variable to 0
-                cpu.temp &= 0x7F;
-
-                // Shift the temp variable left by 1
-                cpu.temp <<= 1;
-
-                // Mask the temp variable to 8 bits
-                cpu.temp &= 0xFF;
-
-                // Set the negative flag if the 8th bit of the temp variable is set
-                cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
-
-                // Set the zero flag if the temp variable is zero
-                cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
-
-                // Store the temp variable into the accumulator
-                cpu.registers.A = (byte)cpu.temp;
-
-                // Return 0 since this instruction does not use an extra cycle
-                return 0;
-            }
-            else
+            } else
             {
                 // Fetch the next byte from memory
                 cpu.Fetch();
 
                 // Load the fetched byte into the temp variable
                 cpu.temp = cpu.fetchedByte;
+            }
 
-                // Set the 9th bit of the temp variable to 0
-                cpu.temp &= 0x7F;
+            // Set the 9th bit of the temp variable to 0
+            cpu.temp &= 0x7F;
 
-                // Shift the temp variable left by 1
-                cpu.temp <<= 1;
+            // Shift the temp variable left by 1
+            cpu.temp <<= 1;
 
-                // Mask the temp variable to 8 bits
-                cpu.temp &= 0xFF;
+            // Mask the temp variable to 8 bits
+            cpu.temp &= 0xFF;
 
-                // Set the negative flag if the 8th bit of the temp variable is set
-                cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
+            // Set the negative flag if the 8th bit of the temp variable is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
 
-                // Set the zero flag if the temp variable is zero
-                cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
+            // Set the zero flag if the temp variable is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
 
+            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Accumulator)
+            {
+                // Store the temp variable into the accumulator
+                cpu.registers.A = (byte)cpu.temp;
+            }
+            else
+            {
                 // Store the temp variable into memory
                 cpu.Write(cpu.addressAbsolute, (byte)cpu.temp);
-
-                // Return 0 since this instruction does not use an extra cycle
-                return 0;
             }
+            
+            // Return 0 since this instruction does not use an extra cycle
+            return 0;
         }
 
         /// <summary>
@@ -718,73 +704,53 @@ namespace Sharp6502
         private static byte ROR_CMOS(CPU cpu)
         {
             // Are we in accumulator mode?
-            if (cpu.CurrentInstruction?.Opcode == 0x6A)
+            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Accumulator)
             {
                 // Load the accumulator into the temp variable
                 cpu.temp = cpu.registers.A;
-
-                // If the carry flag is set, set the 9th bit of the temp variable
-                if (cpu.registers.GetFlag(CPUFlags.Carry))
-                {
-                    cpu.temp |= 0x100;
-                }
-
-                // Set the carry flag if the 9th bit of the temp variable is set
-                cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0x01) > 0);
-
-                // Shift the temp variable right by 1
-                cpu.temp >>= 1;
-
-                // Mask the temp variable to 8 bits
-                cpu.temp &= 0xFF;
-
-                // Set the negative flag if the 8th bit of the temp variable is set
-                cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
-
-                // Set the zero flag if the temp variable is zero
-                cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
-
-                // Store the temp variable into the accumulator
-                cpu.registers.A = (byte)cpu.temp;
-
-                // Return 0 since this instruction does not use an extra cycle
-                return 0;
-            }
-            else
+            } else
             {
                 // Fetch the next byte from memory
                 cpu.Fetch();
 
                 // Load the fetched byte into the temp variable
                 cpu.temp = cpu.fetchedByte;
+            }
 
-                // If the carry flag is set, set the 9th bit of the temp variable
-                if (cpu.registers.GetFlag(CPUFlags.Carry))
-                {
-                    cpu.temp |= 0x100;
-                }
+            // If the carry flag is set, set the 9th bit of the temp variable
+            if (cpu.registers.GetFlag(CPUFlags.Carry))
+            {
+                cpu.temp |= 0x100;
+            }
 
-                // Set the carry flag if the 9th bit of the temp variable is set
-                cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0x01) > 0);
+            // Set the carry flag if the 9th bit of the temp variable is set
+            cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0x01) > 0);
 
-                // Shift the temp variable right by 1
-                cpu.temp >>= 1;
+            // Shift the temp variable right by 1
+            cpu.temp >>= 1;
 
-                // Mask the temp variable to 8 bits
-                cpu.temp &= 0xFF;
+            // Mask the temp variable to 8 bits
+            cpu.temp &= 0xFF;
 
-                // Set the negative flag if the 8th bit of the temp variable is set
-                cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
+            // Set the negative flag if the 8th bit of the temp variable is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
 
-                // Set the zero flag if the temp variable is zero
-                cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
+            // Set the zero flag if the temp variable is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
 
+            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Accumulator)
+            {
+                  // Store the temp variable into the accumulator
+                cpu.registers.A = (byte)cpu.temp;
+            }
+            else
+            {
                 // Store the temp variable into memory
                 cpu.Write(cpu.addressAbsolute, (byte)cpu.temp);
-
-                // Return 0 since this instruction does not use an extra cycle
-                return 0;
             }
+
+            // Return 0 since this instruction does not use an extra cycle
+            return 0;
         }
 
         /// <summary>
