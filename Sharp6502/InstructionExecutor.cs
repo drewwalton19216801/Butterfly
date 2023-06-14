@@ -22,7 +22,7 @@ namespace Sharp6502
             // --------------------------------------
 
             // Get the instruction name
-            string instructionName = cpu.CurrentInstruction?.Name ?? "???";
+            string instructionName = cpu.CurrentInstruction?.Name ?? "XXX";
 
             // Get the method
             MethodInfo? method = typeof(InstructionExecutor).GetMethod(instructionName, BindingFlags.Public | BindingFlags.Static) ?? throw new InvalidOperationException($"The instruction \"{instructionName}\" does not exist.");
