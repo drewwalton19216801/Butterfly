@@ -25,13 +25,7 @@ namespace Sharp6502
             string instructionName = cpu.CurrentInstruction?.Name ?? "???";
 
             // Get the method
-            MethodInfo? method = typeof(InstructionExecutor).GetMethod(instructionName, BindingFlags.Public | BindingFlags.Static);
-
-            if (method == null)
-            {
-                // The method doesn't exist, so we'll throw an exception
-                throw new InvalidOperationException($"The instruction \"{instructionName}\" does not exist.");
-            }
+            MethodInfo? method = typeof(InstructionExecutor).GetMethod(instructionName, BindingFlags.Public | BindingFlags.Static) ?? throw new InvalidOperationException($"The instruction \"{instructionName}\" does not exist.");
 
             // Invoke the method
             object result = (byte)method.Invoke(null, new object[] { cpu });
@@ -60,22 +54,22 @@ namespace Sharp6502
             cpu.Fetch();
 
             // We need perform the addition in 16-bit mode so we can detect the carry bit
-            ushort result = (ushort)(cpu.registers.A + cpu.fetchedByte + (cpu.registers.GetFlag(CPUFlags.Carry) ? 1 : 0));
+            cpu.temp = (ushort)(cpu.registers.A + cpu.fetchedByte + (cpu.registers.GetFlag(CPUFlags.Carry) ? 1 : 0));
 
             // Set the carry flag if the result is greater than 255
-            cpu.registers.SetFlag(CPUFlags.Carry, result > 255);
+            cpu.registers.SetFlag(CPUFlags.Carry, cpu.temp > 255);
 
             // Set the zero flag if the result is 0
-            cpu.registers.SetFlag(CPUFlags.Zero, (result & 0x00FF) == 0);
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0);
 
             // Set the overflow flag if the result is greater than 127 or less than -128
-            cpu.registers.SetFlag(CPUFlags.Overflow, ((cpu.registers.A ^ result) & (cpu.fetchedByte ^ result) & 0x80) != 0);
+            cpu.registers.SetFlag(CPUFlags.Overflow, ((cpu.registers.A ^ cpu.temp) & (cpu.fetchedByte ^ cpu.temp) & 0x80) != 0);
 
             // Set the negative flag if the result is less than 0
-            cpu.registers.SetFlag(CPUFlags.Negative, (result & 0x80) != 0);
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) != 0);
 
             // Store the result in the accumulator
-            cpu.registers.A = (byte)(result & 0x00FF);
+            cpu.registers.A = (byte)(cpu.temp & 0x00FF);
 
             // This instruction can take an extra cycle
             return 1;
@@ -185,15 +179,15 @@ namespace Sharp6502
             cpu.registers.SetFlag(CPUFlags.InterruptDisable, true);
 
             // Push the PC to the stack (high byte first)
-            cpu.PushStack((byte)(cpu.registers.PC >> 8 & 0x00FF));
+            cpu.PushByte((byte)(cpu.registers.PC >> 8 & 0x00FF));
             // Push the PC to the stack (low byte last)
-            cpu.PushStack((byte)(cpu.registers.PC & 0x00FF));
+            cpu.PushByte((byte)(cpu.registers.PC & 0x00FF));
 
             // Set the break flag
             cpu.registers.SetFlag(CPUFlags.Break, true);
 
             // Push the status register to the stack
-            cpu.PushStack(cpu.registers.P);
+            cpu.PushByte(cpu.registers.P);
 
             // Clear the break flag
             cpu.registers.SetFlag(CPUFlags.Break, false);
@@ -232,6 +226,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte CLC(CPU cpu)
         {
+            // Clear the carry flag
+            cpu.registers.SetFlag(CPUFlags.Carry, false);
+
+            // Return 0 extra cycles
             return 0;
         }
 
@@ -346,16 +344,16 @@ namespace Sharp6502
             cpu.Fetch();
 
             // Increment the data
-            ushort data = (ushort)(cpu.fetchedByte + 1);
+            cpu.temp = (ushort)(cpu.fetchedByte + 1);
 
             // Write the data back to memory
-            cpu.memory.Write(cpu.addressAbsolute, (byte)(data & 0x00FF));
+            cpu.memory.Write(cpu.addressAbsolute, (byte)(cpu.temp & 0x00FF));
 
             // Set the zero flag if the data is zero
-            cpu.registers.SetFlag(CPUFlags.Zero, (data & 0x00FF) == 0x0000);
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0x0000);
 
             // Set the negative flag if bit 7 is set
-            cpu.registers.SetFlag(CPUFlags.Negative, (data & 0x0080) > 0);
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x0080) > 0);
 
             // We didn't use an extra cycle
             return 0;
@@ -426,10 +424,10 @@ namespace Sharp6502
             cpu.registers.PC--;
 
             // Push the high byte of the PC to the stack
-            cpu.PushStack((byte)((cpu.registers.PC >> 8) & 0x00FF));
+            cpu.PushByte((byte)((cpu.registers.PC >> 8) & 0x00FF));
 
             // Push the low byte of the PC to the stack
-            cpu.PushStack((byte)(cpu.registers.PC & 0x00FF));
+            cpu.PushByte((byte)(cpu.registers.PC & 0x00FF));
 
             // Set the PC to the absolute address of the operand
             cpu.registers.PC = cpu.addressAbsolute;
@@ -594,34 +592,74 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte ROR(CPU cpu)
         {
-            // Fetch the next byte from memory
-            cpu.Fetch();
-
-            // Rotate the fetched byte right
-            cpu.fetchedByte = (byte)((cpu.fetchedByte >> 1) | (cpu.registers.GetFlag(CPUFlags.Carry) ? 0x80 : 0x00));
-
-            // Set the carry flag if the 0 bit was set
-            cpu.registers.SetFlag(CPUFlags.Carry, (cpu.fetchedByte & 0x01) > 0);
-            
-            // Set the zero flag if the fetched byte is zero
-            cpu.registers.SetFlag(CPUFlags.Zero, cpu.fetchedByte == 0);
-
-            // Set the negative flag if the fetched byte is negative
-            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.fetchedByte & 0x80) > 0);
-
-            // If the instruction is in implied mode, store the fetched byte in the accumulator
-            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Implied)
+            // Are we in accumulator mode?
+            if (cpu.CurrentInstruction?.Opcode == 0x6A)
             {
-                cpu.registers.A = cpu.fetchedByte;
+                // Load the accumulator into the temp variable
+                cpu.temp = cpu.registers.A;
+
+                // If the carry flag is set, set the 9th bit of the temp variable
+                if (cpu.registers.GetFlag(CPUFlags.Carry))
+                {
+                    cpu.temp |= 0x100;
+                }
+
+                // Set the carry flag if the 9th bit of the temp variable is set
+                cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0x01) > 0);
+
+                // Shift the temp variable right by 1
+                cpu.temp >>= 1;
+
+                // Mask the temp variable to 8 bits
+                cpu.temp &= 0xFF;
+
+                // Set the negative flag if the 8th bit of the temp variable is set
+                cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
+
+                // Set the zero flag if the temp variable is zero
+                cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
+
+                // Store the temp variable into the accumulator
+                cpu.registers.A = (byte)cpu.temp;
+
+                // Return 0 since this instruction does not use an extra cycle
+                return 0;
             }
             else
             {
-                // Store the fetched byte in memory
-                cpu.Write(cpu.addressAbsolute, cpu.fetchedByte);
-            }
+                // Fetch the next byte from memory
+                cpu.Fetch();
 
-            // Return 0 since this instruction does not use an extra cycle
-            return 0;
+                // Load the fetched byte into the temp variable
+                cpu.temp = cpu.fetchedByte;
+
+                // If the carry flag is set, set the 9th bit of the temp variable
+                if (cpu.registers.GetFlag(CPUFlags.Carry))
+                {
+                    cpu.temp |= 0x100;
+                }
+
+                // Set the carry flag if the 9th bit of the temp variable is set
+                cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0x01) > 0);
+
+                // Shift the temp variable right by 1
+                cpu.temp >>= 1;
+
+                // Mask the temp variable to 8 bits
+                cpu.temp &= 0xFF;
+
+                // Set the negative flag if the 8th bit of the temp variable is set
+                cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
+
+                // Set the zero flag if the temp variable is zero
+                cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
+
+                // Store the temp variable into memory
+                cpu.Write(cpu.addressAbsolute, (byte)cpu.temp);
+
+                // Return 0 since this instruction does not use an extra cycle
+                return 0;
+            }
         }
 
         /// <summary>
@@ -635,7 +673,7 @@ namespace Sharp6502
             cpu.registers.SP++;
 
             // Status register is pulled from the stack
-            cpu.registers.P = cpu.PopStack();
+            cpu.registers.P = cpu.PopByte();
 
             // Clear the break flag
             cpu.registers.SetFlag(CPUFlags.Break, false);
@@ -644,7 +682,7 @@ namespace Sharp6502
             cpu.registers.SetFlag(CPUFlags.Unused, true);
 
             // Program counter is pulled from the stack
-            cpu.registers.PC = cpu.PopStackWord();
+            cpu.registers.PC = cpu.PopWord();
 
             // Return 0 since this instruction does not use an extra cycle
             return 0;
@@ -676,22 +714,22 @@ namespace Sharp6502
             ushort value = (ushort)(cpu.fetchedByte ^ 0x00FF);
 
             // Now we can add with carry as normal
-            ushort temp = (ushort)(cpu.registers.A + value + (cpu.registers.GetFlag(CPUFlags.Carry) ? 1 : 0));
+            cpu.temp = (ushort)(cpu.registers.A + value + (cpu.registers.GetFlag(CPUFlags.Carry) ? 1 : 0));
 
             // Set the carry flag if the result is greater than 255
-            cpu.registers.SetFlag(CPUFlags.Carry, (temp & 0xFF00) > 0);
+            cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0xFF00) > 0);
 
             // Set the zero flag if the result is 0
-            cpu.registers.SetFlag(CPUFlags.Zero, (temp & 0x00FF) == 0);
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0);
 
             // Set the overflow flag if the result is greater than 127 or less than -128
-            cpu.registers.SetFlag(CPUFlags.Overflow, ((temp ^ cpu.registers.A) & (temp ^ value) & 0x0080) > 0);
+            cpu.registers.SetFlag(CPUFlags.Overflow, ((cpu.temp ^ cpu.registers.A) & (cpu.temp ^ value) & 0x0080) > 0);
 
             // Set the negative flag if the result is negative
-            cpu.registers.SetFlag(CPUFlags.Negative, (temp & 0x0080) > 0);
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x0080) > 0);
 
             // Load the result into the accumulator
-            cpu.registers.A = (byte)(temp & 0x00FF);
+            cpu.registers.A = (byte)(cpu.temp & 0x00FF);
 
             // This instruction can take an extra cycle
             return 1;

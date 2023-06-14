@@ -169,8 +169,19 @@ namespace ButterflyCS
         {
             Log.Debug(subsystem, $"Loading program {filename} into memory at address {address:X4}.");
             byte[] program = File.ReadAllBytes(filename);
+
+            // Log the size of the program
+            Log.Debug(subsystem, $"Program {filename} is {program.Length} bytes long.");
+
             for (int i = 0; i < program.Length; i++)
             {
+                // If we've reached the end of the memory, stop loading the program
+                if (address + i >= cpu.memory.data.Length)
+                {
+                    Log.Warning(subsystem, $"Program {filename} is too large to fit in memory at address {address:X4}.");
+                    break;
+                }
+
                 cpu.memory.data[address + i] = program[i];
             }
             Log.Debug(subsystem, $"Program {filename} loaded into memory at address {address:X4}.");

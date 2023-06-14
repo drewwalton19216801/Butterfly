@@ -19,8 +19,8 @@ namespace ButterflyCS
 
             // Initialize the machine
             Machine machine = new();
-            machine.LoadDemoProgram();
-            machine.Reset();
+            //machine.LoadDemoProgram();
+            //machine.Reset();
 
             // Initialize the GUI
             MainWin mainWin = new(machine);

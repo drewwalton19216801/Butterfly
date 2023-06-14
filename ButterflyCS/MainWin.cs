@@ -226,6 +226,23 @@ namespace ButterflyCS
                 machine.Reset();
             }
 
+            // Check for load (Ctrl+L)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_L))
+            {
+                // Ensure program.bin exists in the executable's directory
+                if (!File.Exists("program.bin"))
+                {
+                    Log.Error(subsystem, "program.bin does not exist in the executable's directory");
+                    return false;
+                }
+
+                // Load a program named "program.bin" from the executable's directory to memory address 0x8000
+                machine.LoadProgram("program.bin", 0x8000);
+
+                // Reset the machine
+                machine.Reset();
+            }
+
             // Check for quit (Ctrl+Q)
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_Q))
             {
@@ -244,13 +261,13 @@ namespace ButterflyCS
         {
             Raylib.ClearBackground(Raylib.GREEN);
 
-            // Draw the registers
+            // Draw the registers (prefixes with 0x to indicate hexadecimal)
             Raylib.DrawText("Registers", 10, 30, 20, Raylib.BLACK);
-            Raylib.DrawText($"A: {machine.cpu.registers.A:X2}", 10, 50, 20, Raylib.BLACK);
-            Raylib.DrawText($"X: {machine.cpu.registers.X:X2}", 10, 70, 20, Raylib.BLACK);
-            Raylib.DrawText($"Y: {machine.cpu.registers.Y:X2}", 10, 90, 20, Raylib.BLACK);
-            Raylib.DrawText($"PC: {machine.cpu.registers.PC:X4}", 10, 110, 20, Raylib.BLACK);
-            Raylib.DrawText($"SP: {machine.cpu.registers.SP:X2}", 10, 130, 20, Raylib.BLACK);
+            Raylib.DrawText($"A: 0x{machine.cpu.registers.A:X2}", 10, 50, 20, Raylib.BLACK);
+            Raylib.DrawText($"X: 0x{machine.cpu.registers.X:X2}", 10, 70, 20, Raylib.BLACK);
+            Raylib.DrawText($"Y: 0x{machine.cpu.registers.Y:X2}", 10, 90, 20, Raylib.BLACK);
+            Raylib.DrawText($"SP: 0x{machine.cpu.registers.SP:X2}", 10, 110, 20, Raylib.BLACK);
+            Raylib.DrawText($"PC: 0x{machine.cpu.registers.PC:X4}", 10, 130, 20, Raylib.BLACK);
 
             string statusString = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
                 machine.cpu.registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
@@ -282,8 +299,11 @@ namespace ButterflyCS
             // Draw the single-stepping state
             Raylib.DrawText($"Single-Stepping: {machine.isSingleStepping}", 10, 270, 20, Raylib.BLACK);
 
-            // Draw the memory at address 0x0200
-            Raylib.DrawText($"Memory at 0x0200: {machine.cpu.memory.Read(0x0200, true):X2}", 10, 290, 20, Raylib.BLACK);
+            // Draw the memory at address 0x6002
+            Raylib.DrawText($"Memory at 0x6002: {machine.cpu.memory.Read(0x6002, true):X2}", 10, 290, 20, Raylib.BLACK);
+
+            // Draw the memory at address 0x6000
+            Raylib.DrawText($"Memory at 0x6000: {machine.cpu.memory.Read(0x6000, true):X2}", 10, 310, 20, Raylib.BLACK);
         }
 
         /// <summary>

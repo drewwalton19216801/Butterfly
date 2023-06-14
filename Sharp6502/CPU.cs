@@ -36,16 +36,17 @@ namespace Sharp6502
             IllegalOpcode
         }
 
-        public Registers registers = new(0, 0, 0, 0xFD, 0, 0);
-        public Memory memory = new();
-        public byte cycles = 0;
-        public ushort addressAbsolute = 0x0000;
-        public ushort addressRelative = 0x00;
-        public byte opcode = 0x00;
-        public ExecutionState cpuState = ExecutionState.Stopped;
-        public Variant cpuVariant = Variant.Generic;
-        public byte fetchedByte = 0x00;
-        public string currentDisassembly = string.Empty;
+        public Registers registers = new(0, 0, 0, 0xFD, 0, 0); // The CPU registers
+        public Memory memory = new(); // The CPU memory
+        public byte cycles = 0; // The number of cycles remaining for the current instruction
+        public ushort temp = 0x0000; // A variable to temporarily store data
+        public ushort addressAbsolute = 0x0000; // Represents the absolute address fetched
+        public ushort addressRelative = 0x00; // Represents the relative address fetched
+        public byte opcode = 0x00; // The current opcode
+        public ExecutionState cpuState = ExecutionState.Stopped; // The current execution state
+        public Variant cpuVariant = Variant.Generic; // The CPU variant
+        public byte fetchedByte = 0x00; // The fetched byte
+        public string currentDisassembly = string.Empty; // The current disassembly
 
         /// <summary>
         /// Gets or sets the current instruction.
@@ -160,6 +161,12 @@ namespace Sharp6502
         /// <summary>
         /// Emits an interrupt request.
         /// </summary>
+        /// <remarks>
+        /// IRQs are a complicated operation. The current instruction is allowed to finish, but then the current program counter and status register
+        /// are pushed to the stack. The interrupt vector is then read from memory and the program counter is set to the interrupt vector. The interrupt
+        /// flag is set to prevent further interrupts from being processed. When the interrupt handler is complete, the status register and program
+        /// counter are restored to their previous values and execution continues as normal.
+        /// </remarks>
         public void IRQ()
         {
             // Make sure interrupts are enabled
@@ -192,6 +199,11 @@ namespace Sharp6502
         /// <summary>
         /// Emits a non-maskable interrupt request.
         /// </summary>
+        /// <remarks>
+        /// A non-maskable interrupt is similar to a regular IRQ, but it cannot be ignored. It
+        /// acts like a regular IRQ, but reads the new PC from memory location 0xFFFA instead of
+        /// 0xFFFE.
+        /// </remarks>
         public void NMI()
         {
             // Push the program counter to the stack
@@ -223,7 +235,7 @@ namespace Sharp6502
         /// Pushes a byte to the stack
         /// </summary>
         /// <param name="data">The data.</param>
-        public void PushStack(byte data)
+        public void PushByte(byte data)
         {
             Write((ushort)(0x0100 + registers.SP), data);
             registers.SP--;
@@ -233,7 +245,7 @@ namespace Sharp6502
         /// Pops a byte from the stack.
         /// </summary>
         /// <returns>A byte.</returns>
-        public byte PopStack()
+        public byte PopByte()
         {
             registers.SP++;
             return Read((ushort)(0x0100 + registers.SP));
@@ -243,10 +255,10 @@ namespace Sharp6502
         /// Pops a word from the stack.
         /// </summary>
         /// <returns>An ushort.</returns>
-        public ushort PopStackWord()
+        public ushort PopWord()
         {
-            ushort word = PopStack();
-            word |= (ushort)(PopStack() << 8);
+            ushort word = PopByte();
+            word |= (ushort)(PopByte() << 8);
             return word;
         }
 
@@ -340,7 +352,7 @@ namespace Sharp6502
              */
             ushort address = startAddress;
             Instruction previousInstruction = null;
-            List<string> instructions = new List<string>();
+            List<string> instructions = new();
 
             // Loop through the addresses.
             for (int i = 0; i < count; i++)
@@ -371,7 +383,7 @@ namespace Sharp6502
                             byte operand = Read((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" #{operand:X2}";
+                            instructions[^1] += $" #{operand:X2}";
                             break;
                         }
                     case Addressing.ZeroPage:
@@ -380,7 +392,7 @@ namespace Sharp6502
                             byte operand = Read((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" ${operand:X2}";
+                            instructions[^1] += $" ${operand:X2}";
                             break;
                         }
                     case Addressing.ZeroPageX:
@@ -389,7 +401,7 @@ namespace Sharp6502
                             byte operand = Read((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" ${operand:X2},X";
+                            instructions[^1] += $" ${operand:X2},X";
                             break;
                         }
                     case Addressing.ZeroPageY:
@@ -398,7 +410,7 @@ namespace Sharp6502
                             byte operand = Read((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" ${operand:X2},Y";
+                            instructions[^1] += $" ${operand:X2},Y";
                             break;
                         }
                     case Addressing.Absolute:
@@ -407,7 +419,7 @@ namespace Sharp6502
                             ushort operand = ReadWord((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" ${operand:X4}";
+                            instructions[^1] += $" ${operand:X4}";
                             break;
                         }
                     case Addressing.AbsoluteX:
@@ -416,7 +428,7 @@ namespace Sharp6502
                             ushort operand = ReadWord((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" ${operand:X4},X";
+                            instructions[^1] += $" ${operand:X4},X";
                             break;
                         }
                     case Addressing.AbsoluteY:
@@ -425,7 +437,7 @@ namespace Sharp6502
                             ushort operand = ReadWord((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" ${operand:X4},Y";
+                            instructions[^1] += $" ${operand:X4},Y";
                             break;
                         }
                     case Addressing.Indirect:
@@ -434,7 +446,7 @@ namespace Sharp6502
                             ushort operand = ReadWord((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" (${operand:X4})";
+                            instructions[^1] += $" (${operand:X4})";
                             break;
                         }
                     case Addressing.IndirectX:
@@ -443,7 +455,7 @@ namespace Sharp6502
                             byte operand = Read((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" (${operand:X2},X)";
+                            instructions[^1] += $" (${operand:X2},X)";
                             break;
                         }
                     case Addressing.IndirectY:
@@ -452,7 +464,7 @@ namespace Sharp6502
                             byte operand = Read((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" (${operand:X2}),Y";
+                            instructions[^1] += $" (${operand:X2}),Y";
                             break;
                         }
                     case Addressing.Relative:
@@ -461,13 +473,13 @@ namespace Sharp6502
                             byte operand = Read((ushort)(address + 1));
 
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" ${operand:X2}";
+                            instructions[^1] += $" ${operand:X2}";
                             break;
                         }
                     case Addressing.Accumulator:
                         {
                             // Add the operand to the instruction.
-                            instructions[instructions.Count - 1] += $" A";
+                            instructions[^1] += $" A";
                             break;
                         }
                 }

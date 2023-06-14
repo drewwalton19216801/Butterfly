@@ -33,37 +33,23 @@
         /// <returns>A byte.</returns>
         public static byte GetAddress(CPU cpu, Addressing addressingMode)
         {
-            switch (addressingMode)
+            return addressingMode switch
             {
-                case Addressing.Implied:
-                    return Implied(cpu);
-                case Addressing.Accumulator:
-                    return Accumulator(cpu);
-                case Addressing.Immediate:
-                    return Immediate(cpu);
-                case Addressing.ZeroPage:
-                    return ZeroPage(cpu);
-                case Addressing.ZeroPageX:
-                    return ZeroPageX(cpu);
-                case Addressing.ZeroPageY:
-                    return ZeroPageY(cpu);
-                case Addressing.Relative:
-                    return Relative(cpu);
-                case Addressing.Absolute:
-                    return Absolute(cpu);
-                case Addressing.AbsoluteX:
-                    return AbsoluteX(cpu);
-                case Addressing.AbsoluteY:
-                    return AbsoluteY(cpu);
-                case Addressing.Indirect:
-                    return Indirect(cpu);
-                case Addressing.IndirectX:
-                    return IndirectX(cpu);
-                case Addressing.IndirectY:
-                    return IndirectY(cpu);
-                default:
-                    throw new Exception("Invalid addressing mode.");
-            }
+                Addressing.Implied => Implied(cpu),
+                Addressing.Accumulator => Accumulator(cpu),
+                Addressing.Immediate => Immediate(cpu),
+                Addressing.ZeroPage => ZeroPage(cpu),
+                Addressing.ZeroPageX => ZeroPageX(cpu),
+                Addressing.ZeroPageY => ZeroPageY(cpu),
+                Addressing.Relative => Relative(cpu),
+                Addressing.Absolute => Absolute(cpu),
+                Addressing.AbsoluteX => AbsoluteX(cpu),
+                Addressing.AbsoluteY => AbsoluteY(cpu),
+                Addressing.Indirect => Indirect(cpu),
+                Addressing.IndirectX => IndirectX(cpu),
+                Addressing.IndirectY => IndirectY(cpu),
+                _ => throw new Exception("Invalid addressing mode."),
+            };
         }
 
         /// <summary>
