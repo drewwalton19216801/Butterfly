@@ -28,6 +28,20 @@ namespace ButterflyCS
         private ushort memoryViewStartAddress = 0x8000;
 
         /// <summary>
+        /// Draw the disassembly?
+        /// </summary>
+        /// <remarks>
+        /// This is a toggleable option and is used to determine 
+        /// whether to draw the disassembly or not in the memory view.
+        /// </remarks>
+        private ushort disasmAddress = 0x8000;
+
+        /// <summary>
+        /// The disassembly string.
+        /// </summary>
+        private string disasmString = "";
+
+        /// <summary>
         /// The emulator screen.
         /// </summary>
         public enum EmulatorScreen
@@ -215,6 +229,14 @@ namespace ButterflyCS
                             // but don't go past the start of memory (0x0000)
                             memoryViewStartAddress = (ushort)Math.Max(memoryViewStartAddress - 1, 0x0000);
                         }
+
+                        // Check for Enter (Return)
+                        // This will allow the user to disassemble the currently highlighted address
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+                        {
+                            disasmAddress = (ushort)(memoryViewStartAddress + 4);
+                            UpdateDisassembly();
+                        }
                         break;
                     }
             }
@@ -319,7 +341,7 @@ namespace ButterflyCS
         /// <summary>
         /// Draws the memory view screen.
         /// </summary>
-        private void DrawMemoryViewScreen()
+        private void DrawMemoryViewScreen(bool drawDisassembly = false)
         {
             Raylib.ClearBackground(Raylib.GREEN);
 
@@ -356,6 +378,19 @@ namespace ButterflyCS
             {
                 Raylib.DrawText($"{machine.cpu.memory.Read((ushort)(memoryViewStartAddress + i), true):X2}", 100, 50 + (i * 20), 20, Raylib.BLACK);
             }
+
+            // Draw the disassembly on the same line as the selected memory address
+            Raylib.DrawText("Disassembly", 200, 30, 20, Raylib.BLACK);
+            Raylib.DrawText($"{disasmString}", 200, 50 + (4 * 20), 20, Raylib.YELLOW);
+        }
+
+        /// <summary>
+        /// Updates the disassembly.
+        /// </summary>
+        private void UpdateDisassembly()
+        {                            
+            disasmString = machine.cpu.Disassemble(disasmAddress);
+            Log.Debug(subsystem, ": Disassembly at 0x" + disasmAddress.ToString("X4") + ": " + disasmString);
         }
     }
 }

@@ -558,7 +558,8 @@ namespace Sharp6502
                     operandString = $"${operand:X2}";
                     break;
                 case Addressing.Accumulator:
-                    operandString = "A";
+                    operand = Read((ushort)(registers.PC + 1));
+                    operandString = $"${operand:X2}";
                     break;
             }
 
