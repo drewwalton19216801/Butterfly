@@ -304,6 +304,15 @@ namespace ButterflyCS
 
             // Draw the memory at address 0x6000
             Raylib.DrawText($"Memory at 0x6000: {machine.cpu.memory.Read(0x6000, true):X2}", 10, 310, 20, Raylib.BLACK);
+
+            // Draw the CPU variant
+            string variantString = machine.cpu.cpuVariant switch
+            {
+                CPU.Variant.NMOS_6502 => "NMOS 6502",
+                CPU.Variant.CMOS_6502 => "CMOS 6502",
+                _ => "Unknown"
+            };
+            Raylib.DrawText($"CPU Variant: {variantString}", 10, 330, 20, Raylib.BLACK);
         }
 
         /// <summary>

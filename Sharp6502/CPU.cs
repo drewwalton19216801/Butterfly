@@ -21,7 +21,8 @@ namespace Sharp6502
         /// </remarks>
         public enum Variant
         {
-            Generic
+            NMOS_6502,
+            CMOS_6502,
         }
 
         /// <summary>
@@ -44,7 +45,7 @@ namespace Sharp6502
         public ushort addressRelative = 0x00; // Represents the relative address fetched
         public byte opcode = 0x00; // The current opcode
         public ExecutionState cpuState = ExecutionState.Stopped; // The current execution state
-        public Variant cpuVariant = Variant.Generic; // The CPU variant
+        public Variant cpuVariant = Variant.CMOS_6502; // The CPU variant
         public byte fetchedByte = 0x00; // The fetched byte
         public string currentDisassembly = string.Empty; // The current disassembly
 
