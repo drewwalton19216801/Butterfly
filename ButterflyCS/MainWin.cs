@@ -309,7 +309,7 @@ namespace ButterflyCS
             string variantString = machine.cpu.cpuVariant switch
             {
                 CPU.Variant.NMOS_6502 => "NMOS 6502",
-                CPU.Variant.CMOS_6502 => "CMOS 6502",
+                CPU.Variant.CMOS_65C02 => "CMOS 65C02",
                 _ => "Unknown"
             };
             Raylib.DrawText($"CPU Variant: {variantString}", 10, 330, 20, Raylib.BLACK);

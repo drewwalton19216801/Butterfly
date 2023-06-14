@@ -22,7 +22,7 @@ namespace Sharp6502
         public enum Variant
         {
             NMOS_6502, // The original 6502
-            CMOS_6502, // The 65C02
+            CMOS_65C02, // The 65C02
             NES_6502, // The NES 6502 is a 6502 with a few quirks (aka Ricoh 2A03)
         }
 
@@ -295,7 +295,7 @@ namespace Sharp6502
             registers.Y = 0;
             registers.SP = 0xFD;
             registers.PC = ReadWord(0xFFFC); // Read the PC from the reset vector.
-            registers.P = (byte)(CPUFlags.None | CPUFlags.Unused);
+            registers.P = (byte)(CPUFlags.None | CPUFlags.Unused | CPUFlags.InterruptDisable);
             cycles = 8;
             Log.Debug(subsystem, "CPU reset complete.");
 
