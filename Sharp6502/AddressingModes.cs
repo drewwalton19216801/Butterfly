@@ -36,7 +36,7 @@
             return addressingMode switch
             {
                 Addressing.Implied => Implied(cpu),
-                Addressing.Accumulator => Accumulator(cpu),
+                Addressing.Accumulator => Accumulator(),
                 Addressing.Immediate => Immediate(cpu),
                 Addressing.ZeroPage => ZeroPage(cpu),
                 Addressing.ZeroPageX => ZeroPageX(cpu),
@@ -69,7 +69,7 @@
         /// The accumulator addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte Accumulator(CPU cpu)
+        public static byte Accumulator()
         {
             // This mode never uses an extra cycle,
             // and doesn't need to fetch any data.
