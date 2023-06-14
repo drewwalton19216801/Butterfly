@@ -21,9 +21,9 @@ namespace Sharp6502
         /// </remarks>
         public enum Variant
         {
-            NMOS_6502,
-            CMOS_6502,
-            NES_6502,
+            NMOS_6502, // The original 6502
+            CMOS_6502, // The 65C02
+            NES_6502, // The NES 6502 is a 6502 with a few quirks (aka Ricoh 2A03)
         }
 
         /// <summary>
