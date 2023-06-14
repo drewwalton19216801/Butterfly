@@ -610,7 +610,7 @@ namespace Sharp6502
         /// <returns>A byte.</returns>
         /// <remarks>
         /// The NMOS 6502 has a bug in the ROR instruction. It shifts left instead of right,
-        /// shifts a 0 into the 7th bit (instead of the carry flag), and does not affect the
+        /// shifts a 0 into the 9th bit (instead of the carry flag), and does not affect the
         /// carry flag.
         /// </remarks>
         private static byte ROR_NMOS(CPU cpu)
