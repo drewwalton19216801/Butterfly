@@ -53,20 +53,50 @@ namespace Sharp6502
             // Fetch the data to add
             cpu.Fetch();
 
-            // We need perform the addition in 16-bit mode so we can detect the carry bit
+            // Add the value to the accumulator
             cpu.temp = (ushort)(cpu.registers.A + cpu.fetchedByte + (cpu.registers.GetFlag(CPUFlags.Carry) ? 1 : 0));
-
-            // Set the carry flag if the result is greater than 255
-            cpu.registers.SetFlag(CPUFlags.Carry, cpu.temp > 255);
 
             // Set the zero flag if the result is 0
             cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0);
 
-            // Set the overflow flag if the result is greater than 127 or less than -128
-            cpu.registers.SetFlag(CPUFlags.Overflow, ((cpu.registers.A ^ cpu.temp) & (cpu.fetchedByte ^ cpu.temp) & 0x80) != 0);
+            // If the CPU variant is NOT NES_6502, then we check for decimal mode
+            if (cpu.cpuVariant != CPU.Variant.NES_6502)
+            {
+                // If the decimal flag is set, then we need to convert the result to BCD
+                if (cpu.registers.GetFlag(CPUFlags.Decimal))
+                {
+                    // If the result is greater than 99, then we need to add 96 to the result
+                    if (((cpu.registers.A & 0xF) + (cpu.fetchedByte & 0xF) + (cpu.registers.GetFlag(CPUFlags.Carry) ? 1 : 0)) > 9)
+                    {
+                        cpu.temp += 6;
+                    }
 
-            // Set the negative flag if the result is less than 0
-            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) != 0);
+                    // Set the negative flag if the result is negative
+                    cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) != 0);
+
+                    // Set the overflow flag if the result is greater than 127 or less than -128
+                    cpu.registers.SetFlag(CPUFlags.Overflow, ((cpu.registers.A ^ cpu.temp) & (cpu.fetchedByte ^ cpu.temp) & 0x80) != 0);
+
+                    // If the result is greater than 99, then we need to add 96 to the result
+                    if (cpu.temp > 99)
+                    {
+                        cpu.temp += 96;
+                    }
+
+                    // Set the carry flag if the result is greater than 0x99
+                    cpu.registers.SetFlag(CPUFlags.Carry, cpu.temp > 0x99);
+                }
+            } else
+            {
+                // Set the negative flag if the result is less than 0
+                cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) != 0);
+
+                // Set the overflow flag if the result is greater than 127 or less than -128
+                cpu.registers.SetFlag(CPUFlags.Overflow, ((cpu.registers.A ^ cpu.temp) & (cpu.fetchedByte ^ cpu.temp) & 0x80) != 0);
+
+                // Set the carry flag to the opposite of (cpu.temp > 0xFF)
+                cpu.registers.SetFlag(CPUFlags.Carry, cpu.temp > 0xFF);
+            }
 
             // Store the result in the accumulator
             cpu.registers.A = (byte)(cpu.temp & 0x00FF);
@@ -240,6 +270,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte CLD(CPU cpu)
         {
+            // Clear the decimal flag
+            cpu.registers.SetFlag(CPUFlags.Decimal, false);
+            
+            // Return 0 extra cycles
             return 0;
         }
 
@@ -844,6 +878,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte SED(CPU cpu)
         {
+            // Set the decimal flag
+            cpu.registers.SetFlag(CPUFlags.Decimal, true);
+
+            // No extra cycle
             return 0;
         }
 
