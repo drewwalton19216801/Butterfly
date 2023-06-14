@@ -780,6 +780,13 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte RTS(CPU cpu)
         {
+            // Pop a word from the stack and store it in the program counter
+            cpu.registers.PC = cpu.PopWord();
+
+            // Increment the program counter
+            cpu.registers.PC++;
+
+            // Return 0 since this instruction does not use an extra cycle
             return 0;
         }
 
