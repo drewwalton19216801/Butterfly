@@ -28,7 +28,7 @@ namespace Sharp6502
             MethodInfo? method = typeof(InstructionExecutor).GetMethod(instructionName, BindingFlags.Public | BindingFlags.Static) ?? throw new InvalidOperationException($"The instruction \"{instructionName}\" does not exist.");
 
             // Invoke the method
-            object result = (byte)method.Invoke(null, new object[] { cpu });
+            object? result = (byte?)method.Invoke(null, new object[] { cpu });
 
             // Handle the result
             if (result is byte byteResult)
