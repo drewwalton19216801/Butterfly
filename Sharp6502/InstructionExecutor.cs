@@ -282,6 +282,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte CLI(CPU cpu)
         {
+            // Clear the interrupt disable flag
+            cpu.registers.SetFlag(CPUFlags.InterruptDisable, false);
+
+            // Return 0 extra cycles
             return 0;
         }
 
@@ -292,6 +296,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte CLV(CPU cpu)
         {
+            // Clear the overflow flag
+            cpu.registers.SetFlag(CPUFlags.Overflow, false);
+            
+            // Return 0 extra cycles
             return 0;
         }
 
@@ -892,6 +900,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte SEC(CPU cpu)
         {
+            // Set the carry flag
+            cpu.registers.SetFlag(CPUFlags.Carry, true);
+
+            // No extra cycle
             return 0;
         }
 
@@ -916,6 +928,10 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte SEI(CPU cpu)
         {
+            // Set the interrupt disable flag
+            cpu.registers.SetFlag(CPUFlags.InterruptDisable, true);
+
+            // No extra cycle
             return 0;
         }
 
