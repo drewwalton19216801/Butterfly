@@ -592,15 +592,12 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte ROR(CPU cpu)
         {
-            switch (cpu.cpuVariant)
+            return cpu.cpuVariant switch
             {
-                case CPU.Variant.CMOS_6502:
-                    return ROR_CMOS(cpu);
-                case CPU.Variant.NMOS_6502:
-                    return ROR_NMOS(cpu);
-                default:
-                    throw new Exception("Invalid CPU variant");
-            }
+                CPU.Variant.CMOS_6502 => ROR_CMOS(cpu),
+                CPU.Variant.NMOS_6502 => ROR_NMOS(cpu),
+                _ => throw new Exception("Invalid CPU variant"),
+            };
         }
 
         /// <summary>

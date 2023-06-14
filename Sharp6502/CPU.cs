@@ -352,7 +352,7 @@ namespace Sharp6502
              * Non-instruction bytes will return a string containing the word "DATA"
              */
             ushort address = startAddress;
-            Instruction previousInstruction = null;
+            Instruction? previousInstruction = null;
             List<string> instructions = new();
 
             // Loop through the addresses.
