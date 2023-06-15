@@ -315,7 +315,23 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte CMP(CPU cpu)
         {
-            return 0;
+            // Fetch the next byte
+            cpu.Fetch();
+
+            // Compare the fetched byte with the accumulator
+            cpu.temp = (ushort)(cpu.registers.A - cpu.fetchedByte);
+
+            // Set the carry flag if the accumulator is greater than or equal to the fetched byte
+            cpu.registers.SetFlag(CPUFlags.Carry, cpu.registers.A >= cpu.fetchedByte);
+
+            // Set the Zero flag if the lower 8 bits of cpu.temp are equal to zero after the CMP instruction.
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0x0000);
+
+            // Set the Negative flag if bit 7 of cpu.temp is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x0080) == 0x0080);
+
+            // Return 1 extra cycle
+            return 1;
         }
 
         /// <summary>
@@ -325,7 +341,23 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte CPX(CPU cpu)
         {
-            return 0;
+            // Fetch the next byte
+            cpu.Fetch();
+
+            // Compare the fetched byte with the X register
+            cpu.temp = (ushort)(cpu.registers.X - cpu.fetchedByte);
+
+            // Set the carry flag if the X register is greater than or equal to the fetched byte
+            cpu.registers.SetFlag(CPUFlags.Carry, cpu.registers.X >= cpu.fetchedByte);
+
+            // Set the Zero flag if the lower 8 bits of cpu.temp are equal to zero after the CMP instruction.
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0x0000);
+
+            // Set the Negative flag if bit 7 of cpu.temp is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x0080) == 0x0080);
+
+            // Return 1 extra cycle
+            return 1;
         }
 
         /// <summary>
@@ -335,7 +367,23 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte CPY(CPU cpu)
         {
-            return 0;
+            // Fetch the next byte
+            cpu.Fetch();
+
+            // Compare the fetched byte with the Y register
+            cpu.temp = (ushort)(cpu.registers.Y - cpu.fetchedByte);
+
+            // Set the carry flag if the Y register is greater than or equal to the fetched byte
+            cpu.registers.SetFlag(CPUFlags.Carry, cpu.registers.Y >= cpu.fetchedByte);
+
+            // Set the Zero flag if the lower 8 bits of cpu.temp are equal to zero after the CMP instruction.
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0x0000);
+
+            // Set the Negative flag if bit 7 of cpu.temp is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x0080) == 0x0080);
+
+            // Return 1 extra cycle
+            return 1;
         }
 
         /// <summary>
@@ -345,6 +393,22 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte DEC(CPU cpu)
         {
+            // Fetch the next byte
+            cpu.Fetch();
+
+            // Decrement the fetched byte by one
+            cpu.temp = (ushort)(cpu.fetchedByte - 1);
+
+            // Write the decremented byte back to memory
+            cpu.Write(cpu.addressAbsolute, (byte)(cpu.temp & 0x00FF));
+
+            // Set the zero flag
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0x0000);
+
+            // Set the negative flag
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x0080) == 0x0080);
+
+            // Return 0 extra cycles
             return 0;
         }
 
@@ -355,6 +419,16 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte DEX(CPU cpu)
         {
+            // Decrement the X register by one
+            cpu.registers.X--;
+
+            // Set the zero flag
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.X == 0x00);
+
+            // Set the negative flag
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.X & 0x80) == 0x80);
+
+            // Return 0 extra cycles
             return 0;
         }
 
@@ -365,6 +439,16 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte DEY(CPU cpu)
         {
+            // Decrement the Y register by one\
+            cpu.registers.Y--;
+
+            // Set the zero flag
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.Y == 0x00);
+
+            // Set the negative flag
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.registers.Y & 0x80) == 0x80);
+
+            // Return 0 extra cycles
             return 0;
         }
 
