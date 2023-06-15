@@ -25,6 +25,11 @@ namespace ButterflyCS
         public CPU cpu;
 
         /// <summary>
+        /// A demo device that hooks into the memory space.
+        /// </summary>
+        public MemHookDemoDevice memHookDemoDevice;
+
+        /// <summary>
         /// The CPU timer.
         /// </summary>
         public Timer cpuTimer;
@@ -50,6 +55,7 @@ namespace ButterflyCS
         {
             Log.Debug(subsystem, "Machine created.");
             cpu = new CPU();
+            memHookDemoDevice = new MemHookDemoDevice();
             clockCycleDuration = 1 / CycleSpeed;
             isRunning = false;
             isPaused = false;
@@ -58,6 +64,10 @@ namespace ButterflyCS
             // Set up the timer
             cpuTimer = new Timer(clockCycleDuration * 1000); // Timer interval is in milliseconds
             cpuTimer.Elapsed += Cycle!;
+
+            // Hook up the demo device
+            cpu.memory.RegisterReadHook(memHookDemoDevice.startAddress, memHookDemoDevice.endAddress, memHookDemoDevice.Read); // Read hook
+            cpu.memory.RegisterWriteHook(memHookDemoDevice.startAddress, memHookDemoDevice.endAddress, memHookDemoDevice.Write); // Write hook
         }
 
         /// <summary>
