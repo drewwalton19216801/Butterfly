@@ -157,8 +157,8 @@
         /// <param name="readFunc">The read function to be called.</param>
         /// <remarks>
         /// Allows a component to hook a memory address and provide additional
-        /// functionality. For example, the PPU could hook memory addresses 0x2000
-        /// through 0x2007 to provide access to the PPU registers.
+        /// functionality. For example, a keyboard component could hook memory
+        /// address 0x4016 to provide access to the keyboard.
         /// </remarks>
         public void RegisterReadHook(ushort startAddress, ushort endAddress, Func<ushort, byte> readFunc)
         {
