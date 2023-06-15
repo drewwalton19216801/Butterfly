@@ -194,6 +194,20 @@ namespace ButterflyCS
                             // Decrease the speed by 2 Hz
                             machine.DecreaseSpeed(2);
                         }
+
+                        // Check for Ctrl+N
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_N))
+                        {
+                            // Toggle NMI
+                            machine.cpu.NMI();
+                        }
+
+                        // Check for Ctrl+I
+                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_I))
+                        {
+                            // Toggle IRQ
+                            machine.cpu.IRQ();
+                        }
                         break;
                     }
                 case EmulatorScreen.Memory:
@@ -258,8 +272,8 @@ namespace ButterflyCS
                     return false;
                 }
 
-                // Load a program named "program.bin" from the executable's directory to memory address 0x8000
-                machine.LoadProgram("program.bin", 0x8000);
+                // Load a program named "program.bin" from the executable's directory to memory address 0x0000
+                machine.LoadProgram("program.bin", 0x0000);
 
                 // Reset the machine
                 machine.Reset();
