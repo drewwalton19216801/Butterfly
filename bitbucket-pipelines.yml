@@ -28,4 +28,4 @@ pipelines:
               - dotnet restore
               - dotnet publish --no-restore --configuration Release
             artifacts:
-              - publish/**
+              - ./publish/**
