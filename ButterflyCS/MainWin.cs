@@ -42,6 +42,11 @@ namespace ButterflyCS
         private string disasmString = "";
 
         /// <summary>
+        /// The gamepad.
+        /// </summary>
+        private int gamepad = 0;
+
+        /// <summary>
         /// The emulator screen.
         /// </summary>
         public enum EmulatorScreen
@@ -156,21 +161,21 @@ namespace ButterflyCS
                 currentScreen = EmulatorScreen.Help;
             }
 
-            // Check for pause (Ctrl+P)
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_P))
+            // Check for pause (Ctrl+P or gamepad Start)
+            if ((Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_P)) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_MIDDLE_RIGHT))
             {
                 machine.isPaused = !machine.isPaused;
                 machine.isSingleStepping = false;
             }
-            // Check for single-step (Ctrl+S)
-            else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_S))
+            // Check for single-step (Ctrl+S or gamepad Back)
+            else if ((Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_S)) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_MIDDLE_LEFT))
             {
                 machine.isSingleStepping = true;
                 machine.isPaused = true;
             }
 
-            // If machine is in single-step mode, execute one cycle if the user presses the spacebar
-            if (machine.isSingleStepping && Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
+            // If machine is in single-step mode, execute one cycle if the user presses the spacebar or gamepad A
+            if (machine.isSingleStepping && (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)))
             {
                 Log.Debug(subsystem, "Single-stepping");
                 machine.cpu.Clock();
@@ -181,15 +186,15 @@ namespace ButterflyCS
             {
                 case EmulatorScreen.MachineState:
                     {
-                        // Check for Ctrl+PgUp
-                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_UP))
+                        // Check for Ctrl+PgUp or Gamepad Up
+                        if ((Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_UP)) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_LEFT_FACE_UP))
                         {
                             // Increase the speed by 2 Hz
                             machine.IncreaseSpeed(2);
                         }
 
-                        // Check for Ctrl+PgDown
-                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_DOWN))
+                        // Check for Ctrl+PgDown or Gamepad Down
+                        if ((Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_PAGE_DOWN)) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_LEFT_FACE_DOWN))
                         {
                             // Decrease the speed by 2 Hz
                             machine.DecreaseSpeed(2);
@@ -228,25 +233,25 @@ namespace ButterflyCS
                             memoryViewStartAddress = (ushort)Math.Max(memoryViewStartAddress - 15, 0x0000);
                         }
 
-                        // Check for Ctrl+Up
-                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_UP))
+                        // Check for Up
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_UP) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_LEFT_FACE_UP))
                         {
                             // Increase the memory view start address by 1 address,
                             // but don't go past the end of memory (0xFFFF)
                             memoryViewStartAddress = (ushort)Math.Min(memoryViewStartAddress + 1, 0xFFFF);
                         }
 
-                        // Check for Ctrl+Down
-                        if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_DOWN))
+                        // Check for Down
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_DOWN) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_LEFT_FACE_DOWN))
                         {
                             // Decrease the memory view start address by 1 address,
                             // but don't go past the start of memory (0x0000)
                             memoryViewStartAddress = (ushort)Math.Max(memoryViewStartAddress - 1, 0x0000);
                         }
 
-                        // Check for Enter (Return)
+                        // Check for Enter (Return) or Gamepad B
                         // This will allow the user to disassemble the currently highlighted address
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
                         {
                             disasmAddress = (ushort)(memoryViewStartAddress + 4);
                             UpdateDisassembly();
@@ -255,8 +260,8 @@ namespace ButterflyCS
                     }
             }
 
-            // Check for reset (Ctrl+R)
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_R))
+            // Check for reset (Ctrl+R or gamepad Y)
+            if ((Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_R)) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_LEFT))
             {
                 // Reset the machine
                 machine.Reset();
@@ -273,7 +278,7 @@ namespace ButterflyCS
                 }
 
                 // Load a program named "program.bin" from the executable's directory to memory address 0x0000
-                machine.LoadProgram("program.bin", 0x0000);
+                machine.LoadProgram("rom.bin", 0x8000);
 
                 // Reset the machine
                 machine.Reset();
@@ -350,6 +355,34 @@ namespace ButterflyCS
                 _ => "Unknown"
             };
             Raylib.DrawText($"CPU Variant: {variantString}", 10, 330, 20, Raylib.BLACK);
+
+            // Get the current gamepad button being pressed
+            GamepadButton currentButton = (GamepadButton)Raylib.GetGamepadButtonPressed();
+            // Convert the button to a string
+            string buttonString = currentButton switch
+            {
+                GamepadButton.GAMEPAD_BUTTON_LEFT_FACE_UP => "Up",
+                GamepadButton.GAMEPAD_BUTTON_LEFT_FACE_RIGHT => "Right",
+                GamepadButton.GAMEPAD_BUTTON_LEFT_FACE_DOWN => "Down",
+                GamepadButton.GAMEPAD_BUTTON_LEFT_FACE_LEFT => "Left",
+                GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_UP => "X",
+                GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_RIGHT => "A",
+                GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_DOWN => "B",
+                GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_LEFT => "Y",
+                GamepadButton.GAMEPAD_BUTTON_LEFT_TRIGGER_1 => "Left Shoulder",
+                GamepadButton.GAMEPAD_BUTTON_LEFT_TRIGGER_2 => "Left Trigger",
+                GamepadButton.GAMEPAD_BUTTON_RIGHT_TRIGGER_1 => "Right Shoulder",
+                GamepadButton.GAMEPAD_BUTTON_RIGHT_TRIGGER_2 => "Right Trigger",
+                GamepadButton.GAMEPAD_BUTTON_MIDDLE_LEFT => "Middle Left",
+                GamepadButton.GAMEPAD_BUTTON_MIDDLE => "Middle",
+                GamepadButton.GAMEPAD_BUTTON_MIDDLE_RIGHT => "Middle Right",
+                GamepadButton.GAMEPAD_BUTTON_LEFT_THUMB => "Left Thumb",
+                GamepadButton.GAMEPAD_BUTTON_RIGHT_THUMB => "Right Thumb",
+                _ => "None"
+            };
+
+            // Draw the current gamepad button being pressed
+            Raylib.DrawText($"Gamepad Button: {buttonString}", 10, 350, 20, Raylib.BLACK);
         }
 
         /// <summary>
