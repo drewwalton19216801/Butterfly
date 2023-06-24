@@ -16,7 +16,7 @@ namespace Sharp6502
         public static byte GetAddress(CPU cpu, string addressingMode)
         {
             // --------------------------------------
-            // We're going to use reflection to get the method that corresponds to the instruction name
+            // We're going to use reflection to get the method that corresponds to the addressing mode,
             // and then invoke it. This is a lot faster than a switch statement, and it's a lot easier
             // to maintain.
             // --------------------------------------
