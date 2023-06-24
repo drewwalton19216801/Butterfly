@@ -1,0 +1,59 @@
+F00:0001           .org $8000
+F00:0002       
+F00:0003       reset:
+F00:0004           lda #$ff
+               S01:FFFFFFFFFFFF8000:  A9 FF
+F00:0005           sta $6002
+               S01:FFFFFFFFFFFF8002:  8D 02 60
+F00:0006       
+F00:0007           lda #$50
+               S01:FFFFFFFFFFFF8005:  A9 50
+F00:0008           sta $6000
+               S01:FFFFFFFFFFFF8007:  8D 00 60
+F00:0009       
+F00:0010       loop:
+F00:0011           ror
+               S01:FFFFFFFFFFFF800A:  6A
+F00:0012           sta $6000
+               S01:FFFFFFFFFFFF800B:  8D 00 60
+F00:0013           jmp loop
+               S01:FFFFFFFFFFFF800E:  4C 0A 80
+F00:0014       
+F00:0015       irq:
+F00:0016           rti
+               S01:FFFFFFFFFFFF8011:  40
+F00:0017       
+F00:0018       nmi:
+F00:0019           rti
+               S01:FFFFFFFFFFFF8012:  40
+F00:0020       
+F00:0021           .org $fffa
+F00:0022           .word nmi
+               S02:FFFFFFFFFFFFFFFA:  12 80
+F00:0023           .word reset
+               S02:FFFFFFFFFFFFFFFC:  00 80
+F00:0024           .word irq
+               S02:FFFFFFFFFFFFFFFE:  11 80
+F00:0025           .word $8000
+               S02:00000000:  00 80
+F00:0026       
+
+
+Sections:
+S01  seg8000
+S02  segfffa
+
+
+Sources:
+F00  LDA_demo.S
+
+
+Symbols:
+nmi EXPR(-32750=0x8012) ABS 
+irq EXPR(-32751=0x8011) ABS 
+loop EXPR(-32758=0x800a) ABS 
+reset EXPR(-32768=0x8000) ABS 
+__RPTCNT EXPR(-1=0xffff) INTERNAL 
+__VASM EXPR(0=0x0) INTERNAL 
+
+There have been 1 errors!
