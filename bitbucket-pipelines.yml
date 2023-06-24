@@ -20,4 +20,4 @@ pipelines:
               - dotnet restore
               - dotnet publish ./ButterflyCS/ButterflyCS.csproj --no-restore --configuration Release -o ./publish
             artifacts:
-              - ./publish**
+              - ./publish/**
