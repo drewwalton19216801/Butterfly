@@ -14,7 +14,6 @@ namespace Sharp6502
         /// <returns>1 if an additional cycle was used, otherwise 0</returns>
         public static byte ExecuteInstruction(CPU cpu)
         {
-            // This is extremely hacky, but it works
             // --------------------------------------
             // We're going to use reflection to get the method that corresponds to the instruction name
             // and then invoke it. This is a lot faster than a switch statement, and it's a lot easier
