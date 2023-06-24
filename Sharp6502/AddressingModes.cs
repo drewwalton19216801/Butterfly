@@ -1,25 +1,7 @@
-﻿namespace Sharp6502
-{
-    /// <summary>
-    /// The addressing modes.
-    /// </summary>
-    public enum Addressing
-    {
-        Implied,
-        Accumulator,
-        Immediate,
-        ZeroPage,
-        ZeroPageX,
-        ZeroPageY,
-        Relative,
-        Absolute,
-        AbsoluteX,
-        AbsoluteY,
-        Indirect,
-        IndirectX,
-        IndirectY
-    }
+﻿using System.Reflection;
 
+namespace Sharp6502
+{
     /// <summary>
     /// Addressing mode functions.
     /// </summary>
@@ -31,25 +13,32 @@
         /// <param name="cpu">The CPU object</param>
         /// <param name="addressingMode">The addressing mode.</param>
         /// <returns>A byte.</returns>
-        public static byte GetAddress(CPU cpu, Addressing addressingMode)
+        public static byte GetAddress(CPU cpu, string addressingMode)
         {
-            return addressingMode switch
+            // --------------------------------------
+            // We're going to use reflection to get the method that corresponds to the instruction name
+            // and then invoke it. This is a lot faster than a switch statement, and it's a lot easier
+            // to maintain.
+            // --------------------------------------
+
+            // Get the method name
+            string methodName = addressingMode.ToString();
+
+            // Get the method
+            MethodInfo? method = typeof(AddressingModes).GetMethod(methodName) ?? throw new Exception("Invalid addressing mode: "+addressingMode);
+
+            // Invoke the method
+            object? result = (byte?)method.Invoke(null, new object[] { cpu });
+
+            // Handle the result
+            if (result is byte byteResult)
             {
-                Addressing.Implied => Implied(cpu),
-                Addressing.Accumulator => Accumulator(),
-                Addressing.Immediate => Immediate(cpu),
-                Addressing.ZeroPage => ZeroPage(cpu),
-                Addressing.ZeroPageX => ZeroPageX(cpu),
-                Addressing.ZeroPageY => ZeroPageY(cpu),
-                Addressing.Relative => Relative(cpu),
-                Addressing.Absolute => Absolute(cpu),
-                Addressing.AbsoluteX => AbsoluteX(cpu),
-                Addressing.AbsoluteY => AbsoluteY(cpu),
-                Addressing.Indirect => Indirect(cpu),
-                Addressing.IndirectX => IndirectX(cpu),
-                Addressing.IndirectY => IndirectY(cpu),
-                _ => throw new Exception("Invalid addressing mode."),
-            };
+                return byteResult;
+            }
+            else
+            {
+                throw new Exception("Invalid addressing mode: "+addressingMode);
+            }
         }
 
         /// <summary>
@@ -69,7 +58,7 @@
         /// The accumulator addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte Accumulator()
+        public static byte Accumulator(CPU cpu)
         {
             // This mode never uses an extra cycle,
             // and doesn't need to fetch any data.

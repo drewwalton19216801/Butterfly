@@ -741,7 +741,7 @@ namespace Sharp6502
         private static byte ROR_NMOS(CPU cpu)
         {
             // Are we in accumulator mode?
-            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Accumulator)
+            if (cpu.CurrentInstruction?.AddressingMode == "Accumulator")
             {
                 // Load the accumulator into the temp variable
                 cpu.temp = cpu.registers.A;
@@ -769,7 +769,7 @@ namespace Sharp6502
             // Set the zero flag if the temp variable is zero
             cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
 
-            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Accumulator)
+            if (cpu.CurrentInstruction?.AddressingMode == "Accumulator")
             {
                 // Store the temp variable into the accumulator
                 cpu.registers.A = (byte)cpu.temp;
@@ -792,7 +792,7 @@ namespace Sharp6502
         private static byte ROR_CMOS(CPU cpu)
         {
             // Are we in accumulator mode?
-            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Accumulator)
+            if (cpu.CurrentInstruction?.AddressingMode == "Accumulator")
             {
                 // Load the accumulator into the temp variable
                 cpu.temp = cpu.registers.A;
@@ -826,7 +826,7 @@ namespace Sharp6502
             // Set the zero flag if the temp variable is zero
             cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
 
-            if (cpu.CurrentInstruction?.AddressingMode == Addressing.Accumulator)
+            if (cpu.CurrentInstruction?.AddressingMode == "Accumulator")
             {
                   // Store the temp variable into the accumulator
                 cpu.registers.A = (byte)cpu.temp;

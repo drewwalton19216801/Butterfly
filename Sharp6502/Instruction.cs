@@ -28,7 +28,7 @@
         /// <summary>
         /// The addressing mode of the instruction.
         /// </summary>
-        public Addressing AddressingMode { get; set; }
+        public string AddressingMode { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Instruction"/> class.
@@ -38,7 +38,7 @@
         /// <param name="length">The length.</param>
         /// <param name="cycles">The cycles.</param>
         /// <param name="addressingMode">The addressing mode.</param>
-        public Instruction(string name, byte opcode, uint length, byte cycles, Addressing addressingMode)
+        public Instruction(string name, byte opcode, uint length, byte cycles, string addressingMode)
         {
             Name = name;
             Opcode = opcode;

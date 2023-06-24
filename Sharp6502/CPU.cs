@@ -274,7 +274,7 @@ namespace Sharp6502
             {
                 throw new InvalidOperationException("Cannot fetch instruction when no instruction is set.");
             }
-            else if (!(CurrentInstruction.AddressingMode == Addressing.Implied))
+            else if (!(CurrentInstruction.AddressingMode == "Implied"))
             {
                 fetchedByte = Read(addressAbsolute);
             }
@@ -357,7 +357,7 @@ namespace Sharp6502
             for (int i = 0; i < count; i++)
             {
                 // Check if we're disassembling an operand.
-                if (previousInstruction != null && previousInstruction.AddressingMode == Addressing.Immediate)
+                if (previousInstruction != null && previousInstruction.AddressingMode == "Immediate")
                 {
                     // We're disassembling an operand, so we just add "DATA" to the list.
                     instructions.Add($"DATA");
@@ -376,7 +376,7 @@ namespace Sharp6502
                 // Go through the addressing mode and add the operand to the instruction.
                 switch (instruction.AddressingMode)
                 {
-                    case Addressing.Immediate:
+                    case "Immediate":
                         {
                             // Get the operand.
                             byte operand = Read((ushort)(address + 1));
@@ -385,7 +385,7 @@ namespace Sharp6502
                             instructions[^1] += $" #{operand:X2}";
                             break;
                         }
-                    case Addressing.ZeroPage:
+                    case "ZeroPage":
                         {
                             // Get the operand.
                             byte operand = Read((ushort)(address + 1));
@@ -394,7 +394,7 @@ namespace Sharp6502
                             instructions[^1] += $" ${operand:X2}";
                             break;
                         }
-                    case Addressing.ZeroPageX:
+                    case "ZeroPageX":
                         {
                             // Get the operand.
                             byte operand = Read((ushort)(address + 1));
@@ -403,7 +403,7 @@ namespace Sharp6502
                             instructions[^1] += $" ${operand:X2},X";
                             break;
                         }
-                    case Addressing.ZeroPageY:
+                    case "ZeroPageY":
                         {
                             // Get the operand.
                             byte operand = Read((ushort)(address + 1));
@@ -412,7 +412,7 @@ namespace Sharp6502
                             instructions[^1] += $" ${operand:X2},Y";
                             break;
                         }
-                    case Addressing.Absolute:
+                    case "Absolute":
                         {
                             // Get the operand.
                             ushort operand = ReadWord((ushort)(address + 1));
@@ -421,7 +421,7 @@ namespace Sharp6502
                             instructions[^1] += $" ${operand:X4}";
                             break;
                         }
-                    case Addressing.AbsoluteX:
+                    case "AbsoluteX":
                         {
                             // Get the operand.
                             ushort operand = ReadWord((ushort)(address + 1));
@@ -430,7 +430,7 @@ namespace Sharp6502
                             instructions[^1] += $" ${operand:X4},X";
                             break;
                         }
-                    case Addressing.AbsoluteY:
+                    case "AbsoluteY":
                         {
                             // Get the operand.
                             ushort operand = ReadWord((ushort)(address + 1));
@@ -439,7 +439,7 @@ namespace Sharp6502
                             instructions[^1] += $" ${operand:X4},Y";
                             break;
                         }
-                    case Addressing.Indirect:
+                    case "Indirect":
                         {
                             // Get the operand.
                             ushort operand = ReadWord((ushort)(address + 1));
@@ -448,7 +448,7 @@ namespace Sharp6502
                             instructions[^1] += $" (${operand:X4})";
                             break;
                         }
-                    case Addressing.IndirectX:
+                    case "IndirectX":
                         {
                             // Get the operand.
                             byte operand = Read((ushort)(address + 1));
@@ -457,7 +457,7 @@ namespace Sharp6502
                             instructions[^1] += $" (${operand:X2},X)";
                             break;
                         }
-                    case Addressing.IndirectY:
+                    case "IndirectY":
                         {
                             // Get the operand.
                             byte operand = Read((ushort)(address + 1));
@@ -466,7 +466,7 @@ namespace Sharp6502
                             instructions[^1] += $" (${operand:X2}),Y";
                             break;
                         }
-                    case Addressing.Relative:
+                    case "Relative":
                         {
                             // Get the operand.
                             byte operand = Read((ushort)(address + 1));
@@ -475,7 +475,7 @@ namespace Sharp6502
                             instructions[^1] += $" ${operand:X2}";
                             break;
                         }
-                    case Addressing.Accumulator:
+                    case "Accumulator":
                         {
                             // Add the operand to the instruction.
                             instructions[^1] += $" A";
@@ -502,7 +502,7 @@ namespace Sharp6502
         public string Disassemble(Instruction instruction)
         {
             // Get the instruction's address mode.
-            Addressing addressingMode = instruction.AddressingMode;
+            string addressingMode = instruction.AddressingMode;
 
             ushort operand;
             string operandString = string.Empty;
@@ -510,51 +510,51 @@ namespace Sharp6502
             // Get the string representation of the operand.
             switch (addressingMode)
             {
-                case Addressing.Immediate:
+                case "Immediate":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"#${operand:X2}";
                     break;
-                case Addressing.ZeroPage:
+                case "ZeroPage":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"${operand:X2}";
                     break;
-                case Addressing.ZeroPageX:
+                case "ZeroPageX":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"${operand:X2},X";
                     break;
-                case Addressing.ZeroPageY:
+                case "ZeroPageY":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"${operand:X2},Y";
                     break;
-                case Addressing.Absolute:
+                case "Absolute":
                     operand = ReadWord((ushort)(registers.PC + 1));
                     operandString = $"${operand:X4}";
                     break;
-                case Addressing.AbsoluteX:
+                case "AbsoluteX":
                     operand = ReadWord((ushort)(registers.PC + 1));
                     operandString = $"${operand:X4},X";
                     break;
-                case Addressing.AbsoluteY:
+                case "AbsoluteY":
                     operand = ReadWord((ushort)(registers.PC + 1));
                     operandString = $"${operand:X4},Y";
                     break;
-                case Addressing.Indirect:
+                case "Indirect":
                     operand = ReadWord((ushort)(registers.PC + 1));
                     operandString = $"(${operand:X4})";
                     break;
-                case Addressing.IndirectX:
+                case "IndirectX":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"(${operand:X2},X)";
                     break;
-                case Addressing.IndirectY:
+                case "IndirectY":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"(${operand:X2}),Y";
                     break;
-                case Addressing.Relative:
+                case "Relative":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"${operand:X2}";
                     break;
-                case Addressing.Accumulator:
+                case "Accumulator":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"${operand:X2}";
                     break;
