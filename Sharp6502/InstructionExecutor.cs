@@ -124,6 +124,38 @@ namespace Sharp6502
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
         public static byte ASL(CPU cpu)
         {
+            // Fetch the next byte
+            cpu.Fetch();
+
+            // Shift the fetched byte left by 1
+            cpu.temp = (ushort)(cpu.fetchedByte << 1);
+
+            // Set the carry flag if the result is greater than 255
+            cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0xFF00) > 0);
+
+            // Set the negative flag if the result is less than 0
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) != 0);
+
+            // Set the zero flag if the result is 0
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0);
+
+            // Check for null reference
+            if (cpu.CurrentInstruction == null)
+            {
+                throw new NullReferenceException("The current instruction is null.");
+            }
+
+            // If the instruction mode is implied, then we need to store the result in the accumulator
+            if (cpu.CurrentInstruction.AddressingMode == "Implied")
+            {
+                cpu.registers.A = (byte)(cpu.temp & 0x00FF);
+            } else
+            {
+                // Otherwise, we need to store the result in memory
+                cpu.Write(cpu.addressAbsolute, (byte)(cpu.temp & 0x00FF));
+            }
+
+            // This instruction does not take an extra cycle
             return 0;
         }
 
