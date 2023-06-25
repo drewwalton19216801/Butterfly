@@ -66,8 +66,8 @@ namespace ButterflyCS
             cpuTimer.Elapsed += Cycle!;
 
             // Hook up the demo device
-            cpu.memory.RegisterReadHook(memHookDemoDevice.startAddress, memHookDemoDevice.endAddress, memHookDemoDevice.Read); // Read hook
-            cpu.memory.RegisterWriteHook(memHookDemoDevice.startAddress, memHookDemoDevice.endAddress, memHookDemoDevice.Write); // Write hook
+            //cpu.memory.RegisterReadHook(memHookDemoDevice.startAddress, memHookDemoDevice.endAddress, memHookDemoDevice.Read); // Read hook
+            //cpu.memory.RegisterWriteHook(memHookDemoDevice.startAddress, memHookDemoDevice.endAddress, memHookDemoDevice.Write); // Write hook
         }
 
         /// <summary>

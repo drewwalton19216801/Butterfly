@@ -341,10 +341,10 @@ namespace ButterflyCS
             Raylib.DrawText($"Single-Stepping: {machine.isSingleStepping}", 10, 270, 20, Raylib.BLACK);
 
             // Draw the memory at address 0x6002
-            Raylib.DrawText($"Memory at 0x6002: {machine.cpu.memory.Read(0x6002, true):X2}", 10, 290, 20, Raylib.BLACK);
+            Raylib.DrawText($"Memory at 0x801A: {machine.cpu.memory.Read(0x801A, true):X2}", 10, 290, 20, Raylib.BLACK);
 
             // Draw the memory at address 0x6000
-            Raylib.DrawText($"Memory at 0x6000: {machine.cpu.memory.Read(0x6000, true):X2}", 10, 310, 20, Raylib.BLACK);
+            Raylib.DrawText($"Memory at 0xD020: {machine.cpu.memory.Read(0xD020, true):X2}", 10, 310, 20, Raylib.BLACK);
 
             // Draw the CPU variant
             string variantString = machine.cpu.cpuVariant switch
