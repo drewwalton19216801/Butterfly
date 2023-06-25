@@ -88,7 +88,8 @@ namespace Sharp6502
                     // Since we used decimal mode, we need to consume an extra cycle
                     extraCycle = 1;
                 }
-            } else
+            }
+            else
             {
                 // Set the negative flag if the result is less than 0
                 cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) != 0);
@@ -139,21 +140,35 @@ namespace Sharp6502
             // Set the zero flag if the result is 0
             cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0);
 
-            // Check for null reference
-            if (cpu.CurrentInstruction == null)
-            {
-                throw new NullReferenceException("The current instruction is null.");
-            }
+            // Otherwise, we need to store the result in memory
+            cpu.Write(cpu.addressAbsolute, (byte)(cpu.temp & 0x00FF));
 
-            // If the instruction mode is implied, then we need to store the result in the accumulator
-            if (cpu.CurrentInstruction.AddressingMode == "Implied")
-            {
-                cpu.registers.A = (byte)(cpu.temp & 0x00FF);
-            } else
-            {
-                // Otherwise, we need to store the result in memory
-                cpu.Write(cpu.addressAbsolute, (byte)(cpu.temp & 0x00FF));
-            }
+            // This instruction does not take an extra cycle
+            return 0;
+        }
+
+        public static byte ASLA(CPU cpu)
+        {
+            // Get the value of the accumulator
+            cpu.temp = (ushort)(cpu.registers.A);
+
+            // Set the carry flag
+            cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0x80) != 0);
+
+            // Shift the accumulator left by 1
+            cpu.temp <<= 1;
+
+            // Mask the value to 8 bits
+            cpu.temp &= 0xFF;
+
+            // Set the negative flag if the result is less than 0
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) != 0);
+
+            // Set the zero flag if the result is 0
+            cpu.registers.SetFlag(CPUFlags.Zero, (cpu.temp & 0x00FF) == 0);
+
+            // Store the result in the accumulator
+            cpu.registers.A = (byte)(cpu.temp & 0x00FF);
 
             // This instruction does not take an extra cycle
             return 0;
@@ -306,7 +321,7 @@ namespace Sharp6502
         {
             // Clear the decimal flag
             cpu.registers.SetFlag(CPUFlags.Decimal, false);
-            
+
             // Return 0 extra cycles
             return 0;
         }
@@ -334,7 +349,7 @@ namespace Sharp6502
         {
             // Clear the overflow flag
             cpu.registers.SetFlag(CPUFlags.Overflow, false);
-            
+
             // Return 0 extra cycles
             return 0;
         }
@@ -773,11 +788,12 @@ namespace Sharp6502
         private static byte ROR_NMOS(CPU cpu)
         {
             // Are we in accumulator mode?
-            if (cpu.CurrentInstruction?.AddressingMode == "Accumulator")
+            if (cpu.CurrentInstruction?.AddressingMode == "Immediate")
             {
                 // Load the accumulator into the temp variable
                 cpu.temp = cpu.registers.A;
-            } else
+            }
+            else
             {
                 // Fetch the next byte from memory
                 cpu.Fetch();
@@ -801,7 +817,7 @@ namespace Sharp6502
             // Set the zero flag if the temp variable is zero
             cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
 
-            if (cpu.CurrentInstruction?.AddressingMode == "Accumulator")
+            if (cpu.CurrentInstruction?.AddressingMode == "Immediate")
             {
                 // Store the temp variable into the accumulator
                 cpu.registers.A = (byte)cpu.temp;
@@ -811,7 +827,7 @@ namespace Sharp6502
                 // Store the temp variable into memory
                 cpu.Write(cpu.addressAbsolute, (byte)cpu.temp);
             }
-            
+
             // Return 0 since this instruction does not use an extra cycle
             return 0;
         }
@@ -824,11 +840,12 @@ namespace Sharp6502
         private static byte ROR_CMOS(CPU cpu)
         {
             // Are we in accumulator mode?
-            if (cpu.CurrentInstruction?.AddressingMode == "Accumulator")
+            if (cpu.CurrentInstruction?.AddressingMode == "Immediate")
             {
                 // Load the accumulator into the temp variable
                 cpu.temp = cpu.registers.A;
-            } else
+            }
+            else
             {
                 // Fetch the next byte from memory
                 cpu.Fetch();
@@ -858,9 +875,9 @@ namespace Sharp6502
             // Set the zero flag if the temp variable is zero
             cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
 
-            if (cpu.CurrentInstruction?.AddressingMode == "Accumulator")
+            if (cpu.CurrentInstruction?.AddressingMode == "Immediate")
             {
-                  // Store the temp variable into the accumulator
+                // Store the temp variable into the accumulator
                 cpu.registers.A = (byte)cpu.temp;
             }
             else
@@ -1078,7 +1095,7 @@ namespace Sharp6502
         {
             // Copy the accumulator to the X register
             cpu.registers.X = cpu.registers.A;
-            
+
             // Set the zero flag if the result is zero
             cpu.registers.SetFlag(CPUFlags.Zero, cpu.registers.X == 0x00);
 

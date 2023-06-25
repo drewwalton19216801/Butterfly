@@ -35,7 +35,7 @@ namespace Sharp6502
             IllegalOpcode
         }
 
-        public Registers registers = new(0, 0, 0, 0xFD, 0, 0); // The CPU registers
+        public Registers registers = new(0, 0, 0, 0xFF, 0, 0); // The CPU registers
         public Memory memory = new(); // The CPU memory
         public byte cycles = 0; // The number of cycles remaining for the current instruction
         public ushort temp = 0x0000; // A variable to temporarily store data
@@ -290,7 +290,7 @@ namespace Sharp6502
             registers.A = 0;
             registers.X = 0;
             registers.Y = 0;
-            registers.SP = 0xFD;
+            registers.SP = 0xFF;
             registers.PC = ReadWord(0xFFFC); // Read the PC from the reset vector.
             registers.P = (byte)(CPUFlags.None | CPUFlags.Unused | CPUFlags.InterruptDisable);
             cycles = 8;
@@ -475,12 +475,6 @@ namespace Sharp6502
                             instructions[^1] += $" ${operand:X2}";
                             break;
                         }
-                    case "Accumulator":
-                        {
-                            // Add the operand to the instruction.
-                            instructions[^1] += $" A";
-                            break;
-                        }
                 }
 
                 // Increment the address by the number of bytes in the instruction.
@@ -551,10 +545,6 @@ namespace Sharp6502
                     operandString = $"(${operand:X2}),Y";
                     break;
                 case "Relative":
-                    operand = Read((ushort)(registers.PC + 1));
-                    operandString = $"${operand:X2}";
-                    break;
-                case "Accumulator":
                     operand = Read((ushort)(registers.PC + 1));
                     operandString = $"${operand:X2}";
                     break;

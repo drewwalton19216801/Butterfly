@@ -28,7 +28,7 @@
             new Instruction(name: "AND", opcode: 0x31, length: 2, cycles: 5, addressingMode: "IndirectY"),
 
             // ASL (arithmetic shift left)
-            new Instruction(name: "ASL", opcode: 0x0A, length: 1, cycles: 2, addressingMode: "Accumulator"),
+            new Instruction(name: "ASLA", opcode: 0x0A, length: 1, cycles: 2, addressingMode: "Implied"),
             new Instruction(name: "ASL", opcode: 0x06, length: 2, cycles: 5, addressingMode: "ZeroPage"),
             new Instruction(name: "ASL", opcode: 0x16, length: 2, cycles: 6, addressingMode: "ZeroPageX"),
             new Instruction(name: "ASL", opcode: 0x0E, length: 3, cycles: 6, addressingMode: "Absolute"),
@@ -163,7 +163,7 @@
             new Instruction(name: "LDY", opcode: 0xBC, length: 3, cycles: 4, addressingMode: "AbsoluteX"),
 
             // LSR (logical shift right)
-            new Instruction(name: "LSR", opcode: 0x4A, length: 1, cycles: 2, addressingMode: "Accumulator"),
+            new Instruction(name: "LSR", opcode: 0x4A, length: 1, cycles: 2, addressingMode: "Implied"),
             new Instruction(name: "LSR", opcode: 0x46, length: 2, cycles: 5, addressingMode: "ZeroPage"),
             new Instruction(name: "LSR", opcode: 0x56, length: 2, cycles: 6, addressingMode: "ZeroPageX"),
             new Instruction(name: "LSR", opcode: 0x4E, length: 3, cycles: 6, addressingMode: "Absolute"),
@@ -195,14 +195,14 @@
             new Instruction(name: "PLP", opcode: 0x28, length: 1, cycles: 4, addressingMode: "Implied"),
 
             // ROL (rotate left)
-            new Instruction(name: "ROL", opcode: 0x2A, length: 1, cycles: 2, addressingMode: "Accumulator"),
+            new Instruction(name: "ROL", opcode: 0x2A, length: 1, cycles: 2, addressingMode: "Implied"),
             new Instruction(name: "ROL", opcode: 0x26, length: 2, cycles: 5, addressingMode: "ZeroPage"),
             new Instruction(name: "ROL", opcode: 0x36, length: 2, cycles: 6, addressingMode: "ZeroPageX"),
             new Instruction(name: "ROL", opcode: 0x2E, length: 3, cycles: 6, addressingMode: "Absolute"),
             new Instruction(name: "ROL", opcode: 0x3E, length: 3, cycles: 7, addressingMode: "AbsoluteX"),
 
             // ROR (rotate right)
-            new Instruction(name: "ROR", opcode: 0x6A, length: 1, cycles: 2, addressingMode: "Accumulator"),
+            new Instruction(name: "ROR", opcode: 0x6A, length: 1, cycles: 2, addressingMode: "Implied"),
             new Instruction(name: "ROR", opcode: 0x66, length: 2, cycles: 5, addressingMode: "ZeroPage"),
             new Instruction(name: "ROR", opcode: 0x76, length: 2, cycles: 6, addressingMode: "ZeroPageX"),
             new Instruction(name: "ROR", opcode: 0x6E, length: 3, cycles: 6, addressingMode: "Absolute"),

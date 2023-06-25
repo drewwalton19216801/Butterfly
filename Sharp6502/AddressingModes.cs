@@ -55,17 +55,6 @@ namespace Sharp6502
         }
 
         /// <summary>
-        /// The accumulator addressing mode.
-        /// </summary>
-        /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte Accumulator(CPU cpu)
-        {
-            // This mode never uses an extra cycle,
-            // and doesn't need to fetch any data.
-            return 0;
-        }
-
-        /// <summary>
         /// The immediate addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
