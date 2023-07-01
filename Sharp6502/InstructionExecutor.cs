@@ -119,7 +119,7 @@ namespace Sharp6502
         }
 
         /// <summary>
-        /// The ASL (Arithmetic Shift Left) instruction.
+        /// The ASL (Arithmetic Shift Left) instruction for memory.
         /// </summary>
         /// <param name="cpu">CPU object</param>
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
@@ -147,6 +147,11 @@ namespace Sharp6502
             return 0;
         }
 
+        /// <summary>
+        /// The ASL (Arithmetic Shift Left) instruction for the accumulator.
+        /// </summary>
+        /// <param name="cpu">The cpu.</param>
+        /// <returns>A byte.</returns>
         public static byte ASLA(CPU cpu)
         {
             // Get the value of the accumulator

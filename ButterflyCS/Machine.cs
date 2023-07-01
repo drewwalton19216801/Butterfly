@@ -19,34 +19,18 @@ namespace ButterflyCS
         /// </summary>
         private static readonly string subsystem = "Machine";
 
-        /// <summary>
-        /// The CPU.
-        /// </summary>
-        public CPU cpu;
+
+        public CPU cpu; // The CPU
+        public Timer cpuTimer; // The CPU timer
+        public double clockCycleDuration; // The duration of a clock cycle, in seconds
+        public bool isRunning; // Whether the machine is running
+        public bool isPaused; // Whether the machine is paused
+        public bool isSingleStepping; // Whether the machine is single-stepping
 
         /// <summary>
-        /// A demo device that hooks into the memory space.
+        /// Gets or sets the cycle speed.
         /// </summary>
-        public MemHookDemoDevice memHookDemoDevice;
-
-        /// <summary>
-        /// The CPU timer.
-        /// </summary>
-        public Timer cpuTimer;
-
-        /// <summary>
-        /// Gets or sets the machine cycle speed.
-        /// </summary>
-        public double CycleSpeed { get; set; } = 1; // 1 Hz = 1 cycle per second
-
-        /// <summary>
-        /// Duration of a single machine cycle, in seconds.
-        /// </summary>
-        public double clockCycleDuration;
-
-        public bool isRunning;
-        public bool isPaused;
-        public bool isSingleStepping;
+        public double CycleSpeed { get; set; } = 1; // The cycle speed, in Hz
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Machine"/> class.
@@ -55,7 +39,6 @@ namespace ButterflyCS
         {
             Log.Debug(subsystem, "Machine created.");
             cpu = new CPU();
-            memHookDemoDevice = new MemHookDemoDevice();
             clockCycleDuration = 1 / CycleSpeed;
             isRunning = false;
             isPaused = false;

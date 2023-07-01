@@ -5,9 +5,11 @@ namespace ButterflyCS
     /// <summary>
     /// The program.
     /// </summary>
-    public static class Program
+    public class Program
     {
         public static readonly string subsystem = "ButterflyCS";
+
+        private static readonly Machine machine = new();
 
         public static readonly string romFilePath = Path.Combine(
             Environment.CurrentDirectory,
@@ -21,11 +23,55 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static Task Main(string[] args)
         {
+            MachineStart();
+
+            // Create the threads for the UIs
+            Thread terminalThread = new(RunTerminalUI);
+            Thread guiThread = new(RunGUI);
+
+            // Start the threads
+            terminalThread.Start();
+            guiThread.Start();
+
+            // Wait for both threads to finish
+            terminalThread.Join();
+            guiThread.Join();
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// The terminal UI task.
+        /// </summary>
+        /// <returns>A Task.</returns>
+        public static void RunTerminalUI()
+        {
+            Log.Info(subsystem, "Terminal UI started.");
+        }
+
+        /// <summary>
+        /// The main UI task.
+        /// </summary>
+        /// <returns>A Task.</returns>
+        public static void RunGUI()
+        {
+            Log.Info(subsystem, "Main UI started.");
+
+            // Initialize the GUI
+            MainWin mainWin = new(machine);
+            mainWin.StartApplication();
+        }
+
+        /// <summary>
+        /// The task that sets up the machine.
+        /// </summary>
+        /// <returns>A Task.</returns>
+        public static void MachineStart()
+        {
+            Log.Info(subsystem, "Machine initializing");
+
             // Initialize the logging subsystem
             Log.DebugEnabled = true;
-
-            // Initialize the machine
-            Machine machine = new();
 
             // Load the ROM
             machine.LoadProgram(romFilePath, 0x8000);
@@ -33,10 +79,10 @@ namespace ButterflyCS
             // Set the CPU variant
             machine.cpu.cpuVariant = CPU.Variant.CMOS_65C02;
 
-            // Initialize the GUI
-            MainWin mainWin = new(machine);
-            mainWin.StartApplication();
-            return Task.CompletedTask;
+            // Set the CPU speed to 1 Hz
+            machine.CycleSpeed = 1;
+
+            Log.Info(subsystem, "Machine initialized");
         }
     }
 }

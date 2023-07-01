@@ -44,7 +44,7 @@ namespace ButterflyCS
         /// <summary>
         /// The gamepad.
         /// </summary>
-        private int gamepad = 0;
+        private readonly int gamepad = 0;
 
         /// <summary>
         /// The emulator screen.
