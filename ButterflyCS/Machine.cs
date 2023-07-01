@@ -101,6 +101,39 @@ namespace ButterflyCS
         }
 
         /// <summary>
+        /// Steps the machine.
+        /// </summary>
+        public void Step()
+        {
+            if (isSingleStepping)
+            {
+                lock (cpu.cpuLock)
+                {
+                    cpu.Clock();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Runs the machine.
+        /// </summary>
+        public void Run()
+        {
+            isRunning = true;
+            isPaused = false;
+            isSingleStepping = false;
+        }
+
+        /// <summary>
+        /// Stops the machine.
+        /// </summary>
+        public void Stop()
+        {
+            isPaused = true;
+            isSingleStepping = true;
+        }
+
+        /// <summary>
         /// Resets the machine to its initial power-up state.
         /// </summary>
         public void Reset()
