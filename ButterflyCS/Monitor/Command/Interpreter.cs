@@ -51,6 +51,10 @@
                     result = _memInterpreter.ParseArgs(cmdArgs);
                     _commandRunning = false;
                 }
+            } 
+            else
+            {
+                result = "A command is already running.";
             }
 
             return result;

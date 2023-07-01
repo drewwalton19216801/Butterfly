@@ -50,17 +50,10 @@ namespace ButterflyCS.Monitor.Command
             // Split the arguments into an array
             string[] args = argString.Split(' ');
 
-            // Check if the command has subcommands, if not then
-            // display the help text
-            if (args.Length == 0)
-            {
-                return RunHelpCommand();
-            }
-
             // Check if the subcommand is valid
             if (!subcommands.Contains(args[0]))
             {
-                return "Invalid subcommand.";
+                return RunHelpCommand();
             }
 
             // Run the subcommand
@@ -140,7 +133,9 @@ namespace ButterflyCS.Monitor.Command
                 return "Invalid data.";
             }
             _machine.PokeMemory(address, data);
-            return "Wrote " + data + " to " + address + ".";
+
+            // Return a message, converting the data to 0x00 format, and the address to 0x0000 format
+            return $"Wrote 0x{data:X2} to 0x{address:X4}.";
         }
     }
 }

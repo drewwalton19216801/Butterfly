@@ -73,15 +73,23 @@ namespace ButterflyCS.Monitor
 
                 if (keyEvent.KeyEvent.Key == Key.Enter)
                 {
-                    // Strip the prompt (>) from the input
-                    string input = (string)inputBox.Text;
-                    input = input[1..];
+                    // Check for empty input
+                    if (inputBox.Text.Length != 0)
+                    {
+                        // Strip the prompt (>) from the input
+                        string input = (string)inputBox.Text;
+                        input = input[1..];
 
-                    // Run the command
-                    string? output = _interpreter.InterpretCommand(input);
+                        // Check for empty input
+                        if (input.Length != 0)
+                        {
+                            // Run the command
+                            string? output = _interpreter.InterpretCommand(input);
 
-                    // Add the output to the output text view
-                    outputText.Text += output + "\n";
+                            // Add the output to the output text view
+                            outputText.Text += output + "\n";
+                        }
+                    }
 
                     // Reset the prompt
                     inputBox.Text = ">";
