@@ -33,10 +33,10 @@ namespace ButterflyCS
             terminalThread.Start();
             guiThread.Start();
 
-            // Wait for both threads to finish
+            // Wait for the threads to finish
             terminalThread.Join();
             guiThread.Join();
-
+            
             return Task.CompletedTask;
         }
 
@@ -51,7 +51,15 @@ namespace ButterflyCS
             // Loop for 20 seconds, printing the number of seconds left every second
             for (int i = 20; i > 0; i--)
             {
-                Console.WriteLine($"DEBUG DEBUG DEBUG {i} seconds left");
+                // Show seconds or second depending on whether there is 1 second left
+                if (i == 1)
+                {
+                    Log.Debug(subsystem, "There is 1 second left.");
+                }
+                else
+                {
+                    Log.Debug(subsystem, $"There are {i} seconds left.");
+                }
                 Thread.Sleep(1000);
             }
 
