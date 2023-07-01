@@ -24,6 +24,9 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static Task Main(string[] args)
         {
+            // Clear the console
+            Console.Clear();
+
             // Enable debug messages if the "--debug" flag is present
             if (args.Contains("--debug"))
             {
@@ -56,7 +59,12 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static void RunTerminalUI()
         {
-            Application.Run<TUI.Monitor>();
+            Application.Init();
+            var _machine = machine;
+            // Run the terminal UI, passing the machine
+            // PREV: Application.Run<Monitor.Monitor>();
+            Application.Top.Add(new Monitor.Monitor(_machine));
+            Application.Run();
 
             // Quit the application
             Application.Shutdown();

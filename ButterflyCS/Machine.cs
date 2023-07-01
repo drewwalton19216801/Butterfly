@@ -114,6 +114,169 @@ namespace ButterflyCS
         }
 
         /// <summary>
+        /// Peeks the memory at a specified address.
+        /// </summary>
+        /// <param name="address">The address.</param>
+        /// <returns>A string.</returns>
+        public string PeekMemory(ushort address)
+        {
+            byte data;
+            string dataString;
+
+            lock (cpu.cpuLock)
+            {
+                data = cpu.Read(address);
+            }
+
+            // Convert the data to a string
+            dataString = data.ToString("X2");
+
+            return dataString;
+        }
+
+        /// <summary>
+        /// Peeks at a register.
+        /// </summary>
+        /// <param name="register">The register.</param>
+        /// <returns>A string.</returns>
+        public string PeekRegister(string register)
+        {
+            byte data;
+            string dataString;
+
+            switch (register)
+            {
+                case "A":
+                    lock (cpu.cpuLock)
+                    {
+                        data = cpu.registers.A;
+                    }
+                    break;
+                case "X":
+                    lock (cpu.cpuLock)
+                    {
+                        data = cpu.registers.X;
+                    }
+                    break;
+                case "Y":
+                    lock (cpu.cpuLock)
+                    {
+                        data = cpu.registers.Y;
+                    }
+                    break;
+                case "SP":
+                    lock (cpu.cpuLock)
+                    {
+                        data = cpu.registers.SP;
+                    }
+                    break;
+                case "P":
+                    lock (cpu.cpuLock)
+                    {
+                        data = cpu.registers.P;
+                    }
+                    break;
+                default:
+                    data = 0;
+                    break;
+            }
+
+            // Convert the data to a string
+            dataString = data.ToString("X2");
+
+            return dataString;
+        }
+
+        /// <summary>
+        /// Peeks the PC.
+        /// </summary>
+        /// <returns>A string.</returns>
+        public string PeekPC()
+        {
+            ushort data;
+            string dataString;
+
+            lock (cpu.cpuLock)
+            {
+                data = cpu.registers.PC;
+            }
+
+            // Convert the data to a string
+            dataString = data.ToString("X4");
+
+            return dataString;
+        }
+
+        /// <summary>
+        /// Pokes the memory at the specified address with the specified data.
+        /// </summary>
+        /// <param name="address">The address.</param>
+        /// <param name="data">The data.</param>
+        public void PokeMemory(ushort address, byte data)
+        {
+            lock (cpu.cpuLock)
+            {
+                cpu.Write(address, data);
+            }
+        }
+
+        /// <summary>
+        /// Pokes a register with the specified data.
+        /// </summary>
+        /// <param name="register">The register.</param>
+        /// <param name="data">The data.</param>
+        public void PokeRegister(string register, byte data)
+        {
+            switch (register)
+            {
+                case "A":
+                    lock (cpu.cpuLock)
+                    {
+                        cpu.registers.A = data;
+                    }
+                    break;
+                case "X":
+                    lock (cpu.cpuLock)
+                    {
+                        cpu.registers.X = data;
+                    }
+                    break;
+                case "Y":
+                    lock (cpu.cpuLock)
+                    {
+                        cpu.registers.Y = data;
+                    }
+                    break;
+                case "SP":
+                    lock (cpu.cpuLock)
+                    {
+                        cpu.registers.SP = data;
+                    }
+                    break;
+                case "P":
+                    lock (cpu.cpuLock)
+                    {
+                        cpu.registers.P = data;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Pokes the PC with the specified data.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        public void PokePC(ushort data)
+        {
+            lock (cpu.cpuLock)
+            {
+                cpu.registers.PC = data;
+            }
+        }
+
+        /// <summary>
         /// Initializes the machine.
         /// </summary>
         /// <param name="romFilePath">The rom file path.</param>
