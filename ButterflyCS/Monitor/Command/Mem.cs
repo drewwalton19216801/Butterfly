@@ -35,9 +35,11 @@ namespace ButterflyCS.Monitor.Command
         /// <returns>The text to be displayed.</returns>
         public static string RunHelpCommand()
         {
-            return "mem - Read or write memory.\n" +
-                "mem read <address> - Read a byte from memory.\n" +
-                "mem write <address> <data> - Write a byte to memory.";
+            return "mem - Read/write memory\n" +
+                "Usage: mem <subcommand>\n" +
+                "Subcommands:\n" +
+                "  read <address> - Read a byte from memory\n" +
+                "  write <address> <data> - Write a byte to memory.";
         }
 
         /// <summary>
