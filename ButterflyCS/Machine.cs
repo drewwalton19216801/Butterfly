@@ -60,9 +60,6 @@ namespace ButterflyCS
             CycleSpeed += amount;
 
             UpdateTimer();
-
-            // Log the new speed
-            Log.Info(subsystem, $"Cycle speed increased to {CycleSpeed} Hz.");
         }
 
         /// <summary>
@@ -78,9 +75,6 @@ namespace ButterflyCS
             }
 
             UpdateTimer();
-
-            // Log the new speed
-            Log.Info(subsystem, $"Cycle speed decreased to {CycleSpeed} Hz.");
         }
 
         /// <summary>
@@ -128,11 +122,6 @@ namespace ButterflyCS
         /// <param name="romFilePath">The rom file path.</param>
         public void Init(string romFilePath, CPU.Variant variant, double initialSpeed)
         {
-            Log.Info(subsystem, "Machine initializing");
-
-            // Initialize the logging subsystem
-            Log.EnableDebugMessages();
-
             // Load the ROM
             LoadProgram(romFilePath, 0x8000);
 
@@ -141,8 +130,6 @@ namespace ButterflyCS
 
             // Set the CPU speed to whatever the user specified
             CycleSpeed = initialSpeed;
-
-            Log.Info(subsystem, "Machine initialized");
         }
 
         /// <summary>

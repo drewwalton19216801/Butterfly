@@ -21,8 +21,17 @@ namespace ButterflyCS
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>A Task.</returns>
-        public static Task Main()
+        public static Task Main(string[] args)
         {
+            // Enable debug messages if the "--debug" flag is present
+            if (args.Contains("--debug"))
+            {
+                Log.EnableDebugMessages();
+            } else
+            {
+                Log.DisableDebugMessages();
+            }
+
             machine.Init(romFilePath, CPU.Variant.NMOS_6502, 1);
 
             // Create the threads for the UIs
@@ -46,8 +55,6 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static void RunTerminalUI()
         {
-            Log.Info(subsystem, "Terminal UI started.");
-
             // Loop for 20 seconds, printing the number of seconds left every second
             for (int i = 20; i > 0; i--)
             {
@@ -73,11 +80,12 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static void RunGUI()
         {
-            Log.Info(subsystem, "Main UI started.");
-
             // Initialize the GUI
             MainWin mainWin = new(machine);
             mainWin.ShowWindow();
+
+            // If the GUI is closed, quit the application
+            Environment.Exit(0);
         }
     }
 }

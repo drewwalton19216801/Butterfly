@@ -270,7 +270,6 @@ namespace ButterflyCS
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_Q))
             {
                 // Quit the application
-                Log.Info(subsystem, "Quitting application");
                 return true;
             }
 
