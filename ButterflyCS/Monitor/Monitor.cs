@@ -52,7 +52,7 @@ namespace ButterflyCS.Monitor
             outputFrame.Add(outputText);
 
             // The input box is on the bottom of the window
-            var inputBox = new TextField(">")
+            var inputBox = new TextField("")
             {
                 X = 0,
                 Y = Pos.Bottom(outputFrame) - 1,
@@ -64,24 +64,13 @@ namespace ButterflyCS.Monitor
             // Check for enter on the input box
             inputBox.KeyUp += (keyEvent) =>
             {
-                // Check for delete key
-                if ((keyEvent.KeyEvent.Key == Key.DeleteChar) | (keyEvent.KeyEvent.Key == Key.Backspace))
-                {
-                    // If all we have is the prompt, don't delete it
-                    if (inputBox.Text.Length == 1)
-                    {
-                        keyEvent.Handled = true;
-                    }
-                }
-
                 if (keyEvent.KeyEvent.Key == Key.Enter)
                 {
                     // Check for empty input
                     if (inputBox.Text.Length != 0)
                     {
-                        // Strip the prompt (>) from the input
+                        // Get the input
                         string input = (string)inputBox.Text;
-                        input = input[1..];
 
                         // Check for empty input
                         if (input.Length != 0)
@@ -95,8 +84,8 @@ namespace ButterflyCS.Monitor
                     }
 
                     // Reset the prompt
-                    inputBox.Text = ">";
-                    inputBox.CursorPosition = 1;
+                    inputBox.Text = "";
+                    inputBox.CursorPosition = 0;
                 }
             };
 
