@@ -11,6 +11,8 @@
         private readonly Reg _regInterpreter; // The register interpreter
         private bool _commandRunning = false; // Whether or not a command is running
 
+        private string[] supportedCommands = new string[] { "mem", "control", "reg", "help", "quit" }; // The supported commands
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Interpreter"/> class.
         /// </summary>
@@ -23,6 +25,22 @@
             _memInterpreter = new(_machine);
             _controlInterpreter = new(_machine);
             _regInterpreter = new(_machine);
+        }
+
+        /// <summary>
+        /// Displays the usage.
+        /// </summary>
+        /// <returns>A message.</returns>
+        private string DisplayUsage()
+        {
+            return "ButterflyCS Monitor\n" +
+                "Usage: <command> <args>\n" +
+                "Commands:\n" +
+                "  mem - Read/write memory\n" +
+                "  control - Control the machine\n" +
+                "  reg - Read/write registers\n" +
+                "  help - Display this help message\n" +
+                "  quit - Quit the program\n";
         }
 
         /// <summary>
@@ -66,11 +84,17 @@
                     result = _regInterpreter.ParseArgs(cmdArgs);
                     _commandRunning = false;
                 }
-
-                if (cmd == "quit")
+                else if (cmd == "help")
+                {
+                    result = DisplayUsage();
+                }
+                else if (cmd == "quit")
                 {
                     // Quit the program
                     Environment.Exit(0);
+                } else
+                {
+                    result = "Invalid command.\n\n" + DisplayUsage();
                 }
             } 
             else

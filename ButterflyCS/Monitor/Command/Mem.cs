@@ -35,7 +35,7 @@ namespace ButterflyCS.Monitor.Command
         /// <returns>The text to be displayed.</returns>
         public static string RunHelpCommand()
         {
-            return "mem - Read/write memory\n" +
+            return "\nmem - Read/write memory\n" +
                 "Usage: mem <subcommand>\n" +
                 "Subcommands:\n" +
                 "  read <address> - Read a byte from memory\n" +
@@ -61,7 +61,7 @@ namespace ButterflyCS.Monitor.Command
             // Run the subcommand
             return args[0] switch
             {
-                "read" => ReadCommand(args),
+                "read" => "Data: " + ReadCommand(args),
                 "write" => WriteCommand(args),
                 _ => "Invalid subcommand.",
             };

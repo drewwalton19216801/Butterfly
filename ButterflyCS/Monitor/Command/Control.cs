@@ -35,7 +35,7 @@ namespace ButterflyCS.Monitor.Command
         /// <returns>A message</returns>
         public static string RunHelpCommand()
         {
-            return "control - Control the CPU\n" +
+            return "\ncontrol - Control the CPU\n" +
                 "Usage: control <subcommand>\n" +
                 "Subcommands:\n" +
                 "  start - Start the CPU\n" +

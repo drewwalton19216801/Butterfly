@@ -58,7 +58,7 @@ namespace ButterflyCS.Monitor.Command
             // Run the subcommand
             return args[0] switch
             {
-                "read" => Read(args),
+                "read" => "Data: " + Read(args),
                 "write" => Write(args),
                 _ => RunHelpCommand(),
             };
@@ -70,7 +70,7 @@ namespace ButterflyCS.Monitor.Command
         /// <returns>A string.</returns>
         public static string RunHelpCommand()
         {
-            return "reg - Read/write registers\n" +
+            return "\nreg - Read/write registers\n" +
                 "Usage: reg <subcommand>\n" +
                 "Subcommands:\n" +
                 "  read - Read a register\n" +
