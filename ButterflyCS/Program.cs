@@ -21,7 +21,7 @@ namespace ButterflyCS
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>A Task.</returns>
-        public static Task Main(string[] args)
+        public static Task Main()
         {
             machine.Init(romFilePath, CPU.Variant.NMOS_6502, 1);
 
@@ -77,7 +77,7 @@ namespace ButterflyCS
 
             // Initialize the GUI
             MainWin mainWin = new(machine);
-            mainWin.StartApplication();
+            mainWin.ShowWindow();
         }
     }
 }

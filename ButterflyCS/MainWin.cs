@@ -1,9 +1,5 @@
-﻿using System;
-using System.Timers;
-using Timer = System.Timers.Timer;
-using Raylib_CsLo;
+﻿using Raylib_CsLo;
 using Sharp6502;
-using Microsoft.Win32;
 
 namespace ButterflyCS
 {
@@ -76,8 +72,11 @@ namespace ButterflyCS
         /// <summary>
         /// Starts the application.
         /// </summary>
-        public void StartApplication()
+        public void ShowWindow()
         {
+            // Disable Raylib logging, we'll eventually redirect it to our own logging system
+            Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_NONE);
+
             // Initialize the window
             Raylib.InitWindow(800, 600, "Butterfly 6502 Emulator");
 
@@ -394,7 +393,7 @@ namespace ButterflyCS
         /// <summary>
         /// Draws the memory view screen.
         /// </summary>
-        private void DrawMemoryViewScreen(bool drawDisassembly = false)
+        private void DrawMemoryViewScreen(bool drawDisassembly = true)
         {
             Raylib.ClearBackground(Raylib.GREEN);
 
@@ -432,9 +431,12 @@ namespace ButterflyCS
                 Raylib.DrawText($"{machine.cpu.memory.Read((ushort)(memoryViewStartAddress + i), true):X2}", 100, 50 + (i * 20), 20, Raylib.BLACK);
             }
 
-            // Draw the disassembly on the same line as the selected memory address
-            Raylib.DrawText("Disassembly", 200, 30, 20, Raylib.BLACK);
-            Raylib.DrawText($"{disasmString}", 200, 50 + (4 * 20), 20, Raylib.YELLOW);
+            // Draw the disassembly on the same line as the selected memory address if drawDisassembly is true
+            if (drawDisassembly)
+            {
+                Raylib.DrawText("Disassembly", 200, 30, 20, Raylib.BLACK);
+                Raylib.DrawText($"{disasmString}", 200, 50 + (4 * 20), 20, Raylib.YELLOW);
+            }
         }
 
         /// <summary>
