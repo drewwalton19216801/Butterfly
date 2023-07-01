@@ -12,7 +12,7 @@ namespace ButterflyCS.Monitor.Command
     public class Control
     {
         private readonly Machine _machine; // The machine to control
-        private readonly string[] subcommands = new string[] { "start", "stop", "reset", "status", "step" }; // The subcommands we can use
+        private readonly string[] subcommands = new string[] { "start", "stop", "reset", "status", "step", "speed" }; // The subcommands we can use
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Control"/> class.
@@ -42,7 +42,8 @@ namespace ButterflyCS.Monitor.Command
                 "  stop - Stop the CPU\n" +
                 "  reset - Reset the CPU\n" +
                 "  status - Get the status of the CPU\n" +
-                "  step - Step the CPU";
+                "  step - Step the CPU\n" +
+                "  speed - Set the CPU speed in Hz";
         }
 
         /// <summary>
@@ -63,6 +64,7 @@ namespace ButterflyCS.Monitor.Command
                 "reset" => Reset(),
                 "status" => Status(),
                 "step" => Step(),
+                "speed" => Speed(args),
                 _ => RunHelpCommand(),
             };
         }
@@ -115,6 +117,32 @@ namespace ButterflyCS.Monitor.Command
         {
             _machine.Step();
             return "Machine step";
+        }
+
+        /// <summary>
+        /// Sets the CPU speed.
+        /// </summary>
+        /// <param name="args">The args.</param>
+        /// <returns>A string.</returns>
+        private string Speed(string[] args)
+        {
+            // Strip the subcommand
+            args = args[1..];
+
+            // "args" should be 1 element long
+            if (args.Length != 1)
+            {
+                return "Invalid number of arguments";
+            }
+
+            // Grab the argument
+            double speed = double.Parse(args[0]);
+
+            // Set the speed
+            _machine.CycleSpeed = speed;
+            _machine.UpdateTimer();
+
+            return "Speed set to " + args[0] + " Hz";
         }
     }
 }

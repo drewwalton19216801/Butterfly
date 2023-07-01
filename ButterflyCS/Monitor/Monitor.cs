@@ -32,7 +32,8 @@ namespace ButterflyCS.Monitor
                 X = 0,
                 Y = 0,
                 Width = Dim.Fill(),
-                Height = Dim.Fill()
+                Height = Dim.Fill(),
+                CanFocus = false,
             };
 
             // Set up the output text view
@@ -43,6 +44,8 @@ namespace ButterflyCS.Monitor
                 Width = Dim.Fill(),
                 Height = Dim.Fill(),
                 ReadOnly = true,
+                ColorScheme = Colors.Dialog,
+                CanFocus = false,
             };
             
             // Add the output text view to the output frame

@@ -77,7 +77,7 @@ namespace ButterflyCS
         /// <summary>
         /// Updates the timer.
         /// </summary>
-        private void UpdateTimer()
+        public void UpdateTimer()
         {
             // Update the timer interval
             clockCycleDuration = 1 / CycleSpeed;
