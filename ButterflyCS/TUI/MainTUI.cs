@@ -36,7 +36,6 @@ namespace ButterflyCS.TUI
                 Y = Pos.Bottom(outputFrame) - 1,
                 Width = Dim.Fill(),
                 Height = 1,
-                DesiredCursorVisibility = CursorVisibility.Underline
             };
 
             // Check for enter on the input box
