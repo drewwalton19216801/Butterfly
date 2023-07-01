@@ -46,6 +46,7 @@ namespace Sharp6502
         public Variant cpuVariant = Variant.CMOS_65C02; // The CPU variant (default is WDC 65C02)
         public byte fetchedByte = 0x00; // The fetched byte
         public string currentDisassembly = string.Empty; // The current disassembly
+        public object cpuLock = new(); // The CPU lock object
 
         /// <summary>
         /// Gets or sets the current instruction.

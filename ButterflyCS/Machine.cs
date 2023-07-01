@@ -122,7 +122,10 @@ namespace ButterflyCS
             if (!isPaused && !isSingleStepping)
             {
                 Log.Debug(subsystem, "Running a single machine cycle.");
-                cpu.Clock();
+                lock (cpu.cpuLock)
+                {
+                    cpu.Clock();
+                }
             }
         }
 
@@ -132,7 +135,10 @@ namespace ButterflyCS
         public void Reset()
         {
             Log.Debug(subsystem, "Resetting machine to power-up state.");
-            cpu.Reset();
+            lock (cpu.cpuLock)
+            {
+                cpu.Reset();
+            }
             Log.Debug(subsystem, "Machine reset complete.");
         }
 
@@ -159,7 +165,10 @@ namespace ButterflyCS
                     break;
                 }
 
-                cpu.memory.data[address + i] = program[i];
+                lock (cpu.cpuLock)
+                {
+                    cpu.memory.data[address + i] = program[i];
+                }
             }
             Log.Debug(subsystem, $"Program {filename} loaded into memory at address {address:X4}.");
         }

@@ -267,23 +267,6 @@ namespace ButterflyCS
                 machine.Reset();
             }
 
-            // Check for load (Ctrl+L)
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_L))
-            {
-                // Ensure program.bin exists in the executable's directory
-                if (!File.Exists("program.bin"))
-                {
-                    Log.Error(subsystem, "program.bin does not exist in the executable's directory");
-                    return false;
-                }
-
-                // Load a program named "program.bin" from the executable's directory to memory address 0x0000
-                machine.LoadProgram("rom.bin", 0x8000);
-
-                // Reset the machine
-                machine.Reset();
-            }
-
             // Check for quit (Ctrl+Q)
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_Q))
             {
@@ -302,13 +285,43 @@ namespace ButterflyCS
         {
             Raylib.ClearBackground(Raylib.GREEN);
 
+            byte regA = 0;
+            byte regX = 0;
+            byte regY = 0;
+            byte regSP = 0;
+            ushort regPC = 0;
+            string currentDisassembly = string.Empty;
+            byte mem6000 = 0;
+            byte mem6002 = 0;
+            string variantString = string.Empty;
+
+            // Lock the cpu lock object while we read its state
+            lock (machine.cpu.cpuLock)
+            {
+                regA = machine.cpu.registers.A;
+                regX = machine.cpu.registers.X;
+                regY = machine.cpu.registers.Y;
+                regSP = machine.cpu.registers.SP;
+                regPC = machine.cpu.registers.PC;
+                currentDisassembly = machine.cpu.currentDisassembly;
+                mem6000 = machine.cpu.memory.Read(0x6000, true);
+                mem6002 = machine.cpu.memory.Read(0x6002, true);
+                variantString = machine.cpu.cpuVariant switch
+                {
+                    CPU.Variant.NMOS_6502 => "NMOS 6502",
+                    CPU.Variant.CMOS_65C02 => "WDC 65C02",
+                    CPU.Variant.NES_6502 => "Ricoh 2A03 (NES)",
+                    _ => "Unknown"
+                };
+            }
+
             // Draw the registers (prefixes with 0x to indicate hexadecimal)
             Raylib.DrawText("Registers", 10, 30, 20, Raylib.BLACK);
-            Raylib.DrawText($"A: 0x{machine.cpu.registers.A:X2}", 10, 50, 20, Raylib.BLACK);
-            Raylib.DrawText($"X: 0x{machine.cpu.registers.X:X2}", 10, 70, 20, Raylib.BLACK);
-            Raylib.DrawText($"Y: 0x{machine.cpu.registers.Y:X2}", 10, 90, 20, Raylib.BLACK);
-            Raylib.DrawText($"SP: 0x{machine.cpu.registers.SP:X2}", 10, 110, 20, Raylib.BLACK);
-            Raylib.DrawText($"PC: 0x{machine.cpu.registers.PC:X4}", 10, 130, 20, Raylib.BLACK);
+            Raylib.DrawText($"A: 0x{regA:X2}", 10, 50, 20, Raylib.BLACK);
+            Raylib.DrawText($"X: 0x{regX:X2}", 10, 70, 20, Raylib.BLACK);
+            Raylib.DrawText($"Y: 0x{regY:X2}", 10, 90, 20, Raylib.BLACK);
+            Raylib.DrawText($"SP: 0x{regSP:X2}", 10, 110, 20, Raylib.BLACK);
+            Raylib.DrawText($"PC: 0x{regPC:X4}", 10, 130, 20, Raylib.BLACK);
 
             string statusString = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
                 machine.cpu.registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
@@ -329,7 +342,7 @@ namespace ButterflyCS
             Raylib.DrawText($"Running: {machine.isRunning}", 10, 190, 20, Raylib.BLACK);
 
             // Draw the current instruction
-            Raylib.DrawText($"Instruction: {machine.cpu.currentDisassembly}", 10, 210, 20, Raylib.BLACK);
+            Raylib.DrawText($"Instruction: {currentDisassembly}", 10, 210, 20, Raylib.BLACK);
 
             // Draw the cycles remaining
             Raylib.DrawText($"Cycles Remaining: {machine.cpu.cycles}", 10, 230, 20, Raylib.BLACK);
@@ -340,20 +353,13 @@ namespace ButterflyCS
             // Draw the single-stepping state
             Raylib.DrawText($"Single-Stepping: {machine.isSingleStepping}", 10, 270, 20, Raylib.BLACK);
 
-            // Draw the memory at address 0x6002
-            Raylib.DrawText($"Memory at 0x801A: {machine.cpu.memory.Read(0x801A, true):X2}", 10, 290, 20, Raylib.BLACK);
+            // Draw the memory at address 0x6000
+            Raylib.DrawText($"Memory at 0x6000: {mem6000:X2}", 10, 290, 20, Raylib.BLACK);
 
             // Draw the memory at address 0x6000
-            Raylib.DrawText($"Memory at 0xD020: {machine.cpu.memory.Read(0xD020, true):X2}", 10, 310, 20, Raylib.BLACK);
+            Raylib.DrawText($"Memory at 0x6002: {mem6002:X2}", 10, 310, 20, Raylib.BLACK);
 
             // Draw the CPU variant
-            string variantString = machine.cpu.cpuVariant switch
-            {
-                CPU.Variant.NMOS_6502 => "NMOS 6502",
-                CPU.Variant.CMOS_65C02 => "WDC 65C02",
-                CPU.Variant.NES_6502 => "Ricoh 2A03 (NES)",
-                _ => "Unknown"
-            };
             Raylib.DrawText($"CPU Variant: {variantString}", 10, 330, 20, Raylib.BLACK);
 
             // Get the current gamepad button being pressed
