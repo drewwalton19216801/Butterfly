@@ -5,6 +5,8 @@
     /// </summary>
     public static class Log
     {
+        private static readonly object consoleLock = new(); // Lock for the console
+
         /// <summary>
         /// The log message type.
         /// </summary>
@@ -16,7 +18,32 @@
             Debug
         }
 
-        public static bool DebugEnabled = true;
+        private static bool DebugEnabled = true;
+
+        /// <summary>
+        /// Enables the debug messages.
+        /// </summary>
+        public static void EnableDebugMessages()
+        {
+            DebugEnabled = true;
+        }
+
+        /// <summary>
+        /// Disables the debug messages.
+        /// </summary>
+        public static void DisableDebugMessages()
+        {
+            DebugEnabled = false;
+        }
+
+        /// <summary>
+        /// Are debug messages enabled?
+        /// </summary>
+        /// <returns>A bool.</returns>
+        public static bool IsDebugEnabled()
+        {
+              return DebugEnabled;
+        }
 
         /// <summary>
         /// An informational message.
@@ -25,7 +52,10 @@
         /// <param name="message">The message.</param>
         public static void Info(string subsystem, string message)
         {
-            LogMessage(LogType.Info, subsystem, message);
+            lock (consoleLock)
+            {
+                LogMessage(LogType.Info, subsystem, message);
+            }
         }
 
         /// <summary>
@@ -35,7 +65,10 @@
         /// <param name="message">The message.</param>
         public static void Warning(string subsystem, string message)
         {
-            LogMessage(LogType.Warning, subsystem, message);
+            lock (consoleLock)
+            {
+                LogMessage(LogType.Warning, subsystem, message);
+            }
         }
 
         /// <summary>
@@ -45,7 +78,10 @@
         /// <param name="message">The message.</param>
         public static void Error(string subsystem, string message)
         {
-            LogMessage(LogType.Error, subsystem, message);
+            lock (consoleLock)
+            {
+                LogMessage(LogType.Error, subsystem, message);
+            }
         }
 
         /// <summary>
@@ -57,7 +93,10 @@
         {
             if (DebugEnabled)
             {
-                LogMessage(LogType.Debug, subsystem, message);
+                lock (consoleLock)
+                {
+                    LogMessage(LogType.Debug, subsystem, message);
+                }
             }
         }
 

@@ -81,7 +81,7 @@ namespace ButterflyCS
             Log.Info(subsystem, "Machine initializing");
 
             // Initialize the logging subsystem
-            Log.DebugEnabled = true;
+            Log.EnableDebugMessages();
 
             // Load the ROM
             machine.LoadProgram(romFilePath, 0x8000);
