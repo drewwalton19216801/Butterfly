@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.PortableExecutable;
 using System.Timers;
 using Raylib_CsLo;
 using Sharp6502;
@@ -119,6 +120,29 @@ namespace ButterflyCS
                 cpu.Reset();
             }
             Log.Debug(subsystem, "Machine reset complete.");
+        }
+
+        /// <summary>
+        /// Initializes the machine.
+        /// </summary>
+        /// <param name="romFilePath">The rom file path.</param>
+        public void Init(string romFilePath, CPU.Variant variant, double initialSpeed)
+        {
+            Log.Info(subsystem, "Machine initializing");
+
+            // Initialize the logging subsystem
+            Log.EnableDebugMessages();
+
+            // Load the ROM
+            LoadProgram(romFilePath, 0x8000);
+
+            // Set the CPU variant to whatever the user specified
+            cpu.cpuVariant = variant;
+
+            // Set the CPU speed to whatever the user specified
+            CycleSpeed = initialSpeed;
+
+            Log.Info(subsystem, "Machine initialized");
         }
 
         /// <summary>

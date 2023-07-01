@@ -23,7 +23,7 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static Task Main(string[] args)
         {
-            MachineStart();
+            machine.Init(romFilePath, CPU.Variant.NMOS_6502, 1);
 
             // Create the threads for the UIs
             Thread terminalThread = new(RunTerminalUI);
@@ -70,29 +70,6 @@ namespace ButterflyCS
             // Initialize the GUI
             MainWin mainWin = new(machine);
             mainWin.StartApplication();
-        }
-
-        /// <summary>
-        /// The task that sets up the machine.
-        /// </summary>
-        /// <returns>A Task.</returns>
-        public static void MachineStart()
-        {
-            Log.Info(subsystem, "Machine initializing");
-
-            // Initialize the logging subsystem
-            Log.EnableDebugMessages();
-
-            // Load the ROM
-            machine.LoadProgram(romFilePath, 0x8000);
-
-            // Set the CPU variant
-            machine.cpu.cpuVariant = CPU.Variant.CMOS_65C02;
-
-            // Set the CPU speed to 1 Hz
-            machine.CycleSpeed = 1;
-
-            Log.Info(subsystem, "Machine initialized");
         }
     }
 }
