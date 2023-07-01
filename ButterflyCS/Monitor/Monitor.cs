@@ -80,6 +80,9 @@ namespace ButterflyCS.Monitor
 
                             // Add the output to the output text view
                             outputText.Text += output + "\n";
+
+                            // Scroll to the bottom of the output text view
+                            outputText.MoveEnd();
                         }
                     }
 
