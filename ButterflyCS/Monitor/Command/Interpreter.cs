@@ -59,6 +59,12 @@
                     result = _controlInterpreter.ParseArgs(cmdArgs);
                     _commandRunning = false;
                 }
+
+                if (cmd == "quit")
+                {
+                    // Quit the program
+                    Environment.Exit(0);
+                }
             } 
             else
             {
