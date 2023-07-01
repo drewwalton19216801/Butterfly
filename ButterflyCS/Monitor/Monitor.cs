@@ -10,6 +10,7 @@ namespace ButterflyCS.Monitor
     {
         private readonly Machine _machine; // The machine that this monitor is attached to
         private Interpreter _interpreter; // The interpreter for this monitor
+        private string previousCommand = string.Empty; // The previous command
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Monitor"/> class.
@@ -83,12 +84,27 @@ namespace ButterflyCS.Monitor
 
                             // Scroll to the bottom of the output text view
                             outputText.MoveEnd();
+
+                            // Set the previous command
+                            previousCommand = input;
                         }
                     }
 
                     // Reset the prompt
                     inputBox.Text = "";
                     inputBox.CursorPosition = 0;
+                }
+
+                // Check for up arrow
+                if (keyEvent.KeyEvent.Key == Key.CursorUp)
+                {
+                    // If the previous command is not empty,
+                    // set the input box text to the previous command
+                    if (previousCommand.Length != 0)
+                    {
+                        inputBox.Text = previousCommand;
+                        inputBox.CursorPosition = previousCommand.Length;
+                    }
                 }
             };
 
