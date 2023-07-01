@@ -142,7 +142,13 @@ namespace ButterflyCS.Monitor.Command
             // "args" should be 1 element long
             if (args.Length != 1)
             {
-                return "Invalid number of arguments";
+                if (args.Length == 0)
+                {
+                    // Return the current speed
+                    return "Speed is " + _machine.CycleSpeed.ToString() + " Hz";
+                }
+
+                return RunHelpCommand();
             }
 
             // Grab the argument
