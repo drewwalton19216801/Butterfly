@@ -751,7 +751,17 @@ namespace Sharp6502
         }
 
         /// <summary>
-        /// The ROL (Rotate One Bit Left (Memory or Accumulator)) instruction.
+        /// The ROL (Rotate One Bit Left (Accumulator) instruction.
+        /// </summary>
+        /// <param name="cpu">CPU object</param>
+        /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
+        public static byte ROLA(CPU cpu)
+        {
+            return 0;
+        }
+
+        /// <summary>
+        /// The ROL (Rotate One Bit Left (Memory) instruction.
         /// </summary>
         /// <param name="cpu">CPU object</param>
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
@@ -761,10 +771,27 @@ namespace Sharp6502
         }
 
         /// <summary>
-        /// The ROR (Rotate One Bit Right (Memory or Accumulator)) instruction.
+        /// The ROR (Rotate One Bit Right (Accumulator) instruction.
         /// </summary>
         /// <param name="cpu">CPU object</param>
         /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
+        /// <remarks>This version operates on the accumulator.</remarks>
+        public static byte RORA(CPU cpu)
+        {
+            return cpu.cpuVariant switch
+            {
+                CPU.Variant.NMOS_6502 => RORA_NMOS(cpu), // The original 6502 (NMOS) has a bug in the ROR instruction
+                CPU.Variant.CMOS_65C02 => RORA_CMOS(cpu), // The CMOS 6502 does not have the bug in the ROR instruction
+                _ => RORA_CMOS(cpu), // By default, use the CMOS 6502 implementation
+            };
+        }
+
+        /// <summary>
+        /// The ROR (Rotate One Bit Right (Memory) instruction.
+        /// </summary>
+        /// <param name="cpu">CPU object</param>
+        /// <returns>1 if the instruction used an extra cycle, otherwise 0</returns>
+        /// <remarks>This is the version that operates on memory.</remarks>
         public static byte ROR(CPU cpu)
         {
             return cpu.cpuVariant switch
@@ -776,7 +803,7 @@ namespace Sharp6502
         }
 
         /// <summary>
-        /// ROR (Rotate One Bit Right (Memory or Accumulator)) instruction for the NMOS 6502.
+        /// ROR (Rotate One Bit Right (Accumulator)) instruction for the NMOS 6502.
         /// </summary>
         /// <param name="cpu">The cpu.</param>
         /// <returns>A byte.</returns>
@@ -785,7 +812,7 @@ namespace Sharp6502
         /// shifts a 0 into the 9th bit (instead of the carry flag), and does not affect the
         /// carry flag.
         /// </remarks>
-        private static byte ROR_NMOS(CPU cpu)
+        private static byte RORA_NMOS(CPU cpu)
         {
             // Are we in accumulator mode?
             if (cpu.CurrentInstruction?.AddressingMode == "Immediate")
@@ -833,26 +860,14 @@ namespace Sharp6502
         }
 
         /// <summary>
-        /// ROR (Rotate One Bit Right (Memory or Accumulator)) instruction for the CMOS 6502.
+        /// ROR (Rotate One Bit Right (Accumulator) instruction for the CMOS 6502.
         /// </summary>
         /// <param name="cpu">The cpu.</param>
         /// <returns>A byte.</returns>
-        private static byte ROR_CMOS(CPU cpu)
+        private static byte RORA_CMOS(CPU cpu)
         {
-            // Are we in accumulator mode?
-            if (cpu.CurrentInstruction?.AddressingMode == "Immediate")
-            {
-                // Load the accumulator into the temp variable
-                cpu.temp = cpu.registers.A;
-            }
-            else
-            {
-                // Fetch the next byte from memory
-                cpu.Fetch();
-
-                // Load the fetched byte into the temp variable
-                cpu.temp = cpu.fetchedByte;
-            }
+            // Load the accumulator into the temp variable
+            cpu.temp = cpu.registers.A;
 
             // If the carry flag is set, set the 9th bit of the temp variable
             if (cpu.registers.GetFlag(CPUFlags.Carry))
@@ -875,16 +890,83 @@ namespace Sharp6502
             // Set the zero flag if the temp variable is zero
             cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
 
-            if (cpu.CurrentInstruction?.AddressingMode == "Immediate")
+            // Store the temp variable into the accumulator
+            cpu.registers.A = (byte)cpu.temp;
+
+            // Return 0 since this instruction does not use an extra cycle
+            return 0;
+        }
+
+        /// <summary>
+        /// ROR (Rotate One Bit Right (Memory) instruction for the NMOS 6502.
+        /// </summary>
+        /// <param name="cpu">The cpu.</param>
+        /// <returns>A byte.</returns>
+        /// <remarks>
+        /// The NMOS 6502 has a bug in the ROR instruction. It shifts left instead of right,
+        /// shifts a 0 into the 9th bit (instead of the carry flag), and does not affect the
+        /// carry flag.
+        /// </remarks>
+        private static byte ROR_NMOS(CPU cpu)
+        {
+            // Load the next byte from memory into the temp variable
+            cpu.temp = cpu.Fetch();
+
+            // Set the 9th bit of the temp variable to 0
+            cpu.temp &= 0x7F;
+
+            // Shift the temp variable left by 1
+            cpu.temp <<= 1;
+
+            // Mask the temp variable to 8 bits
+            cpu.temp &= 0xFF;
+
+            // Set the negative flag if the 8th bit of the temp variable is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
+
+            // Set the zero flag if the temp variable is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
+
+            // Store the temp variable into memory
+            cpu.Write(cpu.addressAbsolute, (byte)cpu.temp);
+
+            // Return 0 since this instruction does not use an extra cycle
+            return 0;
+        }
+
+        /// <summary>
+        /// ROR (Rotate One Bit Right (Memory) instruction for the CMOS 6502.
+        /// </summary>
+        /// <param name="cpu">The cpu.</param>
+        /// <returns>A byte.</returns>
+        private static byte ROR_CMOS(CPU cpu)
+        {
+            // Load the next byte from memory into the temp variable
+            cpu.temp = cpu.Fetch();
+
+            // If the carry flag is set, set the 9th bit of the temp variable
+            if (cpu.registers.GetFlag(CPUFlags.Carry))
             {
-                // Store the temp variable into the accumulator
-                cpu.registers.A = (byte)cpu.temp;
+                cpu.temp |= 0x100;
             }
-            else
-            {
-                // Store the temp variable into memory
-                cpu.Write(cpu.addressAbsolute, (byte)cpu.temp);
-            }
+
+            // Set the carry flag if the 9th bit of the temp variable is set
+            cpu.registers.SetFlag(CPUFlags.Carry, (cpu.temp & 0x01) > 0);
+
+            // Shift the temp variable right by 1
+            cpu.temp >>= 1;
+
+            // Mask the temp variable to 8 bits
+            cpu.temp &= 0xFF;
+
+            // Set the negative flag if the 8th bit of the temp variable is set
+            cpu.registers.SetFlag(CPUFlags.Negative, (cpu.temp & 0x80) > 0);
+
+            // Set the zero flag if the temp variable is zero
+            cpu.registers.SetFlag(CPUFlags.Zero, cpu.temp == 0);
+
+            // Store the temp variable into memory
+            cpu.Write(cpu.addressAbsolute, (byte)cpu.temp);
 
             // Return 0 since this instruction does not use an extra cycle
             return 0;

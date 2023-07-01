@@ -195,14 +195,14 @@
             new Instruction(name: "PLP", opcode: 0x28, length: 1, cycles: 4, addressingMode: "Implied"),
 
             // ROL (rotate left)
-            new Instruction(name: "ROL", opcode: 0x2A, length: 1, cycles: 2, addressingMode: "Implied"),
+            new Instruction(name: "ROLA", opcode: 0x2A, length: 1, cycles: 2, addressingMode: "Implied"),
             new Instruction(name: "ROL", opcode: 0x26, length: 2, cycles: 5, addressingMode: "ZeroPage"),
             new Instruction(name: "ROL", opcode: 0x36, length: 2, cycles: 6, addressingMode: "ZeroPageX"),
             new Instruction(name: "ROL", opcode: 0x2E, length: 3, cycles: 6, addressingMode: "Absolute"),
             new Instruction(name: "ROL", opcode: 0x3E, length: 3, cycles: 7, addressingMode: "AbsoluteX"),
 
             // ROR (rotate right)
-            new Instruction(name: "ROR", opcode: 0x6A, length: 1, cycles: 2, addressingMode: "Implied"),
+            new Instruction(name: "RORA", opcode: 0x6A, length: 1, cycles: 2, addressingMode: "Implied"),
             new Instruction(name: "ROR", opcode: 0x66, length: 2, cycles: 5, addressingMode: "ZeroPage"),
             new Instruction(name: "ROR", opcode: 0x76, length: 2, cycles: 6, addressingMode: "ZeroPageX"),
             new Instruction(name: "ROR", opcode: 0x6E, length: 3, cycles: 6, addressingMode: "Absolute"),
