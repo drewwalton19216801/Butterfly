@@ -43,7 +43,7 @@ namespace ButterflyCS.Monitor.Command
                 "  reset - Reset the CPU\n" +
                 "  status - Get the status of the CPU\n" +
                 "  step - Step the CPU\n" +
-                "  speed - Set the CPU speed in Hz";
+                "  speed - Set the CPU speed in Hz\n";
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace ButterflyCS.Monitor.Command
         private string Reset()
         {
             _machine.Reset();
-            return "Machine reset";
+            return "Machine reset\n" + Status();
         }
 
         /// <summary>
@@ -105,8 +105,18 @@ namespace ButterflyCS.Monitor.Command
         /// <returns>A message.</returns>
         private string Status()
         {
-            // TODO: Add status
-            return "Status";
+            string status = "Status:\n";
+
+            // Add the registers
+            status += "Registers:\n";
+            status += "[A: " + _machine.PeekRegister("A") + "]";
+            status += " [X: " + _machine.PeekRegister("X") + "]";
+            status += " [Y: " + _machine.PeekRegister("Y") + "]";
+            status += " [PC: " + _machine.PeekPC() + "]";
+            status += " [SP: " + _machine.PeekRegister("SP") + "]";
+            status += " [SR: " + _machine.PeekRegister("SR") + "]\n";
+
+            return status;
         }
 
         /// <summary>

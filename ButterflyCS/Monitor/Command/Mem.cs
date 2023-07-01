@@ -39,7 +39,7 @@ namespace ButterflyCS.Monitor.Command
                 "Usage: mem <subcommand>\n" +
                 "Subcommands:\n" +
                 "  read <address> - Read a byte from memory\n" +
-                "  write <address> <data> - Write a byte to memory.";
+                "  write <address> <data> - Write a byte to memory\n";
         }
 
         /// <summary>

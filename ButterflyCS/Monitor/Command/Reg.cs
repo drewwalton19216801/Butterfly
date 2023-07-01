@@ -74,7 +74,7 @@ namespace ButterflyCS.Monitor.Command
                 "Usage: reg <subcommand>\n" +
                 "Subcommands:\n" +
                 "  read - Read a register\n" +
-                "  write - Write a register";
+                "  write - Write a register\n";
         }
 
         /// <summary>
