@@ -47,6 +47,16 @@ namespace ButterflyCS
         public static void RunTerminalUI()
         {
             Log.Info(subsystem, "Terminal UI started.");
+
+            // Loop for 20 seconds, printing the number of seconds left every second
+            for (int i = 20; i > 0; i--)
+            {
+                Console.WriteLine($"DEBUG DEBUG DEBUG {i} seconds left");
+                Thread.Sleep(1000);
+            }
+
+            // Quit the application
+            Environment.Exit(0);
         }
 
         /// <summary>
