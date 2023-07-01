@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
-
-namespace Sharp6502
+﻿namespace Sharp6502
 {
     /// <summary>
     /// The 6502 microprocessor.

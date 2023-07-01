@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection.PortableExecutable;
-using System.Timers;
-using Raylib_CsLo;
+﻿using System.Timers;
 using Sharp6502;
 using Timer = System.Timers.Timer;
 

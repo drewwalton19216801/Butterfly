@@ -81,7 +81,7 @@ namespace ButterflyCS
         public static void RunGUI()
         {
             // Initialize the GUI
-            MainWin mainWin = new(machine);
+            GUI.MainWin mainWin = new(machine);
             mainWin.ShowWindow();
 
             // If the GUI is closed, quit the application
