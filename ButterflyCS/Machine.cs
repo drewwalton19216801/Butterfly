@@ -64,10 +64,6 @@ namespace ButterflyCS
             // Set up the timer
             cpuTimer = new Timer(clockCycleDuration * 1000); // Timer interval is in milliseconds
             cpuTimer.Elapsed += Cycle!;
-
-            // Hook up the demo device
-            //cpu.memory.RegisterReadHook(memHookDemoDevice.startAddress, memHookDemoDevice.endAddress, memHookDemoDevice.Read); // Read hook
-            //cpu.memory.RegisterWriteHook(memHookDemoDevice.startAddress, memHookDemoDevice.endAddress, memHookDemoDevice.Write); // Write hook
         }
 
         /// <summary>
