@@ -8,6 +8,7 @@
         private readonly Machine _machine; // The machine that this interpreter is attached to
         private readonly Mem _memInterpreter; // The memory interpreter
         private readonly Control _controlInterpreter; // The control interpreter
+        private readonly Reg _regInterpreter; // The register interpreter
         private bool _commandRunning = false; // Whether or not a command is running
 
         /// <summary>
@@ -21,6 +22,7 @@
             // Initialize the interpreters
             _memInterpreter = new(_machine);
             _controlInterpreter = new(_machine);
+            _regInterpreter = new(_machine);
         }
 
         /// <summary>
@@ -57,6 +59,11 @@
                 {
                     _commandRunning = true;
                     result = _controlInterpreter.ParseArgs(cmdArgs);
+                    _commandRunning = false;
+                } else if (cmd == "reg")
+                {
+                    _commandRunning = true;
+                    result = _regInterpreter.ParseArgs(cmdArgs);
                     _commandRunning = false;
                 }
 
