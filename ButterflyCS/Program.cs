@@ -1,4 +1,5 @@
 ﻿using Sharp6502;
+using Terminal.Gui;
 
 namespace ButterflyCS
 {
@@ -55,22 +56,10 @@ namespace ButterflyCS
         /// <returns>A Task.</returns>
         public static void RunTerminalUI()
         {
-            // Loop for 20 seconds, printing the number of seconds left every second
-            for (int i = 20; i > 0; i--)
-            {
-                // Show seconds or second depending on whether there is 1 second left
-                if (i == 1)
-                {
-                    Log.Debug(subsystem, "There is 1 second left.");
-                }
-                else
-                {
-                    Log.Debug(subsystem, $"There are {i} seconds left.");
-                }
-                Thread.Sleep(1000);
-            }
+            Application.Run<TUI.Monitor>();
 
             // Quit the application
+            Application.Shutdown();
             Environment.Exit(0);
         }
 
