@@ -1,6 +1,4 @@
-﻿using Sharp6502;
-
-namespace ButterflyCS.Monitor.Command
+﻿namespace ButterflyCS.Monitor.Command
 {
     /// <summary>
     /// The reg command interpreter.
