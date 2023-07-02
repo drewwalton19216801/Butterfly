@@ -18,10 +18,10 @@ The [Instruction Executor](https://bitbucket.org/drewwalton19216801/butterfly-cs
 The Sharp6502 library included with Butterfly uses a flat 64KB memory buffer, with support for hooking reads and writes at various addresses. This is useful for implementing other devices that need to read/write in the 6502s 16-bit address space. See [Sharp6502/Memory.cs](https://bitbucket.org/drewwalton19216801/butterfly-cs/src/dev/Sharp6502/Memory.cs) for more details on how that works.
 
 ## Building
-Run `dotnet publish` from the root repository directory to build the Butterfly emulator and supporting libraries. [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui) and [Raylib-CsLo](https://github.com/NotNotTech/Raylib-CsLo) provide the libraries used for the Monitor interface as well as video output.
+Run `dotnet publish` from the root repository directory to build the Butterfly emulator and supporting libraries. [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui) and [Raylib-CsLo](https://github.com/NotNotTech/Raylib-CsLo) provide the libraries used for the Monitor interface as well as (eventual) video output.
 
 ## Running
-TODO: Currently, the emulator will automatically load `rom.bin` in the same directory as the ButterflyCS executable.
+Enter the ButterflyCS directory and run `dotnet run .`, this will start the monitor and the GUI.
 
 ## Contributing
 Your contributions are welcome. Please feel free to fork this project and submit pull requests.
