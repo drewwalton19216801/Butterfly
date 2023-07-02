@@ -119,7 +119,13 @@
         /// <returns>A message.</returns>
         private string Step()
         {
+            if (!_machine.isSingleStepping)
+            {
+                _machine.isSingleStepping = true;
+            }
+
             _machine.Step();
+
             return "Machine step";
         }
 
