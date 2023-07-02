@@ -5,8 +5,19 @@
     /// </summary>
     public class MemoryReadHook
     {
+        /// <summary>
+        /// The start address of the hook.
+        /// </summary>
         public ushort startAddress;
+
+        /// <summary>
+        /// The end address of the hook.
+        /// </summary>
         public ushort endAddress;
+
+        /// <summary>
+        /// The read function.
+        /// </summary>
         public Func<ushort, byte> readFunc;
 
         /// <summary>
@@ -28,8 +39,19 @@
     /// </summary>
     public class MemoryWriteHook
     {
+        /// <summary>
+        /// The start address of the hook.
+        /// </summary>
         public ushort startAddress;
+
+        /// <summary>
+        /// The end address of the hook.
+        /// </summary>
         public ushort endAddress;
+
+        /// <summary>
+        /// The write function.
+        /// </summary>
         public Action<ushort, byte> writeFunc;
 
         /// <summary>

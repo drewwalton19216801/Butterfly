@@ -26,32 +26,33 @@ namespace ButterflyCS
         /// <summary>
         /// The CPU timer.
         /// </summary>
-        public Timer cpuTimer; // The CPU timer
+        public Timer cpuTimer;
 
         /// <summary>
         /// The clock cycle duration, in seconds.
         /// </summary>
-        public double clockCycleDuration; // The duration of a clock cycle, in seconds
+        public double clockCycleDuration;
 
         /// <summary>
         /// Whether the machine is running.
         /// </summary>
-        public bool isRunning; // Whether the machine is running
+        public bool isRunning;
 
         /// <summary>
         /// Whether the machine is paused.
         /// </summary>
-        public bool isPaused; // Whether the machine is paused
+        public bool isPaused;
 
         /// <summary>
         /// Whether the machine is single-stepping mode.
         /// </summary>
-        public bool isSingleStepping; // Whether the machine is single-stepping
+        public bool isSingleStepping;
 
         /// <summary>
         /// Gets or sets the cycle speed.
         /// </summary>
-        public double CycleSpeed { get; set; } = 1; // The cycle speed, in Hz
+        /// <remarks>Speed is in Hz.</remarks>
+        public double CycleSpeed { get; set; } = 1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Machine"/> class.

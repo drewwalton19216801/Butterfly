@@ -5,6 +5,9 @@
     /// </summary>
     public static class InstructionSet
     {
+        /// <summary>
+        /// The instructions.
+        /// </summary>
         public static readonly Instruction[] Instructions =
         {
             // ADC (Add with Carry)
