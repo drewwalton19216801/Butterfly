@@ -12,11 +12,6 @@ namespace ButterflyCS
 
         private static readonly Machine machine = new();
 
-        public static readonly string romFilePath = Path.Combine(
-            Environment.CurrentDirectory,
-            "rom.bin"
-        );
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -36,7 +31,7 @@ namespace ButterflyCS
                 Log.DisableDebugMessages();
             }
 
-            machine.Init(romFilePath, CPU.Variant.NMOS_6502, 1);
+            machine.Init(CPU.Variant.NMOS_6502, 1);
 
             // Create the threads for the UIs
             Thread terminalThread = new(RunTerminalUI);

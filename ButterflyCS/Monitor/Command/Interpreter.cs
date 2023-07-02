@@ -1,4 +1,6 @@
-﻿namespace ButterflyCS.Monitor.Command
+﻿using System.Runtime.CompilerServices;
+
+namespace ButterflyCS.Monitor.Command
 {
     /// <summary>
     /// The monitor command interpreter
@@ -9,9 +11,10 @@
         private readonly Mem _memInterpreter; // The memory interpreter
         private readonly Control _controlInterpreter; // The control interpreter
         private readonly Reg _regInterpreter; // The register interpreter
+        private readonly Load _loadInterpreter; // The load interpreter
         private bool _commandRunning = false; // Whether or not a command is running
 
-        private string[] supportedCommands = new string[] { "mem", "control", "reg", "help", "quit" }; // The supported commands
+        private string[] supportedCommands = new string[] { "mem", "control", "reg", "load", "help", "quit" }; // The supported commands
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Interpreter"/> class.
@@ -25,6 +28,7 @@
             _memInterpreter = new(_machine);
             _controlInterpreter = new(_machine);
             _regInterpreter = new(_machine);
+            _loadInterpreter = new(_machine);
         }
 
         /// <summary>
@@ -39,6 +43,7 @@
                 "  mem - Read/write memory\n" +
                 "  control - Control the machine\n" +
                 "  reg - Read/write registers\n" +
+                "  load - Load a file into memory\n" +
                 "  help - Display this help message\n" +
                 "  quit - Quit the program\n";
         }
@@ -82,6 +87,12 @@
                 {
                     _commandRunning = true;
                     result = _regInterpreter.ParseArgs(cmdArgs);
+                    _commandRunning = false;
+                }
+                else if (cmd == "load")
+                {
+                    _commandRunning = true;
+                    result = _loadInterpreter.ParseArgs(cmdArgs);
                     _commandRunning = false;
                 }
                 else if (cmd == "help")

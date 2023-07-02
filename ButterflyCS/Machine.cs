@@ -312,12 +312,8 @@ namespace ButterflyCS
         /// <summary>
         /// Initializes the machine.
         /// </summary>
-        /// <param name="romFilePath">The rom file path.</param>
-        public void Init(string romFilePath, CPU.Variant variant, double initialSpeed)
+        public void Init(CPU.Variant variant, double initialSpeed)
         {
-            // Load the ROM
-            LoadProgram(romFilePath, 0x8000);
-
             // Set the CPU variant to whatever the user specified
             cpu.cpuVariant = variant;
 

@@ -55,8 +55,8 @@
             // Run the subcommand
             return args[0] switch
             {
-                "read" => "Data: " + ReadCommand(args),
-                "write" => WriteCommand(args),
+                "read" => "Data: " + Read(args),
+                "write" => Write(args),
                 _ => "Invalid subcommand.",
             };
         }
@@ -66,7 +66,7 @@
         /// </summary>
         /// <param name="args">The args.</param>
         /// <returns>A string.</returns>
-        private string ReadCommand(string[] args)
+        private string Read(string[] args)
         {
             // Strip the subcommand from the args
             args = args[1..];
@@ -100,7 +100,7 @@
         /// </summary>
         /// <param name="args">The args.</param>
         /// <returns>A string.</returns>
-        private string WriteCommand(string[] args)
+        private string Write(string[] args)
         {
             // Strip the subcommand from the args
             args = args[1..];
