@@ -97,6 +97,7 @@ namespace ButterflyCS.Monitor.Command
             }
 
             _machine.LoadProgram(path, address);
+            _machine.Reset();
 
             // Get the file name from the path
             string fileName = System.IO.Path.GetFileName(path);
