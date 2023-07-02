@@ -39,7 +39,7 @@
         /// <summary>
         /// Parses the command arguments.
         /// </summary>
-        /// <param name="cmdString">The arguments.</param>
+        /// <param name="argString">The arguments.</param>
         /// <returns>A string to be displayed.</returns>
         public string ParseArgs(string argString)
         {

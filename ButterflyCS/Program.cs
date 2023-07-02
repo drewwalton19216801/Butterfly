@@ -8,6 +8,9 @@ namespace ButterflyCS
     /// </summary>
     public class Program
     {
+        /// <summary>
+        /// The subsystem name.
+        /// </summary>
         public static readonly string subsystem = "ButterflyCS";
 
         private static readonly Machine machine = new();

@@ -47,13 +47,44 @@ namespace ButterflyCS.GUI
         /// </summary>
         public enum EmulatorScreen
         {
+            /// <summary>
+            /// The machine state screen.
+            /// </summary>
             MachineState,
+
+            /// <summary>
+            /// The memory view screen.
+            /// </summary>
             Memory,
+
+            /// <summary>
+            /// The disassembly screen.
+            /// </summary>
             Disassembly,
+
+            /// <summary>
+            /// The stack screen.
+            /// </summary>
             Stack,
+
+            /// <summary>
+            /// The flags screen.
+            /// </summary>
             Flags,
+
+            /// <summary>
+            /// The registers screen.
+            /// </summary>
             Registers,
+
+            /// <summary>
+            /// The breakpoints screen.
+            /// </summary>
             Breakpoints,
+
+            /// <summary>
+            /// The help screen.
+            /// </summary>
             Help
         }
 

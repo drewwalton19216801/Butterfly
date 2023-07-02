@@ -18,11 +18,34 @@ namespace ButterflyCS
         private static readonly string subsystem = "Machine";
 
 
-        public CPU cpu; // The CPU
+        /// <summary>
+        /// The CPU.
+        /// </summary>
+        public CPU cpu;
+
+        /// <summary>
+        /// The CPU timer.
+        /// </summary>
         public Timer cpuTimer; // The CPU timer
+
+        /// <summary>
+        /// The clock cycle duration, in seconds.
+        /// </summary>
         public double clockCycleDuration; // The duration of a clock cycle, in seconds
+
+        /// <summary>
+        /// Whether the machine is running.
+        /// </summary>
         public bool isRunning; // Whether the machine is running
+
+        /// <summary>
+        /// Whether the machine is paused.
+        /// </summary>
         public bool isPaused; // Whether the machine is paused
+
+        /// <summary>
+        /// Whether the machine is single-stepping mode.
+        /// </summary>
         public bool isSingleStepping; // Whether the machine is single-stepping
 
         /// <summary>
