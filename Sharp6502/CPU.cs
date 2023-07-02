@@ -15,9 +15,20 @@
         /// </summary>
         public enum Variant
         {
-            NMOS_6502, // The original 6502
-            CMOS_65C02, // The 65C02
-            NES_6502, // The NES 6502 is a 6502 with a few quirks (aka Ricoh 2A03)
+            /// <summary>
+            /// The original 6502.
+            /// </summary>
+            NMOS_6502,
+
+            /// <summary>
+            /// The 65C02.
+            /// </summary>
+            CMOS_65C02,
+
+            /// <summary>
+            /// The Ricoh 2A03 (aka NES 6502).
+            /// </summary>
+            NES_6502,
         }
 
         /// <summary>
@@ -25,25 +36,95 @@
         /// </summary>
         public enum ExecutionState
         {
+            /// <summary>
+            /// The CPU is stopped.
+            /// </summary>
             Stopped,
+
+            /// <summary>
+            /// The CPU is fetching data.
+            /// </summary>
             Fetching,
+
+            /// <summary>
+            /// The CPU is executing an instruction.
+            /// </summary>
             Executing,
+
+            /// <summary>
+            /// The CPU has received an interrupt.
+            /// </summary>
             Interrupt,
+
+            /// <summary>
+            /// The CPU has encountered an illegal opcode.
+            /// </summary>
             IllegalOpcode
         }
 
-        public Registers registers = new(0, 0, 0, 0xFF, 0, 0); // The CPU registers
-        public Memory memory = new(); // The CPU memory
-        public byte cycles = 0; // The number of cycles remaining for the current instruction
-        public ushort temp = 0x0000; // A variable to temporarily store data
-        public ushort addressAbsolute = 0x0000; // Represents the absolute address fetched
-        public ushort addressRelative = 0x00; // Represents the relative address fetched
-        public byte opcode = 0x00; // The current opcode
-        public ExecutionState cpuState = ExecutionState.Stopped; // The current execution state
-        public Variant cpuVariant = Variant.CMOS_65C02; // The CPU variant (default is WDC 65C02)
-        public byte fetchedByte = 0x00; // The fetched byte
-        public string currentDisassembly = string.Empty; // The current disassembly
-        public object cpuLock = new(); // The CPU lock object
+        /// <summary>
+        /// The CPU registers.
+        /// </summary>
+        public Registers registers = new(0, 0, 0, 0xFF, 0, 0);
+
+        /// <summary>
+        /// The CPU memory space.
+        /// </summary>
+        public Memory memory = new();
+
+        /// <summary>
+        /// The number of cycles remaining for the current instruction.
+        /// </summary>
+        public byte cycles = 0;
+
+        /// <summary>
+        /// A temporary variable used by the CPU.
+        /// </summary>
+        public ushort temp = 0x0000;
+
+        /// <summary>
+        /// The absolute address fetched.
+        /// </summary>
+        public ushort addressAbsolute = 0x0000;
+
+        /// <summary>
+        /// The relative address fetched.
+        /// </summary>
+        public ushort addressRelative = 0x00;
+
+        /// <summary>
+        /// The current opcode.
+        /// </summary>
+        public byte opcode = 0x00;
+
+        /// <summary>
+        /// The current execution state.
+        /// </summary>
+        public ExecutionState cpuState = ExecutionState.Stopped;
+
+        /// <summary>
+        /// The current CPU variant.
+        /// </summary>
+        /// <remarks>
+        /// This defaults to CMOS_65C02, which is the most compatible variant, but
+        /// can be switched mid-execution. Why you would want to do this is beyond me.
+        /// </remarks>
+        public Variant cpuVariant = Variant.CMOS_65C02;
+
+        /// <summary>
+        /// The fetched byte.
+        /// </summary>
+        public byte fetchedByte = 0x00;
+
+        /// <summary>
+        /// The string representation of the current instruction.
+        /// </summary>
+        public string currentDisassembly = string.Empty;
+
+        /// <summary>
+        /// The CPU lock object.
+        /// </summary>
+        public object cpuLock = new();
 
         /// <summary>
         /// Gets or sets the current instruction.
