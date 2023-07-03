@@ -9,11 +9,6 @@ namespace ButterflyCS.GUI
     public static class MainWin
     {
         /// <summary>
-        /// The subsystem (for logging).
-        /// </summary>
-        private static readonly string subsystem = "GUI";
-
-        /// <summary>
         /// The memory view start address.
         /// </summary>
         private static ushort memoryViewStartAddress = 0x8000;
@@ -104,13 +99,9 @@ namespace ButterflyCS.GUI
             Machine.isPaused = true;
             Machine.isSingleStepping = false;
 
-            // Start the CPU timer
-            if (Machine.cpuTimer == null)
-            {
-                throw new Exception("CPU timer is null!");
-            }
+            if (Machine.cpuTimer == null) { throw new Exception("CPU timer init error!"); }
             Machine.cpuTimer.Start();
-
+            
             // Main loop
             while (!Raylib.WindowShouldClose())
             {
@@ -196,12 +187,7 @@ namespace ButterflyCS.GUI
             // If machine is in single-step mode, execute one cycle if the user presses the spacebar or gamepad A
             if (Machine.isSingleStepping && (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE) || Raylib.IsGamepadButtonPressed(gamepad, GamepadButton.GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)))
             {
-                Log.Debug(subsystem, "Single-stepping");
-                if (Machine.cpu == null)
-                {
-                    throw new Exception("CPU is null");
-                }
-                Machine.cpu.Clock();
+                CPU.Clock();
             }
 
             // Each screen can have its own input processing
@@ -226,23 +212,13 @@ namespace ButterflyCS.GUI
                         // Check for Ctrl+N
                         if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_N))
                         {
-                            // Toggle NMI
-                            if (Machine.cpu == null)
-                            {
-                                throw new Exception("CPU is null");
-                            }
-                            Machine.cpu.NMI();
+                            CPU.NMI();
                         }
 
                         // Check for Ctrl+I
                         if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) && Raylib.IsKeyPressed(KeyboardKey.KEY_I))
                         {
-                            // Toggle IRQ
-                            if (Machine.cpu == null)
-                            {
-                                throw new Exception("CPU is null");
-                            }
-                            Machine.cpu.IRQ();
+                            CPU.IRQ();
                         }
                         break;
                     }
@@ -313,7 +289,6 @@ namespace ButterflyCS.GUI
         /// </summary>
         private static void DrawMachineStateScreen()
         {
-            if (Machine.cpu == null) { return; }
             Raylib.ClearBackground(Raylib.GREEN);
 
             byte regA = 0;
@@ -327,17 +302,17 @@ namespace ButterflyCS.GUI
             string variantString = string.Empty;
 
             // Lock the cpu lock object while we read its state
-            lock (Machine.cpu.cpuLock)
+            lock (CPU.cpuLock)
             {
-                regA = Machine.cpu.registers.A;
-                regX = Machine.cpu.registers.X;
-                regY = Machine.cpu.registers.Y;
-                regSP = Machine.cpu.registers.SP;
-                regPC = Machine.cpu.registers.PC;
-                currentDisassembly = Machine.cpu.currentDisassembly;
-                mem6000 = Machine.cpu.memory.Read(0x6000, true);
-                mem6002 = Machine.cpu.memory.Read(0x6002, true);
-                variantString = Machine.cpu.cpuVariant switch
+                regA = Registers.A;
+                regX = Registers.X;
+                regY = Registers.Y;
+                regSP = Registers.SP;
+                regPC = Registers.PC;
+                currentDisassembly = CPU.currentDisassembly;
+                mem6000 = Memory.Read(0x6000, true);
+                mem6002 = Memory.Read(0x6002, true);
+                variantString = CPU.cpuVariant switch
                 {
                     CPU.Variant.NMOS_6502 => "NMOS 6502",
                     CPU.Variant.CMOS_65C02 => "WDC 65C02",
@@ -355,14 +330,14 @@ namespace ButterflyCS.GUI
             Raylib.DrawText($"PC: 0x{regPC:X4}", 10, 130, 20, Raylib.BLACK);
 
             string statusString = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
-                Machine.cpu.registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
-                Machine.cpu.registers.GetFlag(CPUFlags.Overflow) ? 'V' : 'v',
-                Machine.cpu.registers.GetFlag(CPUFlags.Unused) ? 'U' : 'u',
-                Machine.cpu.registers.GetFlag(CPUFlags.Break) ? 'B' : 'b',
-                Machine.cpu.registers.GetFlag(CPUFlags.Decimal) ? 'D' : 'd',
-                Machine.cpu.registers.GetFlag(CPUFlags.InterruptDisable) ? 'I' : 'i',
-                Machine.cpu.registers.GetFlag(CPUFlags.Zero) ? 'Z' : 'z',
-                Machine.cpu.registers.GetFlag(CPUFlags.Carry) ? 'C' : 'c');
+                Registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
+                Registers.GetFlag(CPUFlags.Overflow) ? 'V' : 'v',
+                Registers.GetFlag(CPUFlags.Unused) ? 'U' : 'u',
+                Registers.GetFlag(CPUFlags.Break) ? 'B' : 'b',
+                Registers.GetFlag(CPUFlags.Decimal) ? 'D' : 'd',
+                Registers.GetFlag(CPUFlags.InterruptDisable) ? 'I' : 'i',
+                Registers.GetFlag(CPUFlags.Zero) ? 'Z' : 'z',
+                Registers.GetFlag(CPUFlags.Carry) ? 'C' : 'c');
 
             Raylib.DrawText($"Status: {statusString}", 10, 150, 20, Raylib.BLACK);
 
@@ -376,7 +351,7 @@ namespace ButterflyCS.GUI
             Raylib.DrawText($"Instruction: {currentDisassembly}", 10, 210, 20, Raylib.BLACK);
 
             // Draw the cycles remaining
-            Raylib.DrawText($"Cycles Remaining: {Machine.cpu.cycles}", 10, 230, 20, Raylib.BLACK);
+            Raylib.DrawText($"Cycles Remaining: {CPU.cycles}", 10, 230, 20, Raylib.BLACK);
 
             // Draw the paused state
             Raylib.DrawText($"Paused: {Machine.isPaused}", 10, 250, 20, Raylib.BLACK);
@@ -427,10 +402,6 @@ namespace ButterflyCS.GUI
         /// </summary>
         private static void DrawMemoryViewScreen(bool drawDisassembly = true)
         {
-            if (Machine.cpu == null)
-            {
-                return;
-            }
             Raylib.ClearBackground(Raylib.GREEN);
 
             /*
@@ -464,7 +435,7 @@ namespace ButterflyCS.GUI
             // Draw the memory values
             for (int i = 0; i < 20; i++)
             {
-                Raylib.DrawText($"{Machine.cpu.memory.Read((ushort)(memoryViewStartAddress + i), true):X2}", 100, 50 + (i * 20), 20, Raylib.BLACK);
+                Raylib.DrawText($"{Memory.Read((ushort)(memoryViewStartAddress + i), true):X2}", 100, 50 + (i * 20), 20, Raylib.BLACK);
             }
 
             // Draw the disassembly on the same line as the selected memory address if drawDisassembly is true
@@ -480,9 +451,7 @@ namespace ButterflyCS.GUI
         /// </summary>
         private static void UpdateDisassembly()
         {
-            if (Machine.cpu == null) { return; }
-            disasmString = Machine.cpu.Disassemble(disasmAddress);
-            Log.Debug(subsystem, ": Disassembly at 0x" + disasmAddress.ToString("X4") + ": " + disasmString);
+            disasmString = CPU.Disassemble(disasmAddress);
         }
     }
 }

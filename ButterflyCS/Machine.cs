@@ -13,17 +13,6 @@ namespace ButterflyCS
     public static class Machine
     {
         /// <summary>
-        /// The subsystem.
-        /// </summary>
-        private static readonly string subsystem = "Machine";
-
-
-        /// <summary>
-        /// The CPU.
-        /// </summary>
-        public static CPU? cpu;
-
-        /// <summary>
         /// The CPU timer.
         /// </summary>
         public static Timer? cpuTimer;
@@ -59,8 +48,6 @@ namespace ButterflyCS
         /// </summary>
         public static void Init(CPU.Variant variant, double initialSpeed)
         {
-            Log.Debug(subsystem, "Machine created.");
-            cpu = new CPU();
             clockCycleDuration = 1 / CycleSpeed;
             isRunning = false;
             isPaused = false;
@@ -71,7 +58,7 @@ namespace ButterflyCS
             cpuTimer.Elapsed += Cycle!;
 
             // Set the CPU variant to whatever the user specified
-            cpu.cpuVariant = variant;
+            CPU.cpuVariant = variant;
 
             // Set the CPU speed to whatever the user specified
             CycleSpeed = initialSpeed;
@@ -120,14 +107,12 @@ namespace ButterflyCS
         /// </summary>
         public static void Cycle(object? sender, ElapsedEventArgs a)
         {
-            if (cpu == null) { throw new Exception("CPU is null."); }
             // Execute one clock cycle if not paused or single-stepping
             if (!isPaused && !isSingleStepping)
             {
-                Log.Debug(subsystem, "Running a single machine cycle.");
-                lock (cpu.cpuLock)
+                lock (CPU.cpuLock)
                 {
-                    cpu.Clock();
+                    CPU.Clock();
                 }
             }
         }
@@ -137,12 +122,11 @@ namespace ButterflyCS
         /// </summary>
         public static void Step()
         {
-            if (cpu == null) { throw new Exception("CPU is null."); }
             if (isSingleStepping)
             {
-                lock (cpu.cpuLock)
+                lock (CPU.cpuLock)
                 {
-                    cpu.Clock();
+                    CPU.Clock();
                 }
             }
         }
@@ -171,13 +155,10 @@ namespace ButterflyCS
         /// </summary>
         public static void Reset()
         {
-            if (cpu == null) { return; }
-            Log.Debug(subsystem, "Resetting machine to power-up state.");
-            lock (cpu.cpuLock)
+            lock (CPU.cpuLock)
             {
-                cpu.Reset();
+                CPU.Reset();
             }
-            Log.Debug(subsystem, "Machine reset complete.");
         }
 
         /// <summary>
@@ -187,13 +168,12 @@ namespace ButterflyCS
         /// <returns>A string.</returns>
         public static string PeekMemory(ushort address)
         {
-            if (cpu == null) { throw new Exception("CPU is null."); }
             byte data;
             string dataString;
 
-            lock (cpu.cpuLock)
+            lock (CPU.cpuLock)
             {
-                data = cpu.Read(address);
+                data = CPU.Read(address);
             }
 
             // Convert the data to a string
@@ -209,45 +189,32 @@ namespace ButterflyCS
         /// <returns>A string.</returns>
         public static string PeekRegister(string register)
         {
-            if (cpu == null) { throw new Exception("CPU is null."); }
             byte data;
             string dataString;
 
-            switch (register)
+            lock (CPU.cpuLock)
             {
-                case "A":
-                    lock (cpu.cpuLock)
-                    {
-                        data = cpu.registers.A;
-                    }
-                    break;
-                case "X":
-                    lock (cpu.cpuLock)
-                    {
-                        data = cpu.registers.X;
-                    }
-                    break;
-                case "Y":
-                    lock (cpu.cpuLock)
-                    {
-                        data = cpu.registers.Y;
-                    }
-                    break;
-                case "SP":
-                    lock (cpu.cpuLock)
-                    {
-                        data = cpu.registers.SP;
-                    }
-                    break;
-                case "P":
-                    lock (cpu.cpuLock)
-                    {
-                        data = cpu.registers.P;
-                    }
-                    break;
-                default:
-                    data = 0;
-                    break;
+                switch (register)
+                {
+                    case "A":
+                        data = Registers.A;
+                        break;
+                    case "X":
+                        data = Registers.X;
+                        break;
+                    case "Y":
+                        data = Registers.Y;
+                        break;
+                    case "SP":
+                        data = Registers.SP;
+                        break;
+                    case "P":
+                        data = Registers.P;
+                        break;
+                    default:
+                        data = 0;
+                        break;
+                }
             }
 
             // Convert the data to a string
@@ -262,13 +229,12 @@ namespace ButterflyCS
         /// <returns>A string.</returns>
         public static string PeekPC()
         {
-            if (cpu == null) { throw new Exception("CPU is null."); }
             ushort data;
             string dataString;
 
-            lock (cpu.cpuLock)
+            lock (CPU.cpuLock)
             {
-                data = cpu.registers.PC;
+                data = Registers.PC;
             }
 
             // Convert the data to a string
@@ -284,10 +250,9 @@ namespace ButterflyCS
         /// <param name="data">The data.</param>
         public static void PokeMemory(ushort address, byte data)
         {
-            if (cpu == null) { throw new Exception("CPU is null."); }
-            lock (cpu.cpuLock)
+            lock (CPU.cpuLock)
             {
-                cpu.Write(address, data);
+                CPU.Write(address, data);
             }
         }
 
@@ -298,41 +263,28 @@ namespace ButterflyCS
         /// <param name="data">The data.</param>
         public static void PokeRegister(string register, byte data)
         {
-            if (cpu == null) { throw new Exception("CPU is null."); }
-            switch (register)
+            lock (CPU.cpuLock)
             {
-                case "A":
-                    lock (cpu.cpuLock)
-                    {
-                        cpu.registers.A = data;
-                    }
-                    break;
-                case "X":
-                    lock (cpu.cpuLock)
-                    {
-                        cpu.registers.X = data;
-                    }
-                    break;
-                case "Y":
-                    lock (cpu.cpuLock)
-                    {
-                        cpu.registers.Y = data;
-                    }
-                    break;
-                case "SP":
-                    lock (cpu.cpuLock)
-                    {
-                        cpu.registers.SP = data;
-                    }
-                    break;
-                case "P":
-                    lock (cpu.cpuLock)
-                    {
-                        cpu.registers.P = data;
-                    }
-                    break;
-                default:
-                    break;
+                switch (register)
+                {
+                    case "A":
+                        Registers.A = data;
+                        break;
+                    case "X":
+                        Registers.X = data;
+                        break;
+                    case "Y":
+                        Registers.Y = data;
+                        break;
+                    case "SP":
+                        Registers.SP = data;
+                        break;
+                    case "P":
+                        Registers.P = data;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -342,10 +294,9 @@ namespace ButterflyCS
         /// <param name="data">The data.</param>
         public static void PokePC(ushort data)
         {
-            if (cpu == null) { throw new Exception("CPU is null."); }
-            lock (cpu.cpuLock)
+            lock (CPU.cpuLock)
             {
-                cpu.registers.PC = data;
+                Registers.PC = data;
             }
         }
 
@@ -357,31 +308,21 @@ namespace ButterflyCS
         /// </remarks>
         public static void LoadProgram(string filename, ushort address)
         {
-            if (cpu == null)
-            {
-                throw new Exception("CPU is not initialized.");
-            }
-            Log.Debug(subsystem, $"Loading program {filename} into memory at address {address:X4}.");
             byte[] program = File.ReadAllBytes(filename);
-
-            // Log the size of the program
-            Log.Debug(subsystem, $"Program {filename} is {program.Length} bytes long.");
 
             for (int i = 0; i < program.Length; i++)
             {
                 // If we've reached the end of the memory, stop loading the program
-                if (address + i >= cpu.memory.data.Length)
+                if (address + i >= Memory.data.Length)
                 {
-                    Log.Warning(subsystem, $"Program {filename} is too large to fit in memory at address {address:X4}.");
                     break;
                 }
 
-                lock (cpu.cpuLock)
+                lock (CPU.cpuLock)
                 {
-                    cpu.memory.data[address + i] = program[i];
+                    Memory.data[address + i] = program[i];
                 }
             }
-            Log.Debug(subsystem, $"Program {filename} loaded into memory at address {address:X4}.");
         }
     }
 }

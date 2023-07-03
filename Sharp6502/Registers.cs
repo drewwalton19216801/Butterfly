@@ -58,57 +58,44 @@
     /// <summary>
     /// The 6502 microprocessor registers.
     /// </summary>
-    public class Registers
+    public static class Registers
     {
         /// <summary>
         /// The A (accumulator) register.
         /// </summary>
-        public byte A { get; set; }
+        public static byte A { get; set; }
 
         /// <summary>
         /// The X index register.
         /// </summary>
-        public byte X { get; set; }
+        public static byte X { get; set; }
 
         /// <summary>
         /// The Y index register.
         /// </summary>
-        public byte Y { get; set; }
+        public static byte Y { get; set; }
 
         /// <summary>
         /// The SP (stack pointer) register.
         /// </summary>
-        public byte SP { get; set; }
+        public static byte SP { get; set; }
 
         /// <summary>
         /// The PC (program counter) register.
         /// </summary>
-        public ushort PC { get; set; }
+        public static ushort PC { get; set; }
 
         /// <summary>
         /// The P (processor status) register.
         /// </summary>
-        public byte P { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Registers"/> class.
-        /// </summary>
-        public Registers(byte a, byte x, byte y, byte sp, ushort pc, byte p)
-        {
-            A = a;
-            X = x;
-            Y = y;
-            SP = sp;
-            PC = pc;
-            P = p;
-        }
+        public static byte P { get; set; }
 
         /// <summary>
         /// Sets the value of a status flag.
         /// </summary>
         /// <param name="flag">The flag to set.</param>
         /// <param name="value">The value to set the flag to.</param>
-        public void SetFlag(CPUFlags flag, bool value)
+        public static void SetFlag(CPUFlags flag, bool value)
         {
             if (value)
             {
@@ -125,7 +112,7 @@
         /// </summary>
         /// <param name="flag">The flag to get.</param>
         /// <returns>The flag value.</returns>
-        public bool GetFlag(CPUFlags flag)
+        public static bool GetFlag(CPUFlags flag)
         {
             return (P & (byte)flag) != 0;
         }

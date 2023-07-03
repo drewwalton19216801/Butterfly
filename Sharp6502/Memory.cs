@@ -77,59 +77,40 @@
     /// (0x0100 - 0x01FF). Memory locations can be hooked by other components
     /// to provide additional functionality.
     /// </remarks>
-    public class Memory
+    public static class Memory
     {
-        /// <summary>
-        /// The subsystem name.
-        /// </summary>
-        private static readonly string subsystem = "Memory";
-
         /// <summary>
         /// The data.
         /// </summary>
         /// <remarks>
         /// The memory space is a flat 64K space, stored on the heap of the host.
         /// </remarks>
-        public byte[] data = new byte[0x10000];
+        public static byte[] data = new byte[0x10000];
 
         /// <summary>
         /// The list of registered memory read hooks
         /// </summary>
-        public List<MemoryReadHook> readHooks = new();
+        public static List<MemoryReadHook> readHooks = new();
 
         /// <summary>
         /// The list of registered memory write hooks
         /// </summary>
-        public List<MemoryWriteHook> writeHooks = new();
+        public static List<MemoryWriteHook> writeHooks = new();
 
         /// <summary>
         /// Reads a byte from the specified address.
         /// </summary>
-        public byte Read(ushort address, bool hideDebug = false)
+        public static byte Read(ushort address, bool hideDebug = false)
         {
             // Check for read hooks
             foreach (var hook in readHooks)
             {
                 if (address >= hook.startAddress && address <= hook.endAddress)
                 {
-                    if (hideDebug == false)
-                    {
-                        // Log the hook
-                        string message = $"Read hook called at address {address:X4}";
-                        Log.Info(subsystem, message);
-                    }
-
                     // This address is hooked, so call the hook function instead
                     // of reading from main memory
                     return hook.readFunc(address);
                 }
-            }
-
-            if (hideDebug == false)
-            {
-                // Log the read
-                string msg = $"Read called at address {address:X4}, got data {data[address]:X2}";
-                Log.Debug(subsystem, msg);
             }
 
             // No hooks, so we read from main memory
@@ -139,31 +120,17 @@
         /// <summary>
         /// Writes a byte to the specified address.
         /// </summary>
-        public void Write(ushort address, byte value, bool hideDebug = false)
+        public static void Write(ushort address, byte value, bool hideDebug = false)
         {
             // Write the value to memory before calling any hooks,
             // so debugging tools can see the value in memory.
             data[address] = value;
-
-            if (hideDebug == false)
-            {
-                // Log the write
-                string msg = $"Write called at address {address:X4}, with data {value:X2}";
-                Log.Debug(subsystem, msg);
-            }
 
             // Check for write hooks
             foreach (var hook in writeHooks)
             {
                 if (address >= hook.startAddress && address <= hook.endAddress)
                 {
-                    if (hideDebug == false)
-                    {
-                        // Log the hook
-                        string message = $"Write hook called at address {address:X4}";
-                        Log.Info(subsystem, message);
-                    }
-
                     // Call the hook
                     hook.writeFunc(address, value);
                     return;
@@ -182,12 +149,8 @@
         /// functionality. For example, a keyboard component could hook memory
         /// address 0x4016 to provide access to the keyboard.
         /// </remarks>
-        public void RegisterReadHook(ushort startAddress, ushort endAddress, Func<ushort, byte> readFunc)
+        public static void RegisterReadHook(ushort startAddress, ushort endAddress, Func<ushort, byte> readFunc)
         {
-            // Log that we're registering a read hook
-            string message = $"Registering read hook for addresses {startAddress:X4} - {endAddress:X4}";
-            Log.Debug(subsystem, message);
-
             readHooks.Add(new MemoryReadHook(startAddress, endAddress, readFunc));
         }
 
@@ -202,12 +165,8 @@
         /// functionality. For example, the audio component could hook memory
         /// addresses 0x4000 through 0x4013 to provide access to the audio registers.
         /// </remarks>
-        public void RegisterWriteHook(ushort startAddress, ushort endAddress, Action<ushort, byte> writeFunc)
+        public static void RegisterWriteHook(ushort startAddress, ushort endAddress, Action<ushort, byte> writeFunc)
         {
-            // Log that we're registering a write hook
-            string message = $"Registering write hook for addresses {startAddress:X4} - {endAddress:X4}";
-            Log.Debug(subsystem, message);
-
             writeHooks.Add(new MemoryWriteHook(startAddress, endAddress, writeFunc));
         }
     }

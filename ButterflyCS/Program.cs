@@ -23,15 +23,6 @@ namespace ButterflyCS
             // Clear the console
             Console.Clear();
 
-            // Enable debug messages if the "--debug" flag is present
-            if (args.Contains("--debug"))
-            {
-                Log.EnableDebugMessages();
-            } else
-            {
-                Log.DisableDebugMessages();
-            }
-
             Machine.Init(CPU.Variant.NMOS_6502, 1);
 
             // Create the threads for the UIs

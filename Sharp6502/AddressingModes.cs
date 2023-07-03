@@ -10,10 +10,9 @@ namespace Sharp6502
         /// <summary>
         /// Gets the address of an instruction.
         /// </summary>
-        /// <param name="cpu">The CPU object</param>
         /// <param name="addressingMode">The addressing mode.</param>
         /// <returns>A byte.</returns>
-        public static byte GetAddress(CPU cpu, string addressingMode)
+        public static byte GetAddress(string addressingMode)
         {
             // --------------------------------------
             // We're going to use reflection to get the method that corresponds to the addressing mode,
@@ -28,7 +27,7 @@ namespace Sharp6502
             MethodInfo? method = typeof(AddressingModes).GetMethod(methodName) ?? throw new Exception("Invalid addressing mode: "+addressingMode);
 
             // Invoke the method
-            object? result = (byte?)method.Invoke(null, new object[] { cpu });
+            object? result = (byte?)method.Invoke(null, new object[] {});
 
             // Handle the result
             if (result is byte byteResult)
@@ -45,10 +44,10 @@ namespace Sharp6502
         /// The implied addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte Implied(CPU cpu)
+        public static byte Implied()
         {
             // Set the fetched byte to the value of the accumulator
-            cpu.fetchedByte = cpu.registers.A;
+            CPU.fetchedByte = Registers.A;
 
             // This mode never uses an extra cycle
             return 0;
@@ -58,10 +57,10 @@ namespace Sharp6502
         /// The immediate addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte Immediate(CPU cpu)
+        public static byte Immediate()
         {
             // Set the absolute address to the program counter
-            cpu.addressAbsolute = cpu.registers.PC++;
+            CPU.addressAbsolute = Registers.PC++;
 
             // This mode never uses an extra cycle
             return 0;
@@ -71,19 +70,19 @@ namespace Sharp6502
         /// The zero page addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte ZeroPage(CPU cpu)
+        public static byte ZeroPage()
         {
             // Set the absolute address to the data at the program counter
             // and increment the program counter
-            cpu.addressAbsolute = cpu.memory.Read(cpu.registers.PC++);
+            CPU.addressAbsolute = Memory.Read(Registers.PC++);
             
             // Increment the program counter
-            cpu.registers.PC++;
+            Registers.PC++;
 
             // The zero page addressing mode only uses the first byte of the
             // address, so we need to mask the address to 0x00FF to get the
             // correct address.
-            cpu.addressAbsolute &= 0x00FF;
+            CPU.addressAbsolute &= 0x00FF;
 
             // This mode never uses an extra cycle
             return 0;
@@ -93,18 +92,18 @@ namespace Sharp6502
         /// The zero page X addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte ZeroPageX(CPU cpu)
+        public static byte ZeroPageX()
         {
             // Set the absolute address to the data at the program counter + X
-            cpu.addressAbsolute = (ushort)(cpu.memory.Read(cpu.registers.PC++) + cpu.registers.X);
+            CPU.addressAbsolute = (ushort)(Memory.Read(Registers.PC++) + Registers.X);
 
             // Increment the program counter
-            cpu.registers.PC++;
+            Registers.PC++;
 
             // The zero page addressing mode only uses the first byte of the
             // address, so we need to mask the address to 0x00FF to get the
             // correct address.
-            cpu.addressAbsolute &= 0x00FF;
+            CPU.addressAbsolute &= 0x00FF;
             return 0;
         }
 
@@ -112,18 +111,18 @@ namespace Sharp6502
         /// The zero page Y addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte ZeroPageY(CPU cpu)
+        public static byte ZeroPageY()
         {
             // Set the absolute address to the data at the program counter + Y
-            cpu.addressAbsolute = (ushort)(cpu.memory.Read(cpu.registers.PC++) + cpu.registers.Y);
+            CPU.addressAbsolute = (ushort)(Memory.Read(Registers.PC++) + Registers.Y);
 
             // Increment the program counter
-            cpu.registers.PC++;
+            Registers.PC++;
 
             // The zero page addressing mode only uses the first byte of the
             // address, so we need to mask the address to 0x00FF to get the
             // correct address.
-            cpu.addressAbsolute &= 0x00FF;
+            CPU.addressAbsolute &= 0x00FF;
             return 0;
         }
 
@@ -131,19 +130,19 @@ namespace Sharp6502
         /// The relative addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte Relative(CPU cpu)
+        public static byte Relative()
         {
             // Set the relative address to the data at the program counter
-            cpu.addressRelative = cpu.memory.Read(cpu.registers.PC++);
+            CPU.addressRelative = Memory.Read(Registers.PC++);
 
             // Increment the program counter
-            cpu.registers.PC++;
+            Registers.PC++;
 
             // If the relative address is negative, we need to sign extend it
             // to get the correct address.
-            if ((cpu.addressRelative & 0x80) != 0)
+            if ((CPU.addressRelative & 0x80) != 0)
             {
-                cpu.addressRelative |= 0xFF00;
+                CPU.addressRelative |= 0xFF00;
             }
 
             // This mode never uses an extra cycle
@@ -154,16 +153,16 @@ namespace Sharp6502
         /// The absolute addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte Absolute(CPU cpu)
+        public static byte Absolute()
         {
             // Get the low byte of the address, and increment the program counter
-            ushort lo = cpu.memory.Read(cpu.registers.PC++);
+            ushort lo = Memory.Read(Registers.PC++);
 
             // Get the high byte of the address
-            ushort hi = cpu.memory.Read(cpu.registers.PC++);
+            ushort hi = Memory.Read(Registers.PC++);
 
             // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
-            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+            CPU.addressAbsolute = (ushort)((hi << 8) | lo);
 
             // This mode never uses an extra cycle
             return 0;
@@ -173,21 +172,21 @@ namespace Sharp6502
         /// The absolute X addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte AbsoluteX(CPU cpu)
+        public static byte AbsoluteX()
         {
             // Get the low byte of the address, and increment the program counter
-            ushort lo = cpu.memory.Read(cpu.registers.PC++);
+            ushort lo = Memory.Read(Registers.PC++);
 
             // Get the high byte of the address
-            ushort hi = cpu.memory.Read(cpu.registers.PC++);
+            ushort hi = Memory.Read(Registers.PC++);
 
             // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
-            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+            CPU.addressAbsolute = (ushort)((hi << 8) | lo);
             // Add the X register to the absolute address
-            cpu.addressAbsolute += cpu.registers.X;
+            CPU.addressAbsolute += Registers.X;
 
             // If the absolute address crosses a page boundary, we need to add an extra cycle
-            if ((cpu.addressAbsolute & 0xFF00) != (hi << 8))
+            if ((CPU.addressAbsolute & 0xFF00) != (hi << 8))
             {
                 return 1;
             }
@@ -199,21 +198,21 @@ namespace Sharp6502
         /// The absolute Y addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte AbsoluteY(CPU cpu)
+        public static byte AbsoluteY()
         {
             // Get the low byte of the address, and increment the program counter
-            ushort lo = cpu.memory.Read(cpu.registers.PC++);
+            ushort lo = Memory.Read(Registers.PC++);
 
             // Get the high byte of the address
-            ushort hi = cpu.memory.Read(cpu.registers.PC++);
+            ushort hi = Memory.Read(Registers.PC++);
 
             // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
-            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+            CPU.addressAbsolute = (ushort)((hi << 8) | lo);
             // Add the Y register to the absolute address
-            cpu.addressAbsolute += cpu.registers.Y;
+            CPU.addressAbsolute += Registers.Y;
 
             // If the absolute address crosses a page boundary, we need to add an extra cycle
-            if ((cpu.addressAbsolute & 0xFF00) != (hi << 8))
+            if ((CPU.addressAbsolute & 0xFF00) != (hi << 8))
             {
                 return 1;
             }
@@ -225,12 +224,12 @@ namespace Sharp6502
         /// The indirect addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte Indirect(CPU cpu)
+        public static byte Indirect()
         {
             // Get the low byte of the address, and increment the program counter
-            ushort ptrLo = cpu.memory.Read(cpu.registers.PC++);
+            ushort ptrLo = Memory.Read(Registers.PC++);
             // Get the high byte of the address, and increment the program counter
-            ushort ptrHi = cpu.memory.Read(cpu.registers.PC++);
+            ushort ptrHi = Memory.Read(Registers.PC++);
 
             // Set the pointer address to the high byte shifted left 8 bits OR'd with the low byte
             ushort ptr = (ushort)((ptrHi << 8) | ptrLo);
@@ -241,10 +240,10 @@ namespace Sharp6502
             // Otherwise, we just get the high byte of the address from the pointer + 1.
             if (ptrLo == 0x00FF)
             {
-                cpu.addressAbsolute = (ushort)((cpu.memory.Read((ushort)(ptr & 0xFF00)) << 8) | cpu.memory.Read((ushort)(ptr + 0)));
+                CPU.addressAbsolute = (ushort)((Memory.Read((ushort)(ptr & 0xFF00)) << 8) | Memory.Read((ushort)(ptr + 0)));
             } else
             {
-                cpu.addressAbsolute = (ushort)((cpu.memory.Read((ushort)(ptr + 1)) << 8) | cpu.memory.Read((ushort)(ptr + 0)));
+                CPU.addressAbsolute = (ushort)((Memory.Read((ushort)(ptr + 1)) << 8) | Memory.Read((ushort)(ptr + 0)));
             }
 
             // This mode never uses an extra cycle
@@ -256,18 +255,18 @@ namespace Sharp6502
         /// The indirect X addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte IndirectX(CPU cpu)
+        public static byte IndirectX()
         {
             // Store the address of the pointer and increment the program counter
-            ushort ptr = cpu.memory.Read(cpu.registers.PC++);
+            ushort ptr = Memory.Read(Registers.PC++);
 
             // Get the low byte of the address
-            ushort lo = cpu.memory.Read((ushort)((ptr + cpu.registers.X) & 0x00FF));
+            ushort lo = Memory.Read((ushort)((ptr + Registers.X) & 0x00FF));
             // Get the high byte of the address
-            ushort hi = cpu.memory.Read((ushort)((ptr + cpu.registers.X + 1) & 0x00FF));
+            ushort hi = Memory.Read((ushort)((ptr + Registers.X + 1) & 0x00FF));
 
             // Set the indirect address to the high byte shifted left 8 bits OR'd with the low byte
-            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+            CPU.addressAbsolute = (ushort)((hi << 8) | lo);
 
             // This mode never uses an extra cycle
             return 0;
@@ -277,23 +276,23 @@ namespace Sharp6502
         /// The indirect y addressing mode.
         /// </summary>
         /// <returns>1 if an extra cycle was used, 0 otherwise</returns>
-        public static byte IndirectY(CPU cpu)
+        public static byte IndirectY()
         {
             // Store the address of the pointer and increment the program counter
-            ushort ptr = cpu.memory.Read(cpu.registers.PC++);
+            ushort ptr = Memory.Read(Registers.PC++);
 
             // Get the low byte of the address
-            ushort lo = cpu.memory.Read((ushort)(ptr & 0x00FF));
+            ushort lo = Memory.Read((ushort)(ptr & 0x00FF));
             // Get the high byte of the address
-            ushort hi = cpu.memory.Read((ushort)((ptr + 1) & 0x00FF));
+            ushort hi = Memory.Read((ushort)((ptr + 1) & 0x00FF));
 
             // Set the indirect address to the high byte shifted left 8 bits OR'd with the low byte
-            cpu.addressAbsolute = (ushort)((hi << 8) | lo);
+            CPU.addressAbsolute = (ushort)((hi << 8) | lo);
             // Add the Y register to the indirect address
-            cpu.addressAbsolute += cpu.registers.Y;
+            CPU.addressAbsolute += Registers.Y;
 
             // If the indirect address crosses a page boundary, we need to add an extra cycle
-            if ((cpu.addressAbsolute & 0xFF00) != (hi << 8))
+            if ((CPU.addressAbsolute & 0xFF00) != (hi << 8))
             {
                 return 1;
             }

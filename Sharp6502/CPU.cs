@@ -3,13 +3,8 @@
     /// <summary>
     /// The 6502 microprocessor.
     /// </summary>
-    public class CPU
+    public static class CPU
     {
-        /// <summary>
-        /// The subsystem.
-        /// </summary>
-        private static readonly string subsystem = "CPU";
-
         /// <summary>
         /// The CPU variant (such as 6502, 65C02, etc).
         /// </summary>
@@ -63,44 +58,34 @@
         }
 
         /// <summary>
-        /// The CPU registers.
-        /// </summary>
-        public Registers registers = new(0, 0, 0, 0xFF, 0, 0);
-
-        /// <summary>
-        /// The CPU memory space.
-        /// </summary>
-        public Memory memory = new();
-
-        /// <summary>
         /// The number of cycles remaining for the current instruction.
         /// </summary>
-        public byte cycles = 0;
+        public static byte cycles = 0;
 
         /// <summary>
         /// A temporary variable used by the CPU.
         /// </summary>
-        public ushort temp = 0x0000;
+        public static ushort temp = 0x0000;
 
         /// <summary>
         /// The absolute address fetched.
         /// </summary>
-        public ushort addressAbsolute = 0x0000;
+        public static ushort addressAbsolute = 0x0000;
 
         /// <summary>
         /// The relative address fetched.
         /// </summary>
-        public ushort addressRelative = 0x00;
+        public static ushort addressRelative = 0x00;
 
         /// <summary>
         /// The current opcode.
         /// </summary>
-        public byte opcode = 0x00;
+        public static byte opcode = 0x00;
 
         /// <summary>
         /// The current execution state.
         /// </summary>
-        public ExecutionState cpuState = ExecutionState.Stopped;
+        public static ExecutionState cpuState = ExecutionState.Stopped;
 
         /// <summary>
         /// The current CPU variant.
@@ -109,44 +94,36 @@
         /// This defaults to CMOS_65C02, which is the most compatible variant, but
         /// can be switched mid-execution. Why you would want to do this is beyond me.
         /// </remarks>
-        public Variant cpuVariant = Variant.CMOS_65C02;
+        public static Variant cpuVariant = Variant.CMOS_65C02;
 
         /// <summary>
         /// The fetched byte.
         /// </summary>
-        public byte fetchedByte = 0x00;
+        public static byte fetchedByte = 0x00;
 
         /// <summary>
         /// The string representation of the current instruction.
         /// </summary>
-        public string currentDisassembly = string.Empty;
+        public static string currentDisassembly = string.Empty;
 
         /// <summary>
         /// The CPU lock object.
         /// </summary>
-        public object cpuLock = new();
+        public static object cpuLock = new();
 
         /// <summary>
         /// Gets or sets the current instruction.
         /// </summary>
-        public Instruction? CurrentInstruction { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CPU"/> class.
-        /// </summary>
-        public CPU()
-        {
-            Log.Debug(subsystem, "CPU created.");
-        }
+        public static Instruction? CurrentInstruction { get; set; }
 
         /// <summary>
         /// Reads a byte from memory.
         /// </summary>
         /// <param name="address">The address to read from.</param>
         /// <returns>The data.</returns>
-        public byte Read(ushort address)
+        public static byte Read(ushort address)
         {
-            return memory.Read(address);
+            return Memory.Read(address);
         }
 
         /// <summary>
@@ -154,7 +131,7 @@
         /// </summary>
         /// <param name="address">The address to read from.</param>
         /// <returns>The data.</returns>
-        public ushort ReadWord(ushort address)
+        public static ushort ReadWord(ushort address)
         {
             return (ushort)(Read(address) | (Read((ushort)(address + 1)) << 8));
         }
@@ -164,19 +141,16 @@
         /// </summary>
         /// <param name="address">The address to write to.</param>
         /// <param name="data">The data to write.</param>
-        public void Write(ushort address, byte data)
+        public static void Write(ushort address, byte data)
         {
-            memory.Write(address, data);
+            Memory.Write(address, data);
         }
 
         /// <summary>
         /// Runs the CPU for one clock cycle.
         /// </summary>
-        public void Clock()
+        public static void Clock()
         {
-            // Log the current cycles
-            Log.Debug(subsystem, $"Cycles: {cycles}");
-
             /*
              * Instructions can require a variable number of clock cycles to execute. The number of cycles required is stored in the instruction's
              * definition. The number of cycles remaining is stored in the CPU's cycles field. When the cycles field reaches zero, the instruction
@@ -187,19 +161,14 @@
                 // Set the CPU state to fetching
                 cpuState = ExecutionState.Fetching;
 
-                // Log the execution state
-                Log.Debug(subsystem, "Fetching instruction...");
-
                 /*
                  * Read the next instruction opcode from memory. We can then use
                  * this value to look up the instruction definition.
                  */
-                opcode = Read(registers.PC);
-
-                Log.Debug(subsystem, $"Opcode: {opcode:X2}");
+                opcode = Read(Registers.PC);
 
                 // Always set the unused flag to 1.
-                registers.SetFlag(CPUFlags.Unused, true);
+                Registers.SetFlag(CPUFlags.Unused, true);
 
                 // Decode the instruction
                 CurrentInstruction = InstructionSet.Decode(opcode);
@@ -213,23 +182,20 @@
                 // Update the current disassembly
                 currentDisassembly = Disassemble(CurrentInstruction);
 
-                // Log the disassembly of the current instruction
-                Log.Debug(subsystem, $"Disassembly: {currentDisassembly}");
-
                 // Increment the program counter
-                registers.PC++;
+                Registers.PC++;
 
                 // Run the addressing mode method and get the number of additional cycles required
-                byte addressingUsedExtraCycle = AddressingModes.GetAddress(this, CurrentInstruction.AddressingMode);
+                byte addressingUsedExtraCycle = AddressingModes.GetAddress(CurrentInstruction.AddressingMode);
 
                 // Run the instruction method and get the number of additional cycles required
-                byte instructionUsedExtraCycle = InstructionExecutor.ExecuteInstruction(this);
+                byte instructionUsedExtraCycle = InstructionExecutor.ExecuteInstruction();
 
                 // Add the additional cycles to the total number of cycles required
                 cycles += (byte)(addressingUsedExtraCycle & instructionUsedExtraCycle);
 
                 // Set the unused flag to 1
-                registers.SetFlag(CPUFlags.Unused, true);
+                Registers.SetFlag(CPUFlags.Unused, true);
             }
 
             // Decrement the number of cycles remaining for this instruction
@@ -245,26 +211,26 @@
         /// flag is set to prevent further interrupts from being processed. When the interrupt handler is complete, the status register and program
         /// counter are restored to their previous values and execution continues as normal.
         /// </remarks>
-        public void IRQ()
+        public static void IRQ()
         {
             // Make sure interrupts are enabled
-            if (registers.GetFlag(CPUFlags.InterruptDisable) == false)
+            if (Registers.GetFlag(CPUFlags.InterruptDisable) == false)
             {
                 // Push the program counter to the stack
-                Write((ushort)(0x0100 + registers.SP), (byte)((registers.PC >> 8) & 0x00FF));
-                registers.SP--;
-                Write((ushort)(0x0100 + registers.SP), (byte)(registers.PC & 0x00FF));
-                registers.SP--;
+                Write((ushort)(0x0100 + Registers.SP), (byte)((Registers.PC >> 8) & 0x00FF));
+                Registers.SP--;
+                Write((ushort)(0x0100 + Registers.SP), (byte)(Registers.PC & 0x00FF));
+                Registers.SP--;
 
                 // Push the status register to the stack
-                registers.SetFlag(CPUFlags.Break, false);
-                registers.SetFlag(CPUFlags.Unused, true);
-                registers.SetFlag(CPUFlags.InterruptDisable, true);
-                Write((ushort)(0x0100 + registers.SP), registers.P);
-                registers.SP--;
+                Registers.SetFlag(CPUFlags.Break, false);
+                Registers.SetFlag(CPUFlags.Unused, true);
+                Registers.SetFlag(CPUFlags.InterruptDisable, true);
+                Write((ushort)(0x0100 + Registers.SP), Registers.P);
+                Registers.SP--;
 
                 // Set the interrupt vector
-                registers.PC = ReadWord(0xFFFE);
+                Registers.PC = ReadWord(0xFFFE);
 
                 // Set the CPU state to interrupt
                 cpuState = ExecutionState.Interrupt;
@@ -282,27 +248,27 @@
         /// acts like a regular IRQ, but reads the new PC from memory location 0xFFFA instead of
         /// 0xFFFE.
         /// </remarks>
-        public void NMI()
+        public static void NMI()
         {
             // Push the program counter to the stack
-            Write((ushort)(0x0100 + registers.SP), (byte)((registers.PC >> 8) & 0x00FF));
-            registers.SP--;
-            Write((ushort)(0x0100 + registers.SP), (byte)(registers.PC & 0x00FF));
-            registers.SP--;
+            Write((ushort)(0x0100 + Registers.SP), (byte)((Registers.PC >> 8) & 0x00FF));
+            Registers.SP--;
+            Write((ushort)(0x0100 + Registers.SP), (byte)(Registers.PC & 0x00FF));
+            Registers.SP--;
 
             // Set the break flag to 0, unused and interrupt to 1
-            registers.SetFlag(CPUFlags.Break, false);
-            registers.SetFlag(CPUFlags.Unused, true);
-            registers.SetFlag(CPUFlags.InterruptDisable, true);
+            Registers.SetFlag(CPUFlags.Break, false);
+            Registers.SetFlag(CPUFlags.Unused, true);
+            Registers.SetFlag(CPUFlags.InterruptDisable, true);
 
             // Push the status register to the stack
-            Write((ushort)(0x0100 + registers.SP), registers.P);
+            Write((ushort)(0x0100 + Registers.SP), Registers.P);
 
             // Decrement the stack pointer
-            registers.SP--;
+            Registers.SP--;
 
             // Set the interrupt vector
-            registers.PC = ReadWord(0xFFFA);
+            Registers.PC = ReadWord(0xFFFA);
             cpuState = ExecutionState.Interrupt;
 
             // Add the number of cycles required to execute the interrupt
@@ -313,27 +279,27 @@
         /// Pushes a byte to the stack
         /// </summary>
         /// <param name="data">The data.</param>
-        public void PushByte(byte data)
+        public static void PushByte(byte data)
         {
-            Write((ushort)(0x0100 + registers.SP), data);
-            registers.SP--;
+            Write((ushort)(0x0100 + Registers.SP), data);
+            Registers.SP--;
         }
 
         /// <summary>
         /// Pops a byte from the stack.
         /// </summary>
         /// <returns>A byte.</returns>
-        public byte PopByte()
+        public static byte PopByte()
         {
-            registers.SP++;
-            return Read((ushort)(0x0100 + registers.SP));
+            Registers.SP++;
+            return Read((ushort)(0x0100 + Registers.SP));
         }
 
         /// <summary>
         /// Pops a word from the stack.
         /// </summary>
         /// <returns>An ushort.</returns>
-        public ushort PopWord()
+        public static ushort PopWord()
         {
             ushort word = PopByte();
             word |= (ushort)(PopByte() << 8);
@@ -347,7 +313,7 @@
         /// <remarks>
         /// This method fetches the next byte from memory. If the current instruction is an implied instruction, no byte is fetched.
         /// </remarks>
-        public byte Fetch()
+        public static byte Fetch()
         {
             if (CurrentInstruction == null)
             {
@@ -363,35 +329,15 @@
         /// <summary>
         /// Resets the CPU to its initial power-up state.
         /// </summary>
-        public void Reset()
+        public static void Reset()
         {
-            Log.Debug(subsystem, "Resetting CPU to power-up state.");
-            registers.A = 0;
-            registers.X = 0;
-            registers.Y = 0;
-            registers.SP = 0xFF;
-            registers.PC = ReadWord(0xFFFC); // Read the PC from the reset vector.
-            registers.P = (byte)(CPUFlags.None | CPUFlags.Unused | CPUFlags.InterruptDisable);
+            Registers.A = 0;
+            Registers.X = 0;
+            Registers.Y = 0;
+            Registers.SP = 0xFF;
+            Registers.PC = ReadWord(0xFFFC); // Read the PC from the reset vector.
+            Registers.P = (byte)(CPUFlags.None | CPUFlags.Unused | CPUFlags.InterruptDisable);
             cycles = 8;
-            Log.Debug(subsystem, "CPU reset complete.");
-
-            // assemble a string representing the current register values (except the status register)
-            string registersString = string.Format("A:{0:X2} X:{1:X2} Y:{2:X2} SP:{3:X2} PC:{4:X4}", registers.A, registers.X, registers.Y, registers.SP, registers.PC);
-            // now assemble a string representing the current status register values as individual bits
-			string statusString = string.Format("{0}{1}{2}{3}{4}{5}{6}{7}",
-                registers.GetFlag(CPUFlags.Negative) ? 'N' : 'n',
-	            registers.GetFlag(CPUFlags.Overflow) ? 'V' : 'v',
-	            registers.GetFlag(CPUFlags.Unused) ? 'U' : 'u',
-	            registers.GetFlag(CPUFlags.Break) ? 'B' : 'b',
-	            registers.GetFlag(CPUFlags.Decimal) ? 'D' : 'd',
-	            registers.GetFlag(CPUFlags.InterruptDisable) ? 'I' : 'i',
-	            registers.GetFlag(CPUFlags.Zero) ? 'Z' : 'z',
-	            registers.GetFlag(CPUFlags.Carry) ? 'C' : 'c');
-
-            // Assemble the final string, with the register values and status register bits on separate lines
-            string finalString = string.Format("{0} {1}", registersString, statusString);
-
-            Log.Debug(subsystem, finalString);
         }
 
         /// <summary>
@@ -399,7 +345,7 @@
         /// </summary>
         /// <param name="address">The address.</param>
         /// <returns>Ths disassembled instruction.</returns>
-        public string Disassemble(ushort address)
+        public static string Disassemble(ushort address)
         {
             // Read the instruction at the specified address.
             byte opcode = Read(address);
@@ -417,7 +363,7 @@
         /// <param name="startAddress">The address to begin disassembling from.</param>
         /// <param name="count">The number of addresses to disassemble</param>
         /// <returns>An array of string.</returns>
-        public string[] Disassemble(ushort startAddress, int count)
+        public static string[] Disassemble(ushort startAddress, int count)
         {
             /*
              * We need to disassemble the instructions in the range of addresses specified by startAddress and count.
@@ -572,7 +518,7 @@
         /// </summary>
         /// <param name="instruction">The instruction.</param>
         /// <returns>The disassembled instruction.</returns>
-        public string Disassemble(Instruction instruction)
+        public static string Disassemble(Instruction instruction)
         {
             // Get the instruction's address mode.
             string addressingMode = instruction.AddressingMode;
@@ -584,47 +530,47 @@
             switch (addressingMode)
             {
                 case "Immediate":
-                    operand = Read((ushort)(registers.PC + 1));
+                    operand = Read((ushort)(Registers.PC + 1));
                     operandString = $"#${operand:X2}";
                     break;
                 case "ZeroPage":
-                    operand = Read((ushort)(registers.PC + 1));
+                    operand = Read((ushort)(Registers.PC + 1));
                     operandString = $"${operand:X2}";
                     break;
                 case "ZeroPageX":
-                    operand = Read((ushort)(registers.PC + 1));
+                    operand = Read((ushort)(Registers.PC + 1));
                     operandString = $"${operand:X2},X";
                     break;
                 case "ZeroPageY":
-                    operand = Read((ushort)(registers.PC + 1));
+                    operand = Read((ushort)(Registers.PC + 1));
                     operandString = $"${operand:X2},Y";
                     break;
                 case "Absolute":
-                    operand = ReadWord((ushort)(registers.PC + 1));
+                    operand = ReadWord((ushort)(Registers.PC + 1));
                     operandString = $"${operand:X4}";
                     break;
                 case "AbsoluteX":
-                    operand = ReadWord((ushort)(registers.PC + 1));
+                    operand = ReadWord((ushort)(Registers.PC + 1));
                     operandString = $"${operand:X4},X";
                     break;
                 case "AbsoluteY":
-                    operand = ReadWord((ushort)(registers.PC + 1));
+                    operand = ReadWord((ushort)(Registers.PC + 1));
                     operandString = $"${operand:X4},Y";
                     break;
                 case "Indirect":
-                    operand = ReadWord((ushort)(registers.PC + 1));
+                    operand = ReadWord((ushort)(Registers.PC + 1));
                     operandString = $"(${operand:X4})";
                     break;
                 case "IndirectX":
-                    operand = Read((ushort)(registers.PC + 1));
+                    operand = Read((ushort)(Registers.PC + 1));
                     operandString = $"(${operand:X2},X)";
                     break;
                 case "IndirectY":
-                    operand = Read((ushort)(registers.PC + 1));
+                    operand = Read((ushort)(Registers.PC + 1));
                     operandString = $"(${operand:X2}),Y";
                     break;
                 case "Relative":
-                    operand = Read((ushort)(registers.PC + 1));
+                    operand = Read((ushort)(Registers.PC + 1));
                     operandString = $"${operand:X2}";
                     break;
             }
