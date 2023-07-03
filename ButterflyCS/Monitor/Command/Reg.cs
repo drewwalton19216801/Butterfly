@@ -3,10 +3,9 @@
     /// <summary>
     /// The reg command interpreter.
     /// </summary>
-    public class Reg
+    public static class Reg
     {
-        private readonly Machine _machine; // The machine to control
-        private readonly string[] subcommands = new string[] { "read", "write" }; // The subcommands we can use
+        private static readonly string[] subcommands = new string[] { "read", "write" }; // The subcommands we can use
 
         /// <summary>
         /// The register enum.
@@ -23,26 +22,11 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Reg"/> class.
-        /// </summary>
-        /// <param name="machine">The machine.</param>
-        public Reg(Machine machine)
-        {
-            _machine = machine;
-
-            // Check for null
-            if (_machine == null)
-            {
-                throw new ArgumentNullException(nameof(machine));
-            }
-        }
-
-        /// <summary>
         /// Parses the arguments.
         /// </summary>
         /// <param name="argString">The arg string.</param>
         /// <returns>A message.</returns>
-        public string ParseArgs(string argString)
+        public static string ParseArgs(string argString)
         {
             // Split the arguments into an array
             string[] args = argString.Split(' ');
@@ -80,7 +64,7 @@
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <returns>A message.</returns>
-        private string Read(string[] args)
+        private static string Read(string[] args)
         {
             // Strip the subcommand
             args = args[1..];
@@ -93,10 +77,10 @@
 
             if (reg != Register.PC)
             {
-                return _machine.PeekRegister(reg.ToString());
+                return Machine.PeekRegister(reg.ToString());
             } else
             {
-                return _machine.PeekPC();
+                return Machine.PeekPC();
             }
         }
 
@@ -105,7 +89,7 @@
         /// </summary>
         /// <param name="args">The args.</param>
         /// <returns>A message.</returns>
-        private string Write(string[] args)
+        private static string Write(string[] args)
         {
             // Strip the subcommand
             args = args[1..];
@@ -124,8 +108,8 @@
                 {
                     return "Invalid data!";
                 }
-                _machine.PokeRegister(reg.ToString(), data);
-                return _machine.PeekRegister(reg.ToString());
+                Machine.PokeRegister(reg.ToString(), data);
+                return Machine.PeekRegister(reg.ToString());
             } else
             {
                 // Convert the data to a ushort
@@ -133,8 +117,8 @@
                 {
                     return "Invalid data!";
                 }
-                _machine.PokePC(data);
-                return _machine.PeekPC();
+                Machine.PokePC(data);
+                return Machine.PeekPC();
             }
         }
     }

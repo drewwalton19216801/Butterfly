@@ -13,8 +13,6 @@ namespace ButterflyCS
         /// </summary>
         public static readonly string subsystem = "ButterflyCS";
 
-        private static readonly Machine machine = new();
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -34,7 +32,7 @@ namespace ButterflyCS
                 Log.DisableDebugMessages();
             }
 
-            machine.Init(CPU.Variant.NMOS_6502, 1);
+            Machine.Init(CPU.Variant.NMOS_6502, 1);
 
             // Create the threads for the UIs
             Thread terminalThread = new(RunTerminalUI);
@@ -58,10 +56,9 @@ namespace ButterflyCS
         public static void RunTerminalUI()
         {
             Application.Init();
-            var _machine = machine;
             // Run the terminal UI, passing the machine
             // PREV: Application.Run<Monitor.Monitor>();
-            Application.Top.Add(new Monitor.Monitor(_machine));
+            Application.Top.Add(new Monitor.Monitor());
             Application.Run();
 
             // Quit the application
@@ -76,8 +73,7 @@ namespace ButterflyCS
         public static void RunGUI()
         {
             // Initialize the GUI
-            GUI.MainWin mainWin = new(machine);
-            mainWin.ShowWindow();
+            GUI.MainWin.ShowWindow();
 
             // If the GUI is closed, quit the application
             Environment.Exit(0);

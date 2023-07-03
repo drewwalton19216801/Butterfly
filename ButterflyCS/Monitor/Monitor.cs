@@ -8,22 +8,16 @@ namespace ButterflyCS.Monitor
     /// </summary>
     public class Monitor : Window
     {
-        private readonly Machine _machine; // The machine that this monitor is attached to
-        private Interpreter _interpreter; // The interpreter for this monitor
         private string previousCommand = string.Empty; // The previous command
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Monitor"/> class.
         /// </summary>
-        /// <param name="machine">The machine.</param>
         /// <remarks>
         /// This is the main window of the application.
         /// </remarks>
-        public Monitor(Machine machine)
+        public Monitor()
         {
-            _machine = machine;
-            _interpreter = new(_machine);
-
             // Set the title of the window
             Title = "ButterflyCS Monitor";
 
@@ -77,7 +71,7 @@ namespace ButterflyCS.Monitor
                         if (input.Length != 0)
                         {
                             // Run the command
-                            string? output = _interpreter.InterpretCommand(input);
+                            string? output = Interpreter.InterpretCommand(input);
 
                             // Add the output to the output text view
                             outputText.Text += output + "\n";

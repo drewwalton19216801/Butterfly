@@ -5,33 +5,16 @@ namespace ButterflyCS.Monitor.Command
     /// <summary>
     /// The load command
     /// </summary>
-    public class Load
+    public static class Load
     {
-        private readonly Machine _machine; // The machine that this interpreter is attached to
-        private readonly string[] subcommands = new string[] { "file" }; // The supported subcommands
-
-        /// <summary>
-        /// Create a new instance of the load command
-        /// </summary>
-        /// <param name="machine"></param>
-        /// <exception cref="System.ArgumentNullException"></exception>
-        public Load(Machine machine)
-        {
-            _machine = machine;
-
-            // Check for null
-            if (_machine == null)
-            {
-                throw new System.ArgumentNullException(nameof(machine));
-            }
-        }
+        private static readonly string[] subcommands = new string[] { "file" }; // The supported subcommands
 
         /// <summary>
         /// Parse the arguments for the load command
         /// </summary>
         /// <param name="argString"></param>
         /// <returns>A message.</returns>
-        public string ParseArgs(string argString)
+        public static string ParseArgs(string argString)
         {
             // Split the arguments into an array
             string[] args = argString.Split(' ');
@@ -52,13 +35,14 @@ namespace ButterflyCS.Monitor.Command
 
         private static string Help()
         {
-            return "\nload <subcommand> [arguments] - Load a file into the interpreter\n" +
-                "Usage: load <path> <address>\n" +
+            return "\nload - Load a file into the emulator\n" +
+                "Usage: load <subcommand> <path> <address>\n" +
                 "Subcommands:\n" +
-                "file <path> <address> - Load a file into the interpreter at the specified address\n";
+                "    file <path> <address> - Load a rom file into the emulator at the specified address\n" +
+                "                              : Only supports \"*.bin\" (vasm binary output) files\n";
         }
 
-        private string File(string[] args)
+        private static string File(string[] args)
         {
             // Strip the subcommand
             args = args[1..];
@@ -96,13 +80,16 @@ namespace ButterflyCS.Monitor.Command
                 return "Error: Invalid address\n";
             }
 
-            _machine.LoadProgram(path, address);
-            _machine.Reset();
+            Machine.LoadProgram(path, address);
 
             // Get the file name from the path
             string fileName = System.IO.Path.GetFileName(path);
 
-            return "Loaded file \"" + fileName + "\" at address 0x" + address.ToString("X4") + "\n";
+            string loadedString = "Loaded file \"" + fileName + "\" at address 0x" + address.ToString("X4") + "\n";
+
+            Machine.Reset();
+
+            return loadedString + "CPU has been reset\n";
         }
     }
 }

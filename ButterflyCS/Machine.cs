@@ -10,7 +10,7 @@ namespace ButterflyCS
     /// <remarks>
     /// Implements a 6502-based machine.
     /// </remarks>
-    public class Machine
+    public static class Machine
     {
         /// <summary>
         /// The subsystem.
@@ -21,43 +21,43 @@ namespace ButterflyCS
         /// <summary>
         /// The CPU.
         /// </summary>
-        public CPU cpu;
+        public static CPU? cpu;
 
         /// <summary>
         /// The CPU timer.
         /// </summary>
-        public Timer cpuTimer;
+        public static Timer? cpuTimer;
 
         /// <summary>
         /// The clock cycle duration, in seconds.
         /// </summary>
-        public double clockCycleDuration;
+        public static double clockCycleDuration;
 
         /// <summary>
         /// Whether the machine is running.
         /// </summary>
-        public bool isRunning;
+        public static bool isRunning;
 
         /// <summary>
         /// Whether the machine is paused.
         /// </summary>
-        public bool isPaused;
+        public static bool isPaused;
 
         /// <summary>
         /// Whether the machine is single-stepping mode.
         /// </summary>
-        public bool isSingleStepping;
+        public static bool isSingleStepping;
 
         /// <summary>
         /// Gets or sets the cycle speed.
         /// </summary>
         /// <remarks>Speed is in Hz.</remarks>
-        public double CycleSpeed { get; set; } = 1;
+        public static double CycleSpeed { get; set; } = 1;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Machine"/> class.
+        /// Initializes the machine.
         /// </summary>
-        public Machine()
+        public static void Init(CPU.Variant variant, double initialSpeed)
         {
             Log.Debug(subsystem, "Machine created.");
             cpu = new CPU();
@@ -69,13 +69,19 @@ namespace ButterflyCS
             // Set up the timer
             cpuTimer = new Timer(clockCycleDuration * 1000); // Timer interval is in milliseconds
             cpuTimer.Elapsed += Cycle!;
+
+            // Set the CPU variant to whatever the user specified
+            cpu.cpuVariant = variant;
+
+            // Set the CPU speed to whatever the user specified
+            CycleSpeed = initialSpeed;
         }
 
         /// <summary>
         /// Increases the speed of the machine.
         /// </summary>
         /// <param name="amount">The amount.</param>
-        public void IncreaseSpeed(double amount)
+        public static void IncreaseSpeed(double amount)
         {
             // Increase the cycle speed by the specified amount
             CycleSpeed += amount;
@@ -87,7 +93,7 @@ namespace ButterflyCS
         /// Decreases the speed of the machine.
         /// </summary>
         /// <param name="amount">The amount.</param>
-        public void DecreaseSpeed(double amount)
+        public static void DecreaseSpeed(double amount)
         {
             // Decrease the cycle speed by the specified amount, unless it's already 1 Hz
             if (CycleSpeed > 1)
@@ -101,8 +107,9 @@ namespace ButterflyCS
         /// <summary>
         /// Updates the timer.
         /// </summary>
-        public void UpdateTimer()
+        public static void UpdateTimer()
         {
+            if (cpuTimer == null) { throw new Exception("CPU timer is null."); }
             // Update the timer interval
             clockCycleDuration = 1 / CycleSpeed;
             cpuTimer.Interval = clockCycleDuration * 1000;
@@ -111,8 +118,9 @@ namespace ButterflyCS
         /// <summary>
         /// Runs a single machine cycle.
         /// </summary>
-        public void Cycle(object? sender, ElapsedEventArgs a)
+        public static void Cycle(object? sender, ElapsedEventArgs a)
         {
+            if (cpu == null) { throw new Exception("CPU is null."); }
             // Execute one clock cycle if not paused or single-stepping
             if (!isPaused && !isSingleStepping)
             {
@@ -127,8 +135,9 @@ namespace ButterflyCS
         /// <summary>
         /// Steps the machine.
         /// </summary>
-        public void Step()
+        public static void Step()
         {
+            if (cpu == null) { throw new Exception("CPU is null."); }
             if (isSingleStepping)
             {
                 lock (cpu.cpuLock)
@@ -141,7 +150,7 @@ namespace ButterflyCS
         /// <summary>
         /// Runs the machine.
         /// </summary>
-        public void Run()
+        public static void Run()
         {
             isRunning = true;
             isPaused = false;
@@ -151,7 +160,7 @@ namespace ButterflyCS
         /// <summary>
         /// Stops the machine.
         /// </summary>
-        public void Stop()
+        public static void Stop()
         {
             isPaused = true;
             isSingleStepping = true;
@@ -160,8 +169,9 @@ namespace ButterflyCS
         /// <summary>
         /// Resets the machine to its initial power-up state.
         /// </summary>
-        public void Reset()
+        public static void Reset()
         {
+            if (cpu == null) { return; }
             Log.Debug(subsystem, "Resetting machine to power-up state.");
             lock (cpu.cpuLock)
             {
@@ -175,8 +185,9 @@ namespace ButterflyCS
         /// </summary>
         /// <param name="address">The address.</param>
         /// <returns>A string.</returns>
-        public string PeekMemory(ushort address)
+        public static string PeekMemory(ushort address)
         {
+            if (cpu == null) { throw new Exception("CPU is null."); }
             byte data;
             string dataString;
 
@@ -196,8 +207,9 @@ namespace ButterflyCS
         /// </summary>
         /// <param name="register">The register.</param>
         /// <returns>A string.</returns>
-        public string PeekRegister(string register)
+        public static string PeekRegister(string register)
         {
+            if (cpu == null) { throw new Exception("CPU is null."); }
             byte data;
             string dataString;
 
@@ -248,8 +260,9 @@ namespace ButterflyCS
         /// Peeks the PC.
         /// </summary>
         /// <returns>A string.</returns>
-        public string PeekPC()
+        public static string PeekPC()
         {
+            if (cpu == null) { throw new Exception("CPU is null."); }
             ushort data;
             string dataString;
 
@@ -269,8 +282,9 @@ namespace ButterflyCS
         /// </summary>
         /// <param name="address">The address.</param>
         /// <param name="data">The data.</param>
-        public void PokeMemory(ushort address, byte data)
+        public static void PokeMemory(ushort address, byte data)
         {
+            if (cpu == null) { throw new Exception("CPU is null."); }
             lock (cpu.cpuLock)
             {
                 cpu.Write(address, data);
@@ -282,8 +296,9 @@ namespace ButterflyCS
         /// </summary>
         /// <param name="register">The register.</param>
         /// <param name="data">The data.</param>
-        public void PokeRegister(string register, byte data)
+        public static void PokeRegister(string register, byte data)
         {
+            if (cpu == null) { throw new Exception("CPU is null."); }
             switch (register)
             {
                 case "A":
@@ -325,24 +340,13 @@ namespace ButterflyCS
         /// Pokes the PC with the specified data.
         /// </summary>
         /// <param name="data">The data.</param>
-        public void PokePC(ushort data)
+        public static void PokePC(ushort data)
         {
+            if (cpu == null) { throw new Exception("CPU is null."); }
             lock (cpu.cpuLock)
             {
                 cpu.registers.PC = data;
             }
-        }
-
-        /// <summary>
-        /// Initializes the machine.
-        /// </summary>
-        public void Init(CPU.Variant variant, double initialSpeed)
-        {
-            // Set the CPU variant to whatever the user specified
-            cpu.cpuVariant = variant;
-
-            // Set the CPU speed to whatever the user specified
-            CycleSpeed = initialSpeed;
         }
 
         /// <summary>
@@ -351,8 +355,12 @@ namespace ButterflyCS
         /// <remarks>
         /// This function reads a binary file into memory at the specified address.
         /// </remarks>
-        public void LoadProgram(string filename, ushort address)
+        public static void LoadProgram(string filename, ushort address)
         {
+            if (cpu == null)
+            {
+                throw new Exception("CPU is not initialized.");
+            }
             Log.Debug(subsystem, $"Loading program {filename} into memory at address {address:X4}.");
             byte[] program = File.ReadAllBytes(filename);
 

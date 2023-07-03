@@ -3,25 +3,9 @@
     /// <summary>
     /// The control command interpreter.
     /// </summary>
-    public class Control
+    public static class Control
     {
-        private readonly Machine _machine; // The machine to control
-        private readonly string[] subcommands = new string[] { "start", "stop", "reset", "status", "step", "speed" }; // The subcommands we can use
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Control"/> class.
-        /// </summary>
-        /// <param name="machine">The machine.</param>
-        public Control(Machine machine)
-        {
-            _machine = machine;
-
-            // Check for null
-            if (_machine == null)
-            {
-                throw new ArgumentNullException(nameof(machine));
-            }
-        }
+        private static readonly string[] subcommands = new string[] { "start", "stop", "reset", "status", "step", "speed" }; // The subcommands we can use
 
         /// <summary>
         /// Displays the help message.
@@ -45,7 +29,7 @@
         /// </summary>
         /// <param name="argString">The arg string.</param>
         /// <returns>The message</returns>
-        public string ParseArgs(string argString)
+        public static string ParseArgs(string argString)
         {
             // Split the arguments
             string[] args = argString.Split(' ');
@@ -67,9 +51,9 @@
         /// Starts the machine.
         /// </summary>
         /// <returns>A message.</returns>
-        private string Start()
+        private static string Start()
         {
-            _machine.Run();
+            Machine.Run();
             return "Machine started";
         }
 
@@ -77,9 +61,9 @@
         /// Stops the machine.
         /// </summary>
         /// <returns>A message.</returns>
-        private string Stop()
+        private static string Stop()
         {
-            _machine.Stop();
+            Machine.Stop();
             return "Machine stopped";
         }
 
@@ -87,9 +71,9 @@
         /// Resets the machine.
         /// </summary>
         /// <returns>A message.</returns>
-        private string Reset()
+        private static string Reset()
         {
-            _machine.Reset();
+            Machine.Reset();
             return "Machine reset\n" + Status();
         }
 
@@ -97,18 +81,18 @@
         /// Prints the status of the CPU.
         /// </summary>
         /// <returns>A message.</returns>
-        private string Status()
+        private static string Status()
         {
             string status = "Status:\n";
 
             // Add the registers
             status += "Registers:\n";
-            status += "[A: " + _machine.PeekRegister("A") + "]";
-            status += " [X: " + _machine.PeekRegister("X") + "]";
-            status += " [Y: " + _machine.PeekRegister("Y") + "]";
-            status += " [PC: " + _machine.PeekPC() + "]";
-            status += " [SP: " + _machine.PeekRegister("SP") + "]";
-            status += " [SR: " + _machine.PeekRegister("SR") + "]\n";
+            status += "[A: " + Machine.PeekRegister("A") + "]";
+            status += " [X: " + Machine.PeekRegister("X") + "]";
+            status += " [Y: " + Machine.PeekRegister("Y") + "]";
+            status += " [PC: " + Machine.PeekPC() + "]";
+            status += " [SP: " + Machine.PeekRegister("SP") + "]";
+            status += " [SR: " + Machine.PeekRegister("SR") + "]\n";
 
             return status;
         }
@@ -117,14 +101,14 @@
         /// Steps the machine.
         /// </summary>
         /// <returns>A message.</returns>
-        private string Step()
+        private static string Step()
         {
-            if (!_machine.isSingleStepping)
+            if (!Machine.isSingleStepping)
             {
-                _machine.isSingleStepping = true;
+                Machine.isSingleStepping = true;
             }
 
-            _machine.Step();
+            Machine.Step();
 
             return "Machine step";
         }
@@ -134,7 +118,7 @@
         /// </summary>
         /// <param name="args">The args.</param>
         /// <returns>A string.</returns>
-        private string Speed(string[] args)
+        private static string Speed(string[] args)
         {
             // Strip the subcommand
             args = args[1..];
@@ -145,7 +129,7 @@
                 if (args.Length == 0)
                 {
                     // Return the current speed
-                    return "Speed is " + _machine.CycleSpeed.ToString() + " Hz";
+                    return "Speed is " + Machine.CycleSpeed.ToString() + " Hz";
                 }
 
                 return RunHelpCommand();
@@ -155,8 +139,8 @@
             double speed = double.Parse(args[0]);
 
             // Set the speed
-            _machine.CycleSpeed = speed;
-            _machine.UpdateTimer();
+            Machine.CycleSpeed = speed;
+            Machine.UpdateTimer();
 
             return "Speed set to " + args[0] + " Hz";
         }

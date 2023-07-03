@@ -3,25 +3,9 @@
     /// <summary>
     /// The mem command interpreter.
     /// </summary>
-    public class Mem
+    public static class Mem
     {
-        private readonly Machine _machine;
-        private readonly string[] subcommands = new string[] { "read", "write" };
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Mem"/> class.
-        /// </summary>
-        /// <param name="machine">The machine.</param>
-        public Mem(Machine machine)
-        {
-            _machine = machine;
-
-            // Check for null
-            if (_machine == null)
-            {
-                throw new ArgumentNullException(nameof(machine));
-            }
-        }
+        private static readonly string[] subcommands = new string[] { "read", "write" };
 
         /// <summary>
         /// Runs the help command.
@@ -41,7 +25,7 @@
         /// </summary>
         /// <param name="argString">The arguments.</param>
         /// <returns>A string to be displayed.</returns>
-        public string ParseArgs(string argString)
+        public static string ParseArgs(string argString)
         {
             // Split the arguments into an array
             string[] args = argString.Split(' ');
@@ -66,7 +50,7 @@
         /// </summary>
         /// <param name="args">The args.</param>
         /// <returns>A string.</returns>
-        private string Read(string[] args)
+        private static string Read(string[] args)
         {
             // Strip the subcommand from the args
             args = args[1..];
@@ -89,7 +73,7 @@
             }
 
             // Read the byte from memory
-            string data = _machine.PeekMemory(address);
+            string data = Machine.PeekMemory(address);
 
             // Return the data
             return data;
@@ -100,7 +84,7 @@
         /// </summary>
         /// <param name="args">The args.</param>
         /// <returns>A string.</returns>
-        private string Write(string[] args)
+        private static string Write(string[] args)
         {
             // Strip the subcommand from the args
             args = args[1..];
@@ -128,7 +112,7 @@
             {
                 return "Invalid data.";
             }
-            _machine.PokeMemory(address, data);
+            Machine.PokeMemory(address, data);
 
             // Return a message, converting the data to 0x00 format, and the address to 0x0000 format
             return $"Wrote 0x{data:X2} to 0x{address:X4}.";
