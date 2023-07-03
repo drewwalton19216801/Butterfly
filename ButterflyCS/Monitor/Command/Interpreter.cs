@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Terminal.Gui;
 
 namespace ButterflyCS.Monitor.Command
 {
@@ -81,8 +82,11 @@ namespace ButterflyCS.Monitor.Command
                 }
                 else if (cmd == "quit")
                 {
-                    // Quit the program
-                    Environment.Exit(0);
+                    if (MessageBox.Query(50, 7, "Quit", "Are you sure you want to quit?", "Yes", "No") == 0)
+                    {
+                        // Quit everything and die
+                        Environment.Exit(0);
+                    }
                 } else
                 {
                     result = "Invalid command.\n\n" + DisplayUsage();

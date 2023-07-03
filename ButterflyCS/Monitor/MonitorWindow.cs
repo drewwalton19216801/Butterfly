@@ -8,7 +8,9 @@
 //  </auto-generated>
 // -----------------------------------------------------------------------------
 using ButterflyCS.Monitor.Command;
+using ButterflyCS.Monitor.Wizards;
 using Sharp6502;
+using Terminal.Gui;
 
 namespace ButterflyCS.Monitor
 {
@@ -39,7 +41,8 @@ namespace ButterflyCS.Monitor
                         string output = Interpreter.InterpretCommand(input);
 
                         // Add the output to the output text view
-                        txtOutput.Text += output + "\n";
+                        MonitorOutput.Add(output);
+                        txtOutput.Text += MonitorOutput.GetMostRecentOutput() + "\n";
 
                         // Scroll to the bottom of the output text view
                         txtOutput.MoveEnd();
@@ -86,6 +89,11 @@ namespace ButterflyCS.Monitor
                 btnReset_Clicked();
             };
 
+            btnLoad.Clicked += () =>
+            {
+                btnLoad_Clicked();
+            };
+
             btnQuit.Clicked += () =>
             {
                 btnQuit_Clicked();
@@ -95,11 +103,13 @@ namespace ButterflyCS.Monitor
         private void btnRun_Clicked()
         {
             Machine.Run();
+            UpdateMonitorOutput("Machine running.");
         }
 
         private void btnPause_Clicked()
         {
             Machine.Pause();
+            UpdateMonitorOutput("Machine paused.");
             UpdateRegisters();
         }
 
@@ -110,19 +120,30 @@ namespace ButterflyCS.Monitor
                 Machine.isSingleStepping = true;
             }
             Machine.Step();
+            UpdateMonitorOutput("Machine stepped.");
             UpdateRegisters();
         }
 
         private void btnReset_Clicked()
         {
             Machine.Reset();
+            UpdateMonitorOutput("Machine reset.");
             UpdateRegisters();
+        }
+
+        private void btnLoad_Clicked()
+        {
+            Application.Run(new OpenFile());
+            UpdateMonitorOutput();
         }
 
         private void btnQuit_Clicked()
         {
-            // Quit everything and die
-            Environment.Exit(0);
+            if (MessageBox.Query(50, 7, "Quit", "Are you sure you want to quit?", "Yes", "No") == 0)
+            {
+                // Quit everything and die
+                Environment.Exit(0);
+            }
         }
 
         private void UpdateRegisters()
@@ -132,9 +153,21 @@ namespace ButterflyCS.Monitor
             txtY.Text = Registers.Y.ToString("X2");
             txtSP.Text = Registers.SP.ToString("X2");
             txtPC.Text = Registers.PC.ToString("X4");
+            txtCycles.Text = CPU.cycles.ToString();
 
             // Display the status flags as a series of 0s and 1s
             txtStatus.Text = Convert.ToString(Registers.P, 2).PadLeft(8, '0');
+        }
+
+        private void UpdateMonitorOutput(string output)
+        {
+            MonitorOutput.Add(output);
+            txtOutput.Text += MonitorOutput.GetMostRecentOutput() + "\n";
+        }
+
+        private void UpdateMonitorOutput()
+        {
+            txtOutput.Text += MonitorOutput.GetMostRecentOutput() + "\n";
         }
     }
 }
