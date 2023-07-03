@@ -146,6 +146,16 @@ namespace ButterflyCS
         /// </summary>
         public static void Stop()
         {
+            isRunning = false;
+            isPaused = false;
+            isSingleStepping = false;
+        }
+
+        /// <summary>
+        /// Pauses the machine.
+        /// </summary>
+        public static void Pause()
+        {
             isPaused = true;
             isSingleStepping = true;
         }
