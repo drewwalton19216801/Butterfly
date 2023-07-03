@@ -1,4 +1,5 @@
-﻿using Sharp6502;
+﻿using ButterflyCS.Monitor;
+using Sharp6502;
 using Terminal.Gui;
 
 namespace ButterflyCS
@@ -47,10 +48,7 @@ namespace ButterflyCS
         public static void RunTerminalUI()
         {
             Application.Init();
-            // Run the terminal UI, passing the machine
-            // PREV: Application.Run<Monitor.Monitor>();
-            Application.Top.Add(new Monitor.Monitor());
-            Application.Run();
+            Application.Run(new MonitorWindow());
 
             // Quit the application
             Application.Shutdown();
