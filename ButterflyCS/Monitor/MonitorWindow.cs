@@ -19,13 +19,20 @@ namespace ButterflyCS.Monitor
     /// </summary>
     /// <seealso cref="Terminal.Gui.Toplevel" />
     public partial class MonitorWindow {
-        private string previousCommand = string.Empty; // The previous command
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MonitorWindow"/> class.
         /// </summary>
         public MonitorWindow() {
             InitializeComponent();
+
+            txtOutput.CanFocus = false;
+            txtA.CanFocus = false;
+            txtX.CanFocus = false;
+            txtY.CanFocus = false;
+            txtPC.CanFocus = false;
+            txtSP.CanFocus = false;
+            txtStatus.CanFocus = false;
 
             txtCommand.KeyUp += (keyEvent) =>
             {
@@ -47,24 +54,9 @@ namespace ButterflyCS.Monitor
                         // Scroll to the bottom of the output text view
                         txtOutput.MoveEnd();
 
-                        // Set the previous command
-                        previousCommand = input;
-
                         // Reset the prompt
                         txtCommand.Text = "";
                         txtCommand.CursorPosition = 0;
-                    }
-                }
-
-                // Check for up arrow
-                if (keyEvent.KeyEvent.Key == Terminal.Gui.Key.CursorUp && txtCommand.HasFocus)
-                {
-                    // If the previous command is not empty,
-                    // set the input box text to the previous command
-                    if (previousCommand.Length != 0)
-                    {
-                        txtCommand.Text = previousCommand;
-                        txtCommand.CursorPosition = previousCommand.Length;
                     }
                 }
             };
@@ -162,12 +154,13 @@ namespace ButterflyCS.Monitor
         private void UpdateMonitorOutput(string output)
         {
             MonitorOutput.Add(output);
-            txtOutput.Text += MonitorOutput.GetMostRecentOutput() + "\n";
+            UpdateMonitorOutput();
         }
 
         private void UpdateMonitorOutput()
         {
             txtOutput.Text += MonitorOutput.GetMostRecentOutput() + "\n";
+            txtOutput.MoveEnd();
         }
     }
 }

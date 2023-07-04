@@ -21,27 +21,15 @@ namespace ButterflyCS.Monitor {
         
         private Terminal.Gui.ColorScheme tgDefault;
         
-        private Terminal.Gui.Window outputWindow;
+        private Terminal.Gui.Window winOutput;
         
         private Terminal.Gui.TextView txtOutput;
         
-        private Terminal.Gui.Window controlsWindow;
+        private Terminal.Gui.Window winCommand;
         
         private Terminal.Gui.TextField txtCommand;
         
-        private Terminal.Gui.Button btnRun;
-        
-        private Terminal.Gui.Button btnPause;
-        
-        private Terminal.Gui.Button btnStep;
-        
-        private Terminal.Gui.Button btnReset;
-        
-        private Terminal.Gui.Button btnLoad;
-        
-        private Terminal.Gui.Button btnQuit;
-        
-        private Terminal.Gui.Window registersWindow;
+        private Terminal.Gui.Window winRegisters;
         
         private Terminal.Gui.Label lblRegA;
         
@@ -71,7 +59,28 @@ namespace ButterflyCS.Monitor {
         
         private Terminal.Gui.TextField txtCycles;
         
+        private Terminal.Gui.Window winControls;
+        
+        private Terminal.Gui.Button btnRun;
+        
+        private Terminal.Gui.Button btnPause;
+        
+        private Terminal.Gui.Button btnStep;
+        
+        private Terminal.Gui.Button btnReset;
+        
+        private Terminal.Gui.Button btnLoad;
+        
+        private Terminal.Gui.Button btnQuit;
+        
         private void InitializeComponent() {
+            this.btnQuit = new Terminal.Gui.Button();
+            this.btnLoad = new Terminal.Gui.Button();
+            this.btnReset = new Terminal.Gui.Button();
+            this.btnStep = new Terminal.Gui.Button();
+            this.btnPause = new Terminal.Gui.Button();
+            this.btnRun = new Terminal.Gui.Button();
+            this.winControls = new Terminal.Gui.Window();
             this.txtCycles = new Terminal.Gui.TextField();
             this.lblCycles = new Terminal.Gui.Label();
             this.txtStatus = new Terminal.Gui.TextField();
@@ -86,17 +95,11 @@ namespace ButterflyCS.Monitor {
             this.lblX = new Terminal.Gui.Label();
             this.txtA = new Terminal.Gui.TextField();
             this.lblRegA = new Terminal.Gui.Label();
-            this.registersWindow = new Terminal.Gui.Window();
-            this.btnQuit = new Terminal.Gui.Button();
-            this.btnLoad = new Terminal.Gui.Button();
-            this.btnReset = new Terminal.Gui.Button();
-            this.btnStep = new Terminal.Gui.Button();
-            this.btnPause = new Terminal.Gui.Button();
-            this.btnRun = new Terminal.Gui.Button();
+            this.winRegisters = new Terminal.Gui.Window();
             this.txtCommand = new Terminal.Gui.TextField();
-            this.controlsWindow = new Terminal.Gui.Window();
+            this.winCommand = new Terminal.Gui.Window();
             this.txtOutput = new Terminal.Gui.TextView();
-            this.outputWindow = new Terminal.Gui.Window();
+            this.winOutput = new Terminal.Gui.Window();
             this.greenOnBlack = new Terminal.Gui.ColorScheme();
             this.greenOnBlack.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Green, Terminal.Gui.Color.Black);
             this.greenOnBlack.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightGreen, Terminal.Gui.Color.Black);
@@ -121,22 +124,22 @@ namespace ButterflyCS.Monitor {
             this.Y = 0;
             this.Modal = false;
             this.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.outputWindow.Width = 120;
-            this.outputWindow.Height = 24;
-            this.outputWindow.X = 0;
-            this.outputWindow.Y = 0;
-            this.outputWindow.Modal = false;
-            this.outputWindow.Data = "outputWindow";
-            this.outputWindow.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.outputWindow.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.outputWindow.Border.Effect3D = false;
-            this.outputWindow.Border.Effect3DBrush = null;
-            this.outputWindow.Border.DrawMarginFrame = true;
-            this.outputWindow.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.outputWindow.Title = "Output";
-            this.Add(this.outputWindow);
-            this.txtOutput.Width = Dim.Percent(100f) + 2;
-            this.txtOutput.Height = Dim.Percent(100f) + 2;
+            this.winOutput.Width = 120;
+            this.winOutput.Height = 23;
+            this.winOutput.X = 0;
+            this.winOutput.Y = 0;
+            this.winOutput.Modal = true;
+            this.winOutput.Data = "winOutput";
+            this.winOutput.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.winOutput.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.winOutput.Border.Effect3D = false;
+            this.winOutput.Border.Effect3DBrush = null;
+            this.winOutput.Border.DrawMarginFrame = true;
+            this.winOutput.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.winOutput.Title = "Output";
+            this.Add(this.winOutput);
+            this.txtOutput.Width = 128;
+            this.txtOutput.Height = 22;
             this.txtOutput.X = 0;
             this.txtOutput.Y = 0;
             this.txtOutput.ColorScheme = this.tgDefault;
@@ -146,98 +149,44 @@ namespace ButterflyCS.Monitor {
             this.txtOutput.Data = "txtOutput";
             this.txtOutput.Text = "";
             this.txtOutput.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.outputWindow.Add(this.txtOutput);
-            this.controlsWindow.Width = 80;
-            this.controlsWindow.Height = 6;
-            this.controlsWindow.X = 0;
-            this.controlsWindow.Y = 24;
-            this.controlsWindow.Modal = false;
-            this.controlsWindow.Data = "controlsWindow";
-            this.controlsWindow.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.controlsWindow.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.controlsWindow.Border.Effect3D = false;
-            this.controlsWindow.Border.Effect3DBrush = null;
-            this.controlsWindow.Border.DrawMarginFrame = true;
-            this.controlsWindow.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.controlsWindow.Title = "Controls";
-            this.Add(this.controlsWindow);
+            this.winOutput.Add(this.txtOutput);
+            this.winCommand.Width = 80;
+            this.winCommand.Height = 3;
+            this.winCommand.X = 0;
+            this.winCommand.Y = 23;
+            this.winCommand.Modal = true;
+            this.winCommand.Data = "winCommand";
+            this.winCommand.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.winCommand.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.winCommand.Border.Effect3D = false;
+            this.winCommand.Border.Effect3DBrush = null;
+            this.winCommand.Border.DrawMarginFrame = true;
+            this.winCommand.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.winCommand.Title = "Command";
+            this.Add(this.winCommand);
             this.txtCommand.Width = Dim.Percent(100f) + 2;
             this.txtCommand.Height = 2;
             this.txtCommand.X = 0;
-            this.txtCommand.Y = 1;
+            this.txtCommand.Y = 0;
             this.txtCommand.Secret = false;
             this.txtCommand.Data = "txtCommand";
             this.txtCommand.Text = "";
             this.txtCommand.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.controlsWindow.Add(this.txtCommand);
-            this.btnRun.Width = 7;
-            this.btnRun.Height = 1;
-            this.btnRun.X = 0;
-            this.btnRun.Y = 3;
-            this.btnRun.Data = "btnRun";
-            this.btnRun.Text = "Run";
-            this.btnRun.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.btnRun.IsDefault = false;
-            this.controlsWindow.Add(this.btnRun);
-            this.btnPause.Width = 9;
-            this.btnPause.Height = 1;
-            this.btnPause.X = 9;
-            this.btnPause.Y = 3;
-            this.btnPause.Data = "btnPause";
-            this.btnPause.Text = "Pause";
-            this.btnPause.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.btnPause.IsDefault = false;
-            this.controlsWindow.Add(this.btnPause);
-            this.btnStep.Width = 8;
-            this.btnStep.Height = 1;
-            this.btnStep.X = 20;
-            this.btnStep.Y = 3;
-            this.btnStep.Data = "btnStep";
-            this.btnStep.Text = "Step";
-            this.btnStep.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.btnStep.IsDefault = false;
-            this.controlsWindow.Add(this.btnStep);
-            this.btnReset.Width = 9;
-            this.btnReset.Height = 1;
-            this.btnReset.X = 30;
-            this.btnReset.Y = 3;
-            this.btnReset.Data = "btnReset";
-            this.btnReset.Text = "Reset";
-            this.btnReset.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.btnReset.IsDefault = false;
-            this.controlsWindow.Add(this.btnReset);
-            this.btnLoad.Width = 8;
-            this.btnLoad.Height = 1;
-            this.btnLoad.X = 41;
-            this.btnLoad.Y = 3;
-            this.btnLoad.Data = "btnLoad";
-            this.btnLoad.Text = "Load";
-            this.btnLoad.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.btnLoad.IsDefault = false;
-            this.controlsWindow.Add(this.btnLoad);
-            this.btnQuit.Width = 8;
-            this.btnQuit.Height = 1;
-            this.btnQuit.X = 51;
-            this.btnQuit.Y = 3;
-            this.btnQuit.Data = "btnQuit";
-            this.btnQuit.Text = "Quit";
-            this.btnQuit.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.btnQuit.IsDefault = false;
-            this.controlsWindow.Add(this.btnQuit);
-            this.registersWindow.Width = 40;
-            this.registersWindow.Height = 6;
-            this.registersWindow.X = 80;
-            this.registersWindow.Y = 24;
-            this.registersWindow.Modal = false;
-            this.registersWindow.Data = "registersWindow";
-            this.registersWindow.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.registersWindow.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.registersWindow.Border.Effect3D = false;
-            this.registersWindow.Border.Effect3DBrush = null;
-            this.registersWindow.Border.DrawMarginFrame = true;
-            this.registersWindow.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Title = "Registers";
-            this.Add(this.registersWindow);
+            this.winCommand.Add(this.txtCommand);
+            this.winRegisters.Width = 40;
+            this.winRegisters.Height = 7;
+            this.winRegisters.X = 80;
+            this.winRegisters.Y = 23;
+            this.winRegisters.Modal = true;
+            this.winRegisters.Data = "winRegisters";
+            this.winRegisters.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.winRegisters.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.winRegisters.Border.Effect3D = false;
+            this.winRegisters.Border.Effect3DBrush = null;
+            this.winRegisters.Border.DrawMarginFrame = true;
+            this.winRegisters.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.winRegisters.Title = "Registers";
+            this.Add(this.winRegisters);
             this.lblRegA.Width = 1;
             this.lblRegA.Height = 1;
             this.lblRegA.X = 3;
@@ -245,7 +194,7 @@ namespace ButterflyCS.Monitor {
             this.lblRegA.Data = "lblRegA";
             this.lblRegA.Text = "A";
             this.lblRegA.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.lblRegA);
+            this.winRegisters.Add(this.lblRegA);
             this.txtA.Width = 2;
             this.txtA.Height = 1;
             this.txtA.X = 5;
@@ -254,7 +203,7 @@ namespace ButterflyCS.Monitor {
             this.txtA.Data = "txtA";
             this.txtA.Text = "";
             this.txtA.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.txtA);
+            this.winRegisters.Add(this.txtA);
             this.lblX.Width = 1;
             this.lblX.Height = 1;
             this.lblX.X = 9;
@@ -262,7 +211,7 @@ namespace ButterflyCS.Monitor {
             this.lblX.Data = "lblX";
             this.lblX.Text = "X";
             this.lblX.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.lblX);
+            this.winRegisters.Add(this.lblX);
             this.txtX.Width = 2;
             this.txtX.Height = 1;
             this.txtX.X = 11;
@@ -271,7 +220,7 @@ namespace ButterflyCS.Monitor {
             this.txtX.Data = "txtX";
             this.txtX.Text = "";
             this.txtX.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.txtX);
+            this.winRegisters.Add(this.txtX);
             this.lblY.Width = 1;
             this.lblY.Height = 1;
             this.lblY.X = 15;
@@ -279,7 +228,7 @@ namespace ButterflyCS.Monitor {
             this.lblY.Data = "lblY";
             this.lblY.Text = "Y";
             this.lblY.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.lblY);
+            this.winRegisters.Add(this.lblY);
             this.txtY.Width = 2;
             this.txtY.Height = 2;
             this.txtY.X = 17;
@@ -288,7 +237,7 @@ namespace ButterflyCS.Monitor {
             this.txtY.Data = "txtY";
             this.txtY.Text = "";
             this.txtY.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.txtY);
+            this.winRegisters.Add(this.txtY);
             this.lblSP.Width = 1;
             this.lblSP.Height = 1;
             this.lblSP.X = 21;
@@ -296,7 +245,7 @@ namespace ButterflyCS.Monitor {
             this.lblSP.Data = "lblSP";
             this.lblSP.Text = "SP";
             this.lblSP.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.lblSP);
+            this.winRegisters.Add(this.lblSP);
             this.txtSP.Width = 2;
             this.txtSP.Height = 1;
             this.txtSP.X = 24;
@@ -305,7 +254,7 @@ namespace ButterflyCS.Monitor {
             this.txtSP.Data = "txtSP";
             this.txtSP.Text = "";
             this.txtSP.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.txtSP);
+            this.winRegisters.Add(this.txtSP);
             this.lblPC.Width = 3;
             this.lblPC.Height = 1;
             this.lblPC.X = 28;
@@ -313,7 +262,7 @@ namespace ButterflyCS.Monitor {
             this.lblPC.Data = "lblPC";
             this.lblPC.Text = "PC";
             this.lblPC.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.lblPC);
+            this.winRegisters.Add(this.lblPC);
             this.txtPC.Width = 4;
             this.txtPC.Height = 1;
             this.txtPC.X = 31;
@@ -322,7 +271,7 @@ namespace ButterflyCS.Monitor {
             this.txtPC.Data = "txtPC";
             this.txtPC.Text = "";
             this.txtPC.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.txtPC);
+            this.winRegisters.Add(this.txtPC);
             this.lblStatus.Width = 5;
             this.lblStatus.Height = 1;
             this.lblStatus.X = 4;
@@ -330,7 +279,7 @@ namespace ButterflyCS.Monitor {
             this.lblStatus.Data = "lblStatus";
             this.lblStatus.Text = "Status";
             this.lblStatus.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.lblStatus);
+            this.winRegisters.Add(this.lblStatus);
             this.txtStatus.Width = 8;
             this.txtStatus.Height = 1;
             this.txtStatus.X = 11;
@@ -339,7 +288,7 @@ namespace ButterflyCS.Monitor {
             this.txtStatus.Data = "txtStatus";
             this.txtStatus.Text = "";
             this.txtStatus.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.txtStatus);
+            this.winRegisters.Add(this.txtStatus);
             this.lblCycles.Width = 4;
             this.lblCycles.Height = 1;
             this.lblCycles.X = 21;
@@ -347,7 +296,7 @@ namespace ButterflyCS.Monitor {
             this.lblCycles.Data = "lblCycles";
             this.lblCycles.Text = "Cycles";
             this.lblCycles.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.lblCycles);
+            this.winRegisters.Add(this.lblCycles);
             this.txtCycles.Width = 4;
             this.txtCycles.Height = 1;
             this.txtCycles.X = 28;
@@ -356,7 +305,75 @@ namespace ButterflyCS.Monitor {
             this.txtCycles.Data = "txtCycles";
             this.txtCycles.Text = "";
             this.txtCycles.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.registersWindow.Add(this.txtCycles);
+            this.winRegisters.Add(this.txtCycles);
+            this.winControls.Width = 80;
+            this.winControls.Height = 4;
+            this.winControls.X = 0;
+            this.winControls.Y = 26;
+            this.winControls.Modal = true;
+            this.winControls.Data = "winControls";
+            this.winControls.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.winControls.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.winControls.Border.Effect3D = false;
+            this.winControls.Border.Effect3DBrush = null;
+            this.winControls.Border.DrawMarginFrame = true;
+            this.winControls.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.winControls.Title = "Controls";
+            this.Add(this.winControls);
+            this.btnRun.Width = 7;
+            this.btnRun.Height = 1;
+            this.btnRun.X = 0;
+            this.btnRun.Y = 0;
+            this.btnRun.Data = "btnRun";
+            this.btnRun.Text = "Run";
+            this.btnRun.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.btnRun.IsDefault = false;
+            this.winControls.Add(this.btnRun);
+            this.btnPause.Width = 9;
+            this.btnPause.Height = 1;
+            this.btnPause.X = 9;
+            this.btnPause.Y = 0;
+            this.btnPause.Data = "btnPause";
+            this.btnPause.Text = "Pause";
+            this.btnPause.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.btnPause.IsDefault = false;
+            this.winControls.Add(this.btnPause);
+            this.btnStep.Width = 8;
+            this.btnStep.Height = 1;
+            this.btnStep.X = 20;
+            this.btnStep.Y = 0;
+            this.btnStep.Data = "btnStep";
+            this.btnStep.Text = "Step";
+            this.btnStep.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.btnStep.IsDefault = false;
+            this.winControls.Add(this.btnStep);
+            this.btnReset.Width = 9;
+            this.btnReset.Height = 1;
+            this.btnReset.X = 30;
+            this.btnReset.Y = 0;
+            this.btnReset.Data = "btnReset";
+            this.btnReset.Text = "Reset";
+            this.btnReset.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.btnReset.IsDefault = false;
+            this.winControls.Add(this.btnReset);
+            this.btnLoad.Width = 8;
+            this.btnLoad.Height = 1;
+            this.btnLoad.X = 41;
+            this.btnLoad.Y = 0;
+            this.btnLoad.Data = "btnLoad";
+            this.btnLoad.Text = "Load";
+            this.btnLoad.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.btnLoad.IsDefault = false;
+            this.winControls.Add(this.btnLoad);
+            this.btnQuit.Width = 8;
+            this.btnQuit.Height = 1;
+            this.btnQuit.X = 50;
+            this.btnQuit.Y = 0;
+            this.btnQuit.Data = "btnQuit";
+            this.btnQuit.Text = "Quit";
+            this.btnQuit.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.btnQuit.IsDefault = false;
+            this.winControls.Add(this.btnQuit);
         }
     }
 }
