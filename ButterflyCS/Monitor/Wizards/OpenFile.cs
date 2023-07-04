@@ -9,8 +9,12 @@
 // -----------------------------------------------------------------------------
 namespace ButterflyCS.Monitor.Wizards {
     using Terminal.Gui;
-    
-    
+
+
+    /// <summary>
+    /// The open file wizard
+    /// </summary>
+    /// <seealso cref="Terminal.Gui.Window" />
     public partial class OpenFile {
         private string filePath = string.Empty; // The file path
         private ushort loadAddress = 0x0000; // The load address

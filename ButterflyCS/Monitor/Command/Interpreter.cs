@@ -33,9 +33,12 @@ namespace ButterflyCS.Monitor.Command
         /// Interprets the command.
         /// </summary>
         /// <param name="cmdArgs">The command + args.</param>
-        /// <returns>A string.</returns>
-        public static string? InterpretCommand(string cmdArgs)
+        /// <returns>A boolean value that tells the Monitor if it needs
+        /// to update the UI</returns>
+        public static bool InterpretCommand(string cmdArgs)
         {
+            bool needsReset = false;
+
             // Split the command into an array
             string[] args = cmdArgs.Split(' ');
 
@@ -63,17 +66,20 @@ namespace ButterflyCS.Monitor.Command
                 {
                     _commandRunning = true;
                     result = Control.ParseArgs(cmdArgs);
+                    needsReset = true;
                     _commandRunning = false;
                 } else if (cmd == "reg")
                 {
                     _commandRunning = true;
                     result = Reg.ParseArgs(cmdArgs);
+                    needsReset = true;
                     _commandRunning = false;
                 }
                 else if (cmd == "load")
                 {
                     _commandRunning = true;
                     result = Load.ParseArgs(cmdArgs);
+                    needsReset = true;
                     _commandRunning = false;
                 }
                 else if (cmd == "help")
@@ -97,7 +103,8 @@ namespace ButterflyCS.Monitor.Command
                 result = "A command is already running.";
             }
 
-            return result;
+            MonitorOutput.Add(result);
+            return needsReset;
         }
     }
 }
