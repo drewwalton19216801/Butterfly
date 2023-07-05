@@ -74,7 +74,7 @@ namespace Sharp6502
         {
             // Set the absolute address to the data at the program counter
             // and increment the program counter
-            CPU.addressAbsolute = Memory.Read(Registers.PC++);
+            CPU.addressAbsolute = CPU.Read(Registers.PC++);
             
             // Increment the program counter
             Registers.PC++;
@@ -95,7 +95,7 @@ namespace Sharp6502
         public static byte ZeroPageX()
         {
             // Set the absolute address to the data at the program counter + X
-            CPU.addressAbsolute = (ushort)(Memory.Read(Registers.PC++) + Registers.X);
+            CPU.addressAbsolute = (ushort)(CPU.Read(Registers.PC++) + Registers.X);
 
             // Increment the program counter
             Registers.PC++;
@@ -114,7 +114,7 @@ namespace Sharp6502
         public static byte ZeroPageY()
         {
             // Set the absolute address to the data at the program counter + Y
-            CPU.addressAbsolute = (ushort)(Memory.Read(Registers.PC++) + Registers.Y);
+            CPU.addressAbsolute = (ushort)(CPU.Read(Registers.PC++) + Registers.Y);
 
             // Increment the program counter
             Registers.PC++;
@@ -133,7 +133,7 @@ namespace Sharp6502
         public static byte Relative()
         {
             // Set the relative address to the data at the program counter
-            CPU.addressRelative = Memory.Read(Registers.PC++);
+            CPU.addressRelative = CPU.Read(Registers.PC++);
 
             // Increment the program counter
             Registers.PC++;
@@ -156,10 +156,10 @@ namespace Sharp6502
         public static byte Absolute()
         {
             // Get the low byte of the address, and increment the program counter
-            ushort lo = Memory.Read(Registers.PC++);
+            ushort lo = CPU.Read(Registers.PC++);
 
             // Get the high byte of the address
-            ushort hi = Memory.Read(Registers.PC++);
+            ushort hi = CPU.Read(Registers.PC++);
 
             // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
             CPU.addressAbsolute = (ushort)((hi << 8) | lo);
@@ -175,10 +175,10 @@ namespace Sharp6502
         public static byte AbsoluteX()
         {
             // Get the low byte of the address, and increment the program counter
-            ushort lo = Memory.Read(Registers.PC++);
+            ushort lo = CPU.Read(Registers.PC++);
 
             // Get the high byte of the address
-            ushort hi = Memory.Read(Registers.PC++);
+            ushort hi = CPU.Read(Registers.PC++);
 
             // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
             CPU.addressAbsolute = (ushort)((hi << 8) | lo);
@@ -201,10 +201,10 @@ namespace Sharp6502
         public static byte AbsoluteY()
         {
             // Get the low byte of the address, and increment the program counter
-            ushort lo = Memory.Read(Registers.PC++);
+            ushort lo = CPU.Read(Registers.PC++);
 
             // Get the high byte of the address
-            ushort hi = Memory.Read(Registers.PC++);
+            ushort hi = CPU.Read(Registers.PC++);
 
             // Set the absolute address to the high byte shifted left 8 bits OR'd with the low byte
             CPU.addressAbsolute = (ushort)((hi << 8) | lo);
@@ -227,9 +227,9 @@ namespace Sharp6502
         public static byte Indirect()
         {
             // Get the low byte of the address, and increment the program counter
-            ushort ptrLo = Memory.Read(Registers.PC++);
+            ushort ptrLo = CPU.Read(Registers.PC++);
             // Get the high byte of the address, and increment the program counter
-            ushort ptrHi = Memory.Read(Registers.PC++);
+            ushort ptrHi = CPU.Read(Registers.PC++);
 
             // Set the pointer address to the high byte shifted left 8 bits OR'd with the low byte
             ushort ptr = (ushort)((ptrHi << 8) | ptrLo);
@@ -240,10 +240,10 @@ namespace Sharp6502
             // Otherwise, we just get the high byte of the address from the pointer + 1.
             if (ptrLo == 0x00FF)
             {
-                CPU.addressAbsolute = (ushort)((Memory.Read((ushort)(ptr & 0xFF00)) << 8) | Memory.Read((ushort)(ptr + 0)));
+                CPU.addressAbsolute = (ushort)((CPU.Read((ushort)(ptr & 0xFF00)) << 8) | CPU.Read((ushort)(ptr + 0)));
             } else
             {
-                CPU.addressAbsolute = (ushort)((Memory.Read((ushort)(ptr + 1)) << 8) | Memory.Read((ushort)(ptr + 0)));
+                CPU.addressAbsolute = (ushort)((CPU.Read((ushort)(ptr + 1)) << 8) | CPU.Read((ushort)(ptr + 0)));
             }
 
             // This mode never uses an extra cycle
@@ -258,12 +258,12 @@ namespace Sharp6502
         public static byte IndirectX()
         {
             // Store the address of the pointer and increment the program counter
-            ushort ptr = Memory.Read(Registers.PC++);
+            ushort ptr = CPU.Read(Registers.PC++);
 
             // Get the low byte of the address
-            ushort lo = Memory.Read((ushort)((ptr + Registers.X) & 0x00FF));
+            ushort lo = CPU.Read((ushort)((ptr + Registers.X) & 0x00FF));
             // Get the high byte of the address
-            ushort hi = Memory.Read((ushort)((ptr + Registers.X + 1) & 0x00FF));
+            ushort hi = CPU.Read((ushort)((ptr + Registers.X + 1) & 0x00FF));
 
             // Set the indirect address to the high byte shifted left 8 bits OR'd with the low byte
             CPU.addressAbsolute = (ushort)((hi << 8) | lo);
@@ -279,12 +279,12 @@ namespace Sharp6502
         public static byte IndirectY()
         {
             // Store the address of the pointer and increment the program counter
-            ushort ptr = Memory.Read(Registers.PC++);
+            ushort ptr = CPU.Read(Registers.PC++);
 
             // Get the low byte of the address
-            ushort lo = Memory.Read((ushort)(ptr & 0x00FF));
+            ushort lo = CPU.Read((ushort)(ptr & 0x00FF));
             // Get the high byte of the address
-            ushort hi = Memory.Read((ushort)((ptr + 1) & 0x00FF));
+            ushort hi = CPU.Read((ushort)((ptr + 1) & 0x00FF));
 
             // Set the indirect address to the high byte shifted left 8 bits OR'd with the low byte
             CPU.addressAbsolute = (ushort)((hi << 8) | lo);
