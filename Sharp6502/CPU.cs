@@ -161,11 +161,8 @@
                 // Set the CPU state to fetching
                 cpuState = ExecutionState.Fetching;
 
-                /*
-                 * Read the next instruction opcode from memory. We can then use
-                 * this value to look up the instruction definition.
-                 */
-                opcode = Read(Registers.PC);
+                // Fetch the next instruction
+                opcode = Read(Registers.PC++);
 
                 // Always set the unused flag to 1.
                 Registers.SetFlag(CPUFlags.Unused, true);
@@ -181,9 +178,6 @@
 
                 // Update the current disassembly
                 currentDisassembly = Disassemble(CurrentInstruction);
-
-                // Increment the program counter
-                Registers.PC++;
 
                 // Run the addressing mode method and get the number of additional cycles required
                 byte addressingUsedExtraCycle = AddressingModes.GetAddress(CurrentInstruction.AddressingMode);
@@ -526,53 +520,80 @@
             ushort operand;
             string operandString = string.Empty;
 
-            // Get the string representation of the operand.
+            // Get the string representation of the instruction and its operand.
             switch (addressingMode)
             {
+                case "Implied":
+                    {
+                        operandString = string.Empty;
+                        break;
+                    }
                 case "Immediate":
-                    operand = Read((ushort)(Registers.PC + 1));
-                    operandString = $"#${operand:X2}";
-                    break;
+                    {
+                        operand = Read((ushort)(Registers.PC));
+                        operandString = $" #{operand:X2}";
+                        break;
+                    }
                 case "ZeroPage":
-                    operand = Read((ushort)(Registers.PC + 1));
-                    operandString = $"${operand:X2}";
-                    break;
+                    {
+                        operand = Read((ushort)(Registers.PC));
+                        operandString = $" ${operand:X2}";
+                        break;
+                    }
                 case "ZeroPageX":
-                    operand = Read((ushort)(Registers.PC + 1));
-                    operandString = $"${operand:X2},X";
-                    break;
+                    {
+                        operand = Read((ushort)(Registers.PC));
+                        operandString = $" ${operand:X2},X";
+                        break;
+                    }
                 case "ZeroPageY":
-                    operand = Read((ushort)(Registers.PC + 1));
-                    operandString = $"${operand:X2},Y";
-                    break;
-                case "Absolute":
-                    operand = ReadWord((ushort)(Registers.PC + 1));
-                    operandString = $"${operand:X4}";
-                    break;
-                case "AbsoluteX":
-                    operand = ReadWord((ushort)(Registers.PC + 1));
-                    operandString = $"${operand:X4},X";
-                    break;
-                case "AbsoluteY":
-                    operand = ReadWord((ushort)(Registers.PC + 1));
-                    operandString = $"${operand:X4},Y";
-                    break;
-                case "Indirect":
-                    operand = ReadWord((ushort)(Registers.PC + 1));
-                    operandString = $"(${operand:X4})";
-                    break;
-                case "IndirectX":
-                    operand = Read((ushort)(Registers.PC + 1));
-                    operandString = $"(${operand:X2},X)";
-                    break;
-                case "IndirectY":
-                    operand = Read((ushort)(Registers.PC + 1));
-                    operandString = $"(${operand:X2}),Y";
-                    break;
+                    {
+                        operand = Read((ushort)(Registers.PC));
+                        operandString = $" ${operand:X2},Y";
+                        break;
+                    }
                 case "Relative":
-                    operand = Read((ushort)(Registers.PC + 1));
-                    operandString = $"${operand:X2}";
-                    break;
+                    {
+                        operand = Read((ushort)(Registers.PC));
+                        operandString = $" ${operand:X2}";
+                        break;
+                    }
+                case "Absolute":
+                    {
+                        operand = ReadWord((ushort)(Registers.PC));
+                        operandString = $" ${operand:X4}";
+                        break;
+                    }
+                case "AbsoluteX":
+                    {
+                        operand = ReadWord((ushort)(Registers.PC));
+                        operandString = $" ${operand:X4},X";
+                        break;
+                    }
+                case "AbsoluteY":
+                    {
+                        operand = ReadWord((ushort)(Registers.PC));
+                        operandString = $" ${operand:X4},Y";
+                        break;
+                    }
+                case "Indirect":
+                    {
+                        operand = ReadWord((ushort)(Registers.PC));
+                        operandString = $" (${operand:X4})";
+                        break;
+                    }
+                case "IndirectX":
+                    {
+                        operand = Read((ushort)(Registers.PC));
+                        operandString = $" (${operand:X2},X)";
+                        break;
+                    }
+                case "IndirectY":
+                    {
+                        operand = Read((ushort)(Registers.PC));
+                        operandString = $" (${operand:X2}),Y";
+                        break;
+                    }
             }
 
             // Return the disassembled instruction.

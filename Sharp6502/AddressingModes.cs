@@ -75,9 +75,6 @@ namespace Sharp6502
             // Set the absolute address to the data at the program counter
             // and increment the program counter
             CPU.addressAbsolute = CPU.Read(Registers.PC++);
-            
-            // Increment the program counter
-            Registers.PC++;
 
             // The zero page addressing mode only uses the first byte of the
             // address, so we need to mask the address to 0x00FF to get the
@@ -97,9 +94,6 @@ namespace Sharp6502
             // Set the absolute address to the data at the program counter + X
             CPU.addressAbsolute = (ushort)(CPU.Read(Registers.PC++) + Registers.X);
 
-            // Increment the program counter
-            Registers.PC++;
-
             // The zero page addressing mode only uses the first byte of the
             // address, so we need to mask the address to 0x00FF to get the
             // correct address.
@@ -116,9 +110,6 @@ namespace Sharp6502
             // Set the absolute address to the data at the program counter + Y
             CPU.addressAbsolute = (ushort)(CPU.Read(Registers.PC++) + Registers.Y);
 
-            // Increment the program counter
-            Registers.PC++;
-
             // The zero page addressing mode only uses the first byte of the
             // address, so we need to mask the address to 0x00FF to get the
             // correct address.
@@ -134,9 +125,6 @@ namespace Sharp6502
         {
             // Set the relative address to the data at the program counter
             CPU.addressRelative = CPU.Read(Registers.PC++);
-
-            // Increment the program counter
-            Registers.PC++;
 
             // If the relative address is negative, we need to sign extend it
             // to get the correct address.
