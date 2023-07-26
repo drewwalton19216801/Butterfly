@@ -298,6 +298,7 @@ namespace ButterflyCS.GUI
             ushort regPC = 0;
             string currentDisassembly = string.Empty;
             byte mem6000 = 0;
+            byte mem6001 = 0;
             byte mem6002 = 0;
             string variantString = string.Empty;
 
@@ -310,8 +311,9 @@ namespace ButterflyCS.GUI
                 regSP = Registers.SP;
                 regPC = Registers.PC;
                 currentDisassembly = CPU.currentDisassembly;
-                mem6000 = Memory.Read(0x6000, true);
-                mem6002 = Memory.Read(0x6002, true);
+                mem6000 = CPU.Read(0x6000);
+                mem6001 = CPU.Read(0x6001);
+                mem6002 = CPU.Read(0x6002);
                 variantString = CPU.cpuVariant switch
                 {
                     CPU.Variant.NMOS_6502 => "NMOS 6502",
@@ -359,14 +361,11 @@ namespace ButterflyCS.GUI
             // Draw the single-stepping state
             Raylib.DrawText($"Single-Stepping: {Machine.isSingleStepping}", 10, 270, 20, Raylib.BLACK);
 
-            // Draw the memory at address 0x6000
-            Raylib.DrawText($"Memory at 0x6000: {mem6000:X2}", 10, 290, 20, Raylib.BLACK);
-
-            // Draw the memory at address 0x6000
-            Raylib.DrawText($"Memory at 0x6002: {mem6002:X2}", 10, 310, 20, Raylib.BLACK);
+            // Draw the memory at address 0x6000-0x6002
+            Raylib.DrawText($"0x6000: {mem6000:X2} | 0x6001: {mem6001:X2} | 0x6002: {mem6002:X2}", 10, 290, 20, Raylib.BLACK);
 
             // Draw the CPU variant
-            Raylib.DrawText($"CPU Variant: {variantString}", 10, 330, 20, Raylib.BLACK);
+            Raylib.DrawText($"CPU Variant: {variantString}", 10, 310, 20, Raylib.BLACK);
 
             // Get the current gamepad button being pressed
             GamepadButton currentButton = (GamepadButton)Raylib.GetGamepadButtonPressed();
@@ -394,7 +393,7 @@ namespace ButterflyCS.GUI
             };
 
             // Draw the current gamepad button being pressed
-            Raylib.DrawText($"Gamepad Button: {buttonString}", 10, 350, 20, Raylib.BLACK);
+            Raylib.DrawText($"Gamepad Button: {buttonString}", 10, 330, 20, Raylib.BLACK);
         }
 
         /// <summary>

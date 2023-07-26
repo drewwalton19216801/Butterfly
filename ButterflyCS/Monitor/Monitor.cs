@@ -13,6 +13,9 @@ namespace ButterflyCS.Monitor {
     using Sharp6502;
     using Terminal.Gui;
 
+    /// <summary>
+    /// The main monitor window.
+    /// </summary>
     public partial class MonitorWindow {
         private string previousCommand = string.Empty; // The previous command
 
